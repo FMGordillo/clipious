@@ -39,8 +39,8 @@ mixin _$VideoPlayerState {
         (other.runtimeType == runtimeType &&
             other is VideoPlayerState &&
             (identical(other.colors, colors) || other.colors == colors) &&
-            (identical(other.overFlowTextColor, overFlowTextColor) ||
-                other.overFlowTextColor == overFlowTextColor) &&
+            const DeepCollectionEquality()
+                .equals(other.overFlowTextColor, overFlowTextColor) &&
             (identical(other.key, key) || other.key == key) &&
             (identical(other.startAt, startAt) || other.startAt == startAt) &&
             (identical(other.selectedNonDashTrack, selectedNonDashTrack) ||
@@ -59,7 +59,7 @@ mixin _$VideoPlayerState {
   int get hashCode => Object.hash(
       runtimeType,
       colors,
-      overFlowTextColor,
+      const DeepCollectionEquality().hash(overFlowTextColor),
       key,
       startAt,
       selectedNonDashTrack,
@@ -111,7 +111,7 @@ class _$VideoPlayerStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? colors = null,
-    Object? overFlowTextColor = null,
+    Object? overFlowTextColor = freezed,
     Object? key = null,
     Object? startAt = freezed,
     Object? selectedNonDashTrack = null,
@@ -126,7 +126,7 @@ class _$VideoPlayerStateCopyWithImpl<$Res>
           ? _self.colors
           : colors // ignore: cast_nullable_to_non_nullable
               as ColorScheme,
-      overFlowTextColor: null == overFlowTextColor
+      overFlowTextColor: freezed == overFlowTextColor
           ? _self.overFlowTextColor
           : overFlowTextColor // ignore: cast_nullable_to_non_nullable
               as Color,
@@ -463,8 +463,8 @@ class _VideoPlayerState extends VideoPlayerState {
         (other.runtimeType == runtimeType &&
             other is _VideoPlayerState &&
             (identical(other.colors, colors) || other.colors == colors) &&
-            (identical(other.overFlowTextColor, overFlowTextColor) ||
-                other.overFlowTextColor == overFlowTextColor) &&
+            const DeepCollectionEquality()
+                .equals(other.overFlowTextColor, overFlowTextColor) &&
             (identical(other.key, key) || other.key == key) &&
             (identical(other.startAt, startAt) || other.startAt == startAt) &&
             (identical(other.selectedNonDashTrack, selectedNonDashTrack) ||
@@ -483,7 +483,7 @@ class _VideoPlayerState extends VideoPlayerState {
   int get hashCode => Object.hash(
       runtimeType,
       colors,
-      overFlowTextColor,
+      const DeepCollectionEquality().hash(overFlowTextColor),
       key,
       startAt,
       selectedNonDashTrack,
@@ -539,7 +539,7 @@ class __$VideoPlayerStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? colors = null,
-    Object? overFlowTextColor = null,
+    Object? overFlowTextColor = freezed,
     Object? key = null,
     Object? startAt = freezed,
     Object? selectedNonDashTrack = null,
@@ -554,7 +554,7 @@ class __$VideoPlayerStateCopyWithImpl<$Res>
           ? _self.colors
           : colors // ignore: cast_nullable_to_non_nullable
               as ColorScheme,
-      overFlowTextColor: null == overFlowTextColor
+      overFlowTextColor: freezed == overFlowTextColor
           ? _self.overFlowTextColor
           : overFlowTextColor // ignore: cast_nullable_to_non_nullable
               as Color,

@@ -96,17 +96,23 @@ class VideoList<T extends IdedVideo> extends StatelessWidget {
                                 !small && state.itemList.hasRefresh()
                                     ? await cubit.refreshItems()
                                     : Future.delayed(Duration.zero),
-                            child: GridView.count(
-                              crossAxisCount: gridCount,
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: gridCount,
+                                crossAxisSpacing: small ? 8 : 5,
+                                mainAxisSpacing: small ? 8 : 5,
+                                childAspectRatio: small
+                                    ? smallVideoAspectRatio
+                                    : getGridAspectRatio(context),
+                              ),
                               controller: cubit.scrollController,
                               scrollDirection: scrollDirection,
-                              crossAxisSpacing: small ? 8 : 5,
-                              mainAxisSpacing: small ? 8 : 5,
-                              childAspectRatio: small
-                                  ? smallVideoAspectRatio
-                                  : getGridAspectRatio(context),
-                              children: [
-                                ...items.map((v) {
+                              itemCount: items.length +
+                                  (state.loading ? 5 * gridCount : 0),
+                              itemBuilder: (context, index) {
+                                if (index < items.length) {
+                                  final v = items[index];
                                   Video? onlineVideo;
                                   DownloadedVideo? offlineVideo;
 
@@ -130,14 +136,10 @@ class VideoList<T extends IdedVideo> extends StatelessWidget {
                                     allowModalSheet: allowModalSheet,
                                     openVideoOverride: openVideoOverride,
                                   );
-                                }),
-                                if (state.loading)
-                                  ...repeatWidget(
-                                      () => VideoListItemPlaceHolder(
-                                            small: small,
-                                          ),
-                                      count: 5 * gridCount)
-                              ],
+                                } else {
+                                  return VideoListItemPlaceHolder(small: small);
+                                }
+                              },
                             ),
                           ),
                         )

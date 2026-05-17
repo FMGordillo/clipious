@@ -244,9 +244,13 @@ class VideoFilter {
     }
   }
 
+  // Lazily compiled regex, cached for the lifetime of this filter instance.
+  RegExp? _compiledRegex;
+  RegExp get _regex =>
+      _compiledRegex ??= RegExp(value ?? '', caseSensitive: false);
+
   bool filterVideoStringOperation(String stringToCompare) {
-    var contains =
-        stringToCompare.contains(RegExp(value ?? '', caseSensitive: false));
+    var contains = stringToCompare.contains(_regex);
     log.fine(
         'String compare: "$stringToCompare" ${operation?.name} "$value", contains ? $contains');
     switch (operation) {

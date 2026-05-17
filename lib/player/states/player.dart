@@ -49,6 +49,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   final SettingsCubit settings;
   late final AudioSession audioSession;
 
+  /// Session-level cache: videoId → sponsor segments (avoids repeated HTTP calls on back/forward).
+  final Map<String, List<Pair<int>>> _sponsorSegmentsCache = {};
+
   PlayerCubit(super.initialState, this.settings) {
     onReady();
   }
@@ -578,6 +581,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         } else {
           v = await service.getVideo(video.videoId);
         }
+        if (isClosed) return;
         currentlyPlaying = v;
         mediaCommand = MediaCommand(MediaCommandType.switchVideo,
             value: SwitchVideoValue(video: v, startAt: startAt));
@@ -597,6 +601,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
       await setSponsorBlock();
 
+      if (isClosed) return;
       if (!isTv) {
         mediaHandler.skipToQueueItem(currentIndex);
       }
@@ -767,24 +772,37 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   Future<void> setSponsorBlock() async {
     List<Pair<int>> newSegments = [];
     if (state.currentlyPlaying != null) {
-      List<SponsorSegmentType> types = SponsorSegmentType.values
-          .where((e) => db.getSettings(e.settingsName())?.value == 'true')
-          .toList();
+      final videoId = state.currentlyPlaying!.videoId;
 
-      if (types.isNotEmpty) {
-        List<SponsorSegment> sponsorSegments = await service.getSponsorSegments(
-            state.currentlyPlaying!.videoId, types);
-        List<Pair<int>> segments = List.from(sponsorSegments.map((e) {
-          Duration start = Duration(seconds: e.segment[0].floor());
-          Duration end = Duration(seconds: e.segment[1].floor());
-          Pair<int> segment = Pair(start.inMilliseconds, end.inMilliseconds);
-          return segment;
-        }));
+      if (_sponsorSegmentsCache.containsKey(videoId)) {
+        newSegments = _sponsorSegmentsCache[videoId]!;
+        log.fine(
+            'sponsor block cache hit for $videoId (${newSegments.length} segments)');
+      } else {
+        List<SponsorSegmentType> types = SponsorSegmentType.values
+            .where((e) => db.getSettings(e.settingsName())?.value == 'true')
+            .toList();
 
-        newSegments = segments;
-        log.fine('we found ${segments.length} segments to skip');
+        if (types.isNotEmpty) {
+          List<SponsorSegment> sponsorSegments =
+              await service.getSponsorSegments(videoId, types);
+          if (isClosed) return;
+          List<Pair<int>> segments = List.from(sponsorSegments.map((e) {
+            Duration start = Duration(seconds: e.segment[0].floor());
+            Duration end = Duration(seconds: e.segment[1].floor());
+            Pair<int> segment = Pair(start.inMilliseconds, end.inMilliseconds);
+            return segment;
+          }));
+
+          newSegments = segments;
+          _sponsorSegmentsCache[videoId] = segments;
+          log.fine('we found ${segments.length} segments to skip');
+        } else {
+          _sponsorSegmentsCache[videoId] = [];
+        }
       }
     }
+    if (isClosed) return;
     emit(state.copyWith(sponsorSegments: newSegments));
   }
 

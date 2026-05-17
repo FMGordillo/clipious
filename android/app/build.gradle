@@ -25,9 +25,6 @@ if (flutterVersionName == null) {
 }
 
 def keyFile = ENV['ANDROID_KEY_FILE']
-if (keyFile == null) {
-    keyFile = '/home/gz/dev/android/keys/key.properties'
-}
 
 def buildNumber = flutterVersionCode.toInteger()
 /*
@@ -54,7 +51,9 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 36
+    compileSdkVersion 34
+    buildToolsVersion "35.0.0"
+    ndkVersion flutter.ndkVersion
 
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
@@ -64,12 +63,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 21
-        targetCompatibility 21
+        sourceCompatibility 17
+        targetCompatibility 17
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "17"
     }
 
     lintOptions {
@@ -83,7 +82,7 @@ android {
     defaultConfig {
         applicationId "com.github.lamarios.clipious"
         minSdkVersion 24
-        targetSdkVersion 36
+        targetSdkVersion 34
         versionCode buildNumber
         versionName flutterVersionName
     }
@@ -109,6 +108,18 @@ android {
 
 flutter {
     source '../..'
+}
+
+// work-runtime 2.10.0+ requires compileSdk 35, which triggers an aapt2
+// incompatibility with the Nix-provided android-35 platform jar (the nixpkgs
+// build-tools 35.0.0 aapt2 binary cannot parse android-35's resource table
+// in AGP's link mode). Pin to 2.9.1 — the last release requiring compileSdk 34 —
+// until nixpkgs ships a fixed aapt2. See TODO-UPGRADE.md for removal steps.
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.work:work-runtime:2.9.1'
+        force 'androidx.work:work-runtime-ktx:2.9.1'
+    }
 }
 
 /*

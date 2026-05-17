@@ -92,39 +92,67 @@ For TV users it is recommended to use [Accrescent](https://accrescent.app) as it
 
 ### Code
 
-To get started, you'll need to create a fork of the repo and might run:
-```
-git submodule init
-git submodule update
-#enable git pre commit hooks for auto formatting
-./submodules/flutter/bin/dart run tools/setup_git_hooks.dart
-```
-or using nix that will handle all the above plus starting a working invidious instance with user test and password test.
-```
-nix-shell
-```
-Flutter itself is used as a submodule of this repo in order to pin the version I want to use to enable reproducible build on f-droid
+The project uses [devenv](https://devenv.sh) (Nix-based) to provide a fully reproducible environment including the Android SDK, Flutter, PostgreSQL, and a local Invidious instance.
 
-You'll need to also set up your android SDK and a device / emulator to run the app on.
+#### 1. Enter the dev environment
 
-#### Tests
-
-The app has some tests and they expect to have a locally running invidious server, with a test user (password test).
-
-The easy way it to use [nix](https://nixos.org) and run 
-
-```
-nix-shell
+```bash
+devenv shell
 ```
 
-That will spin a postgres DB, an invidious server and the required user (this is how the tests are run in the ci/cd).
+This gives you the correct Flutter (pinned as a git submodule), Android SDK, `adb`, and all required tools.
 
-Nothing keeps you to run your own user docker or other ways.
+#### 2. One-time setup
 
-Alternatively, you can directly run the tests with its environment:
+Run once after cloning (initialises submodules, configures the Flutter JDK, installs the pre-commit formatting hook):
+
+```bash
+setup
 ```
-nix-shell --run './submodules/flutter/bin/flutter test'
+
+#### 3. Start the local Invidious backend
+
+Tests rely on a locally running Invidious server with a seeded test user. Start it with:
+
+```bash
+devenv up
 ```
+
+This spins up PostgreSQL on port 5433, runs the Invidious migrations, and seeds a test account (username `test`, password `test`). This is how tests are run in CI.
+
+#### 4. Run the tests
+
+```bash
+flutter test
+```
+
+#### 5. Run on a device
+
+Enable *Developer Options → USB Debugging* on your Android device, connect it via USB, then:
+
+```bash
+# Verify the device is visible
+adb devices
+
+# Build and run with hot-reload
+flutter run
+
+# Or build a profile APK and install manually
+flutter build apk --profile --split-per-abi
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-profile.apk
+```
+
+Use `--profile` rather than `--debug` when testing media playback — the native video/audio layers behave closer to a release build.
+
+#### Available scripts
+
+| Script | Description |
+|---|---|
+| `setup` | One-time setup (submodules, JDK config, git hooks) |
+| `build-runner` | Run code generation once (`freezed`, `auto_route`, `json_serializable`) |
+| `build-runner-watch` | Watch mode for code generation |
+
+Flutter is included as a git submodule to pin the exact version used by F-Droid for reproducible builds. The `setup` script adds `./submodules/flutter/bin` to your `PATH` so plain `flutter` and `dart` commands use the pinned version.
 
 ### Translations
 

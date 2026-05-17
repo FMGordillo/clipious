@@ -17,6 +17,19 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(':app')
 }
+// Force all plugin library projects to use SDK versions available in the Nix store.
+// The Nix-provided SDK only has platforms android-32/34/36 and build-tools 30/33/35.
+// Plugin build.gradle files may declare older compileSdk/buildToolsVersion that are
+// not present; upgrading them here is safe because Android SDK platforms are
+// backward-compatible for compilation purposes.
+// gradle.afterProject fires after each project's build script finishes (including
+// the project's own compileSdk assignments), so our values reliably win.
+gradle.afterProject { project ->
+    if (project.pluginManager.hasPlugin('com.android.library')) {
+        project.android.compileSdkVersion 34
+        project.android.buildToolsVersion "35.0.0"
+    }
+}
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir

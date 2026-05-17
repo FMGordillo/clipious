@@ -5,7 +5,7 @@ import 'package:clipious/utils/states/thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class Thumbnail extends StatelessWidget {
+class Thumbnail extends StatefulWidget {
   final Widget? child;
   final double? height;
   final double? width;
@@ -22,25 +22,35 @@ class Thumbnail extends StatelessWidget {
       this.height});
 
   @override
+  State<Thumbnail> createState() => _ThumbnailState();
+}
+
+class _ThumbnailState extends State<Thumbnail> {
+  // Cache the Future so it is not recreated on every rebuild.
+  late final Future<Server> _serverFuture = db.getCurrentlySelectedServer();
+
+  @override
   Widget build(BuildContext context) {
     ColorScheme colors = Theme.of(context).colorScheme;
-    return FutureBuilder<Server?>(
-        future: db.getCurrentlySelectedServer(),
+    return FutureBuilder<Server>(
+        future: _serverFuture,
         builder: (context, server) {
           return !server.hasData || server.data == null
               ? Container(
-                  decoration: decoration,
-                  width: width,
-                  height: height,
-                  child: child)
+                  decoration: widget.decoration,
+                  width: widget.width,
+                  height: widget.height,
+                  child: widget.child)
               : BlocProvider(
-                  create: (context) =>
-                      ThumbnailCubit(ThumbnailState(urls: thumbnails ?? [])),
+                  create: (context) => ThumbnailCubit(
+                      ThumbnailState(urls: widget.thumbnails ?? [])),
                   child: BlocBuilder<ThumbnailCubit, ThumbnailState>(
                       builder: (context, state) {
                     if (state.selected == null) {
                       return _ErrorWidget(
-                          decoration: decoration, width: width, height: height);
+                          decoration: widget.decoration,
+                          width: widget.width,
+                          height: widget.height);
                     } else {
                       final cubit = context.read<ThumbnailCubit>();
 
@@ -55,32 +65,32 @@ class Thumbnail extends StatelessWidget {
                         errorListener: (value) => cubit.onThumbnailFailed(),
                         imageBuilder: (context, imageProvider) =>
                             AnimatedContainer(
-                          height: height,
-                          width: width,
-                          decoration: decoration.copyWith(
+                          height: widget.height,
+                          width: widget.width,
+                          decoration: widget.decoration.copyWith(
                               image: DecorationImage(
                                   image: imageProvider, fit: BoxFit.cover)),
                           // duration: animationDuration,
                           duration: animationDuration ~/ 2,
                           curve: Curves.easeInOutQuad,
-                          child: child,
+                          child: widget.child,
                         ),
                         imageUrl: url,
                         placeholderFadeInDuration: animationDuration,
                         fadeInDuration: animationDuration,
                         fadeOutDuration: animationDuration,
                         errorWidget: (context, url, error) => _ErrorWidget(
-                          decoration: decoration,
-                          width: width,
-                          height: height,
+                          decoration: widget.decoration,
+                          width: widget.width,
+                          height: widget.height,
                         ),
                         progressIndicatorBuilder: (context, url, progress) =>
                             Container(
-                          height: height,
-                          width: width,
+                          height: widget.height,
+                          width: widget.width,
                           alignment: Alignment.center,
-                          decoration: decoration.copyWith(
-                              color: colors.secondaryContainer),
+                          decoration: widget.decoration
+                              .copyWith(color: colors.secondaryContainer),
                           // duration: animationDuration,
                           child: const SizedBox(
                               height: 20,
