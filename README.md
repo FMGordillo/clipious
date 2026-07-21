@@ -100,11 +100,11 @@ The project uses [devenv](https://devenv.sh) (Nix-based) to provide a fully repr
 devenv shell
 ```
 
-This gives you the correct Flutter (pinned as a git submodule), Android SDK, `adb`, and all required tools.
+This gives you the correct Flutter, Android SDK, `adb`, and all required tools.
 
 #### 2. One-time setup
 
-Run once after cloning (initialises submodules, configures the Flutter JDK, installs the pre-commit formatting hook):
+Run once after cloning (configures the Flutter JDK, installs the pre-commit formatting hook):
 
 ```bash
 setup
@@ -148,11 +148,9 @@ Use `--profile` rather than `--debug` when testing media playback — the native
 
 | Script | Description |
 |---|---|
-| `setup` | One-time setup (submodules, JDK config, git hooks) |
+| `setup` | One-time setup |
 | `build-runner` | Run code generation once (`freezed`, `auto_route`, `json_serializable`) |
 | `build-runner-watch` | Watch mode for code generation |
-
-Flutter is included as a git submodule to pin the exact version used by F-Droid for reproducible builds. The `setup` script adds `./submodules/flutter/bin` to your `PATH` so plain `flutter` and `dart` commands use the pinned version.
 
 ### Translations
 

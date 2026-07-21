@@ -157,15 +157,11 @@
     };
   };
 
-  # One-time setup: init submodules, configure flutter JDK, install git hooks.
+  # One-time setup: configure flutter JDK, install git hooks.
   # Separated from enterShell so blocking network/IO operations don't interfere
   # with the interactive terminal.
   scripts.setup = {
     exec = ''
-      echo "Setting up submodules"
-      git submodule init
-      git submodule update
-
       echo "Configuring Flutter JDK"
       flutter config --jdk-dir ${pkgs.jdk21}/lib/openjdk
 
@@ -174,14 +170,11 @@
 
       echo "Done — run 'devenv up' to start PostgreSQL and Invidious."
     '';
-    description = "One-time project setup (submodules, flutter JDK, git hooks)";
+    description = "One-time project setup (flutter JDK, git hooks)";
   };
 
   # Shell hook — only fast, non-blocking, non-interactive operations
   enterShell = ''
-    # Prefer the pinned Flutter submodule over the nixpkgs one
-    export PATH="$DEVENV_ROOT/submodules/flutter/bin:$PATH"
-
     # Set up writable Android SDK and Gradle directories for Nix compatibility
     export ANDROID_SDK_ROOT="$DEVENV_ROOT/.devenv/android-sdk"
     export ANDROID_NDK_HOME="$DEVENV_ROOT/.devenv/android-sdk/ndk-bundle"

@@ -5,17 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Dev environment (nix-based, pins Flutter submodule)
-nix-shell
-
-# Initialize submodules (Flutter is a git submodule)
-git submodule init && git submodule update
+# Dev environment
+devenv shell
 
 # Run tests
-./submodules/flutter/bin/flutter test
+flutter test
 
 # Run a single test file
-./submodules/flutter/bin/flutter test test/path/to/test_file.dart
+flutter test test/path/to/test_file.dart
 
 # Format (CI enforces this)
 dart format ./lib
@@ -29,7 +26,7 @@ make build-runner
 make build-runner-watch
 
 # Build APK
-./submodules/flutter/bin/flutter build apk --profile --split-per-abi
+flutter build apk --profile --split-per-abi
 ```
 
 ## Architecture
@@ -73,7 +70,7 @@ Initialized before the router in `main()`. Global instance at `lib/globals.dart`
 ### Media Playback
 
 - `just_audio` — audio-only playback
-- `river_player` (custom git dependency in `submodules/`) — video
+- `river_player` — video
 - `audio_service` + `workmanager` — background playback
 - `ffmpeg_kit_flutter_new_full` — download/transcoding
 

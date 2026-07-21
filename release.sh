@@ -3,7 +3,7 @@
 #  release.sh – build, tag and publish Clipious to GitHub Releases
 #
 #  Prerequisites
-#  • Flutter (provided via submodule or system)
+#  • Flutter
 #  • make  (homedir /home/fmgordillo/clipious)
 #  • github CLI (gh) – selfsigned installs:  sudo apt install gh
 #  • Android keystore – a file *android/key.properties* (see below)
