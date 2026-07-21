@@ -1,7 +1,7 @@
 ext {
     sourceCompatibility = 21
 }// kotlin 1.7.10
-// graddle 7.2.2
+// gradle 8.14.0
 
 allprojects {
     repositories {
