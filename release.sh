@@ -5,7 +5,7 @@
 #  Prerequisites
 #  • Flutter
 #  • make  (homedir /home/fmgordillo/clipious)
-# • codeberg CLI (berg) – selfsigned installs:  sudo apt install berg
+#  • codeberg CLI (berg)
 #  • Android keystore – a file *android/key.properties* (see below)
 #
 #  Usage
