@@ -13,6 +13,8 @@
   android.buildTools.version = ["33.0.2" "35.0.0"];
   android.flutter.enable = true;
 
+  languages.dart.enable = true;
+
   # Additional packages from shell.nix
   packages = [
     pkgs.gh

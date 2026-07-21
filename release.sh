@@ -14,10 +14,11 @@
 #  The script
 #    1. runs the code‑generator
 #    2. builds signed release APKs for mobile and TV
-#    3. extracts the project version from pubspec.yaml
-#    4. creates and pushes a git tag with the same version
-#    5. creates a draft GitHub release and uploads the two APKs
-#    6. (optional) automatically closes the release when uploading is finished
+#    3. collects all APK files and generates SHA1 checksums
+#    4. extracts the project version from pubspec.yaml
+#    5. creates and pushes a git tag with the same version
+#    6. creates a draft GitHub release and uploads all APKs and checksums
+#    7. (optional) automatically closes the release when uploading is finished
 #
 #  Example:   ./release.sh
 
@@ -28,16 +29,39 @@ echo "Running build_runner to generate code..."
 make build-runner
 
 # ---------- 2. Build release APKs --------------------------------------
+# Build signed Android (mobile) release
 echo "Building signed Android (mobile) release..."
 make android-prod   # creates build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
+# Build signed Android (TV) release
 echo "Building signed Android (TV) release..."
 make tv-prod        # creates build/app/outputs/flutter-apk/app-release.apk
 
-# ---------- 3 uploaded artifacts --------------------------------------
-APK_MOBILE="build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
-APK_TV="build/app/outputs/flutter-apk/appish-release.apk"
-# If tv-prod outputs a different filename, adjust accordingly.
+# ---------- 3. Collect all APK files and generate SHA1 checksums -----------------------
+echo "Collecting APK files and generating SHA1 checksums..."
+BUILD_DIR="build/app/outputs/flutter-apk"
+
+# Find all APK files and extract base names (without extension)
+APK_FILES=()
+SHA1_FILES=()
+
+for apk_file in "$BUILD_DIR"/*.apk; do
+    if [ -f "$apk_file" ]; then
+        apk_name=$(basename "$apk_file")
+        apk_base="${apk_name%.apk}"
+        sha1_file="$apk_base.sha1"
+
+        # Generate SHA1 checksum
+        sha1sum "$apk_file" | cut -d' ' -f1 > "$BUILD_DIR/$sha1_file"
+
+        echo "  Generated checksum for $apk_name"
+
+        APK_FILES+=("$apk_file")
+        SHA1_FILES+=("$BUILD_DIR/$sha1_file")
+    fi
+done
+
+echo "Found ${#APK_FILES[@]} APK files to upload"
 
 # ---------- 4. Determine current version from pubspec.yaml ---------------
 VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'"' -f2)
@@ -54,10 +78,10 @@ gh release create "$TAG" \
     --title "Clipious ${VERSION}" \
     --notes "Automated release of Clipious ${VERSION}" \
     --draft \
-    "$APK_MOBILE" \
-    "$APK_TV"
+    "${APK_FILES[@]}" \
+    "${SHA1_FILES[@]}"
 
 echo "Release $TAG created in draft mode. Uploading binaries..."
-gh release upload "$TAG" "$APK_MOBILE" "$APK_TV"
+gh release upload "$TAG" "${APK_FILES[@]}" "${SHA1_FILES[@]}"
 
 echo "All done. Remember to publish the release from the GitHub UI."
