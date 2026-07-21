@@ -73,15 +73,4 @@ git tag -a "$TAG" -m "Release ${VERSION}"
 git push origin "$TAG"
 
 # ---------- 6. Create/draft Codeberg release --------------------------------
-echo "Creating Codeberg release $TAG..."
-berg release create "$TAG" \
-    --title "Clipious ${VERSION}" \
-    --notes "Automated release of Clipious ${VERSION}" \
-    --draft \
-    "${APK_FILES[@]}" \
-    "${SHA1_FILES[@]}"
-
-echo "Release $TAG created in draft mode. Uploading binaries..."
-berg release upload "$TAG" "${APK_FILES[@]}" "${SHA1_FILES[@]}"
-
 echo "All done. Remember to publish the release from the Codeberg UI."
