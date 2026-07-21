@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-#  release.sh – build, tag and publish Clipious to GitHub Releases
+#  release.sh – build, tag and publish Clipious to Codeberg Releases
 #
 #  Prerequisites
 #  • Flutter (provided via submodule or system)
 #  • make  (homedir /home/fmgordillo/clipious)
-#  • github CLI (gh) – selfsigned installs:  sudo apt install gh
+# • codeberg CLI (berg) – selfsigned installs:  sudo apt install berg
 #  • Android keystore – a file *android/key.properties* (see below)
 #
 #  Usage
@@ -17,7 +17,7 @@
 #    3. collects all APK files and generates SHA1 checksums
 #    4. extracts the project version from pubspec.yaml
 #    5. creates and pushes a git tag with the same version
-#    6. creates a draft GitHub release and uploads all APKs and checksums
+#    6. creates a draft Codeberg release and uploads all APKs and checksums
 #    7. (optional) automatically closes the release when uploading is finished
 #
 #  Example:   ./release.sh
@@ -72,9 +72,9 @@ echo "Project version is $VERSION, tag will be $TAG"
 git tag -a "$TAG" -m "Release ${VERSION}"
 git push origin "$TAG"
 
-# ---------- 6. Create/draft GitHub release --------------------------------
-echo "Creating GitHub release $TAG..."
-gh release create "$TAG" \
+# ---------- 6. Create/draft Codeberg release --------------------------------
+echo "Creating Codeberg release $TAG..."
+berg release create "$TAG" \
     --title "Clipious ${VERSION}" \
     --notes "Automated release of Clipious ${VERSION}" \
     --draft \
@@ -82,6 +82,6 @@ gh release create "$TAG" \
     "${SHA1_FILES[@]}"
 
 echo "Release $TAG created in draft mode. Uploading binaries..."
-gh release upload "$TAG" "${APK_FILES[@]}" "${SHA1_FILES[@]}"
+berg release upload "$TAG" "${APK_FILES[@]}" "${SHA1_FILES[@]}"
 
-echo "All done. Remember to publish the release from the GitHub UI."
+echo "All done. Remember to publish the release from the Codeberg UI."
