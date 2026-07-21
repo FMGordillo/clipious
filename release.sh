@@ -3,7 +3,7 @@
 #  release.sh – build, tag and publish Clipious to Codeberg Releases
 #
 #  Prerequisites
-#  • Flutter (provided via submodule or system)
+#  • Flutter
 #  • make  (homedir /home/fmgordillo/clipious)
 # • codeberg CLI (berg) – selfsigned installs:  sudo apt install berg
 #  • Android keystore – a file *android/key.properties* (see below)

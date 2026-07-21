@@ -6,12 +6,6 @@ FLAVOR = ""
 ENV_FILE = ""
 ANDROID_APP_TYPE = ""
 
-# On NixOS the submodule's bundled dart SDK is a dynamically-linked binary that
-# cannot run outside a FHS environment. Prefer the system (nix-wrapped) flutter
-# over the submodule copy. Override FLUTTER to use a different binary if needed.
-FLUTTER_SYSTEM := $(shell which -a flutter 2>/dev/null | grep -v "submodules" | head -1)
-FLUTTER ?= $(if $(FLUTTER_SYSTEM),$(FLUTTER_SYSTEM),$(shell pwd)/submodules/flutter/bin/flutter)
-
 build-runner:
 	flutter clean
 	flutter pub get
