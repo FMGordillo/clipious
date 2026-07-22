@@ -23,6 +23,22 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
+// work-runtime 2.10.0+ requires compileSdk 35, which triggers an aapt2
+// incompatibility with the Nix-provided android-35 platform jar (the nixpkgs
+// build-tools 35.0.0 aapt2 binary cannot parse android-35's resource table
+// in AGP's link mode). Pin to 2.9.1 — the last release requiring compileSdk 34 —
+// until nixpkgs ships a fixed aapt2. See TODO-UPGRADE.md for removal steps.
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.work:work-runtime:2.9.1'
+        force 'androidx.work:work-runtime-ktx:2.9.1'
+        force 'androidx.browser:browser:1.8.0'
+        force 'androidx.core:core:1.13.1'
+        force 'androidx.core:core-ktx:1.13.1'
+        force 'androidx.activity:activity:1.9.3'
+        force 'androidx.activity:activity-ktx:1.9.3'
+    }
+}
 
 def keyFile = ENV['ANDROID_KEY_FILE']
 
@@ -110,17 +126,7 @@ flutter {
     source '../..'
 }
 
-// work-runtime 2.10.0+ requires compileSdk 35, which triggers an aapt2
-// incompatibility with the Nix-provided android-35 platform jar (the nixpkgs
-// build-tools 35.0.0 aapt2 binary cannot parse android-35's resource table
-// in AGP's link mode). Pin to 2.9.1 — the last release requiring compileSdk 34 —
-// until nixpkgs ships a fixed aapt2. See TODO-UPGRADE.md for removal steps.
-configurations.all {
-    resolutionStrategy {
-        force 'androidx.work:work-runtime:2.9.1'
-        force 'androidx.work:work-runtime-ktx:2.9.1'
-    }
-}
+
 
 /*
 dependencies {
