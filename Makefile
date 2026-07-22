@@ -25,8 +25,8 @@ splashscreen:
 # Build a debug APK for Android (split per ABI) and deploy it
 android-dev:
 	flutter build apk --debug --split-per-abi
-	# adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
-	# adb shell monkey -p com.github.lamarios.clipious -c android.intent.category.LAUNCHER 1
+	adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
+	adb shell monkey -p com.github.lamarios.clipious -c android.intent.category.LAUNCHER 1
 
 # Build a release APK for Android (split per ABI) and deploy it
 # Requires a keystore configured in android/key.properties
