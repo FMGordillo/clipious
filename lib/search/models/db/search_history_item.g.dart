@@ -7,13 +7,7 @@ part of 'search_history_item.dart';
 // **************************************************************************
 
 SearchHistoryItem _$SearchHistoryItemFromJson(Map<String, dynamic> json) =>
-    SearchHistoryItem(
-      json['search'] as String,
-      (json['time'] as num).toInt(),
-    );
+    SearchHistoryItem(json['search'] as String, (json['time'] as num).toInt());
 
 Map<String, dynamic> _$SearchHistoryItemToJson(SearchHistoryItem instance) =>
-    <String, dynamic>{
-      'search': instance.search,
-      'time': instance.time,
-    };
+    <String, dynamic>{'search': instance.search, 'time': instance.time};

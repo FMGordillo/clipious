@@ -76,13 +76,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': '登録者なし',
-        'other': '登録者 $count 人',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': '登録者なし',
+      'other': '登録者 $count 人',
+    });
     return '$_temp0';
   }
 
@@ -671,7 +668,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$type \'$value\' $operation動画を$hideOrFilter。';
   }
 
@@ -980,14 +981,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': '1時間',
-        '24': '1日',
-        'other': '$hours時間',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': '1時間',
+      '24': '1日',
+      'other': '$hours時間',
+    });
     return '新着動画を$_temp0ごとに確認中';
   }
 
@@ -1008,13 +1006,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String notificationFrequencySliderLabel(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '24': '1日',
-        'other': '$hours時間',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '24': '1日',
+      'other': '$hours時間',
+    });
     return '$_temp0';
   }
 

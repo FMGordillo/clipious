@@ -9,9 +9,9 @@ ANDROID_APP_TYPE = ""
 build-runner:
 	flutter clean
 	flutter pub get
-	dart run build_runner build --delete-conflicting-outputs
+	dart run build_runner build
 build-runner-watch:
-	dart run build_runner watch --delete-conflicting-outputs
+	dart run build_runner watch
 
 splashscreen:
 	dart run flutter_native_splash:create --path flutter_native_splash.yaml

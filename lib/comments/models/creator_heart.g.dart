@@ -7,9 +7,9 @@ part of 'creator_heart.dart';
 // **************************************************************************
 
 CreatorHeart _$CreatorHeartFromJson(Map<String, dynamic> json) => CreatorHeart(
-      json['creatorThumbnail'] as String,
-      json['creatorName'] as String,
-    );
+  json['creatorThumbnail'] as String,
+  json['creatorName'] as String,
+);
 
 Map<String, dynamic> _$CreatorHeartToJson(CreatorHeart instance) =>
     <String, dynamic>{

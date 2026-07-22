@@ -111,11 +111,11 @@
 
   # Scripts — replaces shell aliases
   scripts.build-runner = {
-    exec = "dart run build_runner build --delete-conflicting-outputs";
+    exec = "dart run build_runner build";
     description = "Run code generation once";
   };
   scripts.build-runner-watch = {
-    exec = "dart run build_runner watch --delete-conflicting-outputs";
+    exec = "dart run build_runner watch";
     description = "Watch for changes and run code generation";
   };
   scripts.check-services = {

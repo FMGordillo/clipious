@@ -76,13 +76,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': 'Geen abonnees',
-        'other': '$count abonnees',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': 'Geen abonnees',
+      'other': '$count abonnees',
+    });
     return '$_temp0';
   }
 
@@ -690,7 +687,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$hideOrFilter video\'s waar $type $operation \'$value\'.';
   }
 
@@ -1021,14 +1022,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': 'elk uur',
-        '24': 'elke dag',
-        'other': 'elke $hours uur',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': 'elk uur',
+      '24': 'elke dag',
+      'other': 'elke $hours uur',
+    });
     return 'Controleert voor nieuwe video\'s $_temp0';
   }
 
@@ -1053,13 +1051,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String notificationFrequencySliderLabel(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '24': '1 dag',
-        'other': '$hours uur',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '24': '1 dag',
+      'other': '$hours uur',
+    });
     return '$_temp0';
   }
 

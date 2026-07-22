@@ -46,7 +46,6 @@ class _$HomeLayoutCWProxyImpl implements _$HomeLayoutCWProxy {
       call(showBigSource: showBigSource);
 
   @override
-
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `HomeLayout(...).copyWith.fieldName(value)`.
   ///

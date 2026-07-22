@@ -18,7 +18,6 @@ import flutter_volume_controller
 import flutter_web_auth_2
 import just_audio
 import package_info_plus
-import path_provider_foundation
 import screen_brightness_macos
 import share_plus
 import sqflite_darwin
@@ -40,7 +39,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterWebAuth2Plugin.register(with: registry.registrar(forPlugin: "FlutterWebAuth2Plugin"))
   JustAudioPlugin.register(with: registry.registrar(forPlugin: "JustAudioPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
-  PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   ScreenBrightnessMacosPlugin.register(with: registry.registrar(forPlugin: "ScreenBrightnessMacosPlugin"))
   SharePlusMacosPlugin.register(with: registry.registrar(forPlugin: "SharePlusMacosPlugin"))
   SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
