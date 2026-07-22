@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
+import 'package:clipious/videos/models/dislike.dart';
 import 'package:logging/logging.dart';
 
 import '../../downloads/states/download_manager.dart';
@@ -27,32 +28,23 @@ class VideoCubit extends Cubit<VideoState> {
 
   Future<void> onReady() async {
     try {
-      // Kick off all three network calls in parallel to reduce latency.
-      final videoFuture = service.getVideo(state.videoId);
-      final isLoggedInFuture = service.isLoggedIn();
-      final Future<int?> dislikesFuture;
-      if (settings.state.useReturnYoutubeDislike) {
-        dislikesFuture = service
-            .getDislikes(state.videoId)
-            .then<int?>((d) => d.dislikes)
-            .catchError((e) {
-          log.info("Failed to get dislikes for video ${state.videoId}");
-          return state.dislikes;
-        });
-      } else {
-        dislikesFuture = Future.value(state.dislikes);
+      Video video = await service.getVideo(state.videoId);
+      var dislikes = state.dislikes;
+
+      try {
+        if (settings.state.useReturnYoutubeDislike) {
+          Dislike dislike = await service.getDislikes(state.videoId);
+          dislikes = dislike.dislikes;
+        }
+      } catch (e) {
+        log.info("Failed to get dislikes for video ${state.videoId}");
       }
 
-      final video = await videoFuture;
-      final dislikes = await dislikesFuture;
-      final isLoggedIn = await isLoggedInFuture;
-
-      if (isClosed) return;
       emit(state.copyWith(
           loadingVideo: false,
           video: video,
           dislikes: dislikes,
-          isLoggedIn: isLoggedIn));
+          isLoggedIn: await service.isLoggedIn()));
 
       getDownloadStatus();
     } catch (err) {
@@ -62,7 +54,6 @@ class VideoCubit extends Cubit<VideoState> {
       } else {
         error = coulnotLoadVideos;
       }
-      if (isClosed) return;
       emit(state.copyWith(error: error, loadingVideo: false));
       rethrow;
     }

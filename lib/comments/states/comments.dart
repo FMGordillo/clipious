@@ -18,15 +18,13 @@ class CommentsCubit extends Cubit<CommentsState> {
   }
 
   loadMore() async {
-    final videoId = state.video.videoId;
-    final continuation = state.continuation;
-
+    var state = this.state.copyWith();
     emit(state.copyWith(loadingComments: true));
 
-    VideoComments comments =
-        await service.getComments(videoId, continuation: continuation);
+    state = this.state.copyWith();
+    VideoComments comments = await service.getComments(state.video.videoId,
+        continuation: state.continuation);
 
-    if (isClosed) return;
     var stateComments = state.comments;
     stateComments.comments.addAll(comments.comments);
     emit(state.copyWith(
@@ -36,25 +34,25 @@ class CommentsCubit extends Cubit<CommentsState> {
   }
 
   getComments() async {
-    final videoId = state.video.videoId;
-    final sortBy = state.sortBy;
-    final source = state.source;
-
+    var state = this.state.copyWith();
     emit(state.copyWith(
         error: '',
         loadingComments: true,
-        comments: VideoComments(0, videoId, '', [])));
+        comments: VideoComments(0, state.video.videoId, '', [])));
+
+    state = this.state.copyWith();
 
     try {
-      VideoComments comments =
-          await service.getComments(videoId, sortBy: sortBy, source: source);
-      if (isClosed) return;
+      VideoComments comments = await service.getComments(state.video.videoId,
+          continuation: state.continuation,
+          sortBy: state.sortBy,
+          source: state.source);
       emit(state.copyWith(
           comments: comments,
           loadingComments: false,
           continuation: comments.continuation));
     } catch (err) {
-      if (isClosed) return;
+      state = this.state.copyWith();
       if (err is InvidiousServiceError) {
         emit(state.copyWith(error: err.message));
       } else {

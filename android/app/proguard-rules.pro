@@ -1,1 +1,5 @@
--keep class com.antonkarpenko.ffmpegkit.** { *; } -keep class com.ryanheise.just_audio.** { *; }
+-keep class com.antonkarpenko.ffmpegkit.** { *; }
+-keep class com.ryanheise.just_audio.** { *; }
+-keep class com.ryanheise.audioservice.** { *; }
+-keep class ir.r3r.river_player.** { *; }
+-keep class androidx.media3.** { *; }

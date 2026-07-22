@@ -13,8 +13,6 @@ class CommentsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return video == null
         ? const SizedBox.shrink()
-        : SingleChildScrollView(
-            child: CommentsContainer(
-                key: ValueKey(video!.videoId), video: video!));
+        : SingleChildScrollView(child: CommentsContainer(video: video!));
   }
 }

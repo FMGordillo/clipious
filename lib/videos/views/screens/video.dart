@@ -116,7 +116,7 @@ class VideoScreen extends StatelessWidget {
               duration: animationDuration,
               opacity: videoState.opacity,
               child: AutoTabsRouter.tabBar(
-                  key: ValueKey(videoState.video?.videoId),
+                  key: ValueKey(videoState.video),
                   physics: const NeverScrollableScrollPhysics(),
                   routes: [
                     VideoInfoRoute(

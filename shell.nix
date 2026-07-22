@@ -36,17 +36,8 @@ pkgs.mkShell {
   # to run CI or DB migrations
   shellHook = (clipiousNix.prepareShell {}) + ''
 
-  echo "Setting up submodules"
-  git submodule init
-  git submodule update
-
   echo "Setting up pre-commit hook"
   dart run tools/setup_git_hooks.dart
-
-  "Adding flutter submodule to path"
-  export PATH="./submodules/flutter/bin:$PATH"
-
-  echo "creating useful aliases..."
 
 
   flutter config --jdk-dir ${pkgs.jdk21}/lib/openjdk

@@ -104,7 +104,7 @@ mixin _$PlayerState {
             const DeepCollectionEquality().equals(other.playQueue, playQueue) &&
             (identical(other.isAudio, isAudio) || other.isAudio == isAudio) &&
             (identical(other.isPip, isPip) || other.isPip == isPip) &&
-            const DeepCollectionEquality().equals(other.offset, offset) &&
+            (identical(other.offset, offset) || other.offset == offset) &&
             (identical(other.startAt, startAt) || other.startAt == startAt) &&
             (identical(other.position, position) ||
                 other.position == position) &&
@@ -158,7 +158,7 @@ mixin _$PlayerState {
         const DeepCollectionEquality().hash(playQueue),
         isAudio,
         isPip,
-        const DeepCollectionEquality().hash(offset),
+        offset,
         startAt,
         position,
         bufferedPosition,
@@ -264,7 +264,7 @@ class _$PlayerStateCopyWithImpl<$Res> implements $PlayerStateCopyWith<$Res> {
     Object? playQueue = null,
     Object? isAudio = null,
     Object? isPip = null,
-    Object? offset = freezed,
+    Object? offset = null,
     Object? startAt = freezed,
     Object? position = null,
     Object? bufferedPosition = null,
@@ -369,7 +369,7 @@ class _$PlayerStateCopyWithImpl<$Res> implements $PlayerStateCopyWith<$Res> {
           ? _self.isPip
           : isPip // ignore: cast_nullable_to_non_nullable
               as bool,
-      offset: freezed == offset
+      offset: null == offset
           ? _self.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as Offset,
@@ -1079,7 +1079,7 @@ class _PlayerState extends PlayerState {
             const DeepCollectionEquality().equals(other.playQueue, playQueue) &&
             (identical(other.isAudio, isAudio) || other.isAudio == isAudio) &&
             (identical(other.isPip, isPip) || other.isPip == isPip) &&
-            const DeepCollectionEquality().equals(other.offset, offset) &&
+            (identical(other.offset, offset) || other.offset == offset) &&
             (identical(other.startAt, startAt) || other.startAt == startAt) &&
             (identical(other.position, position) ||
                 other.position == position) &&
@@ -1133,7 +1133,7 @@ class _PlayerState extends PlayerState {
         const DeepCollectionEquality().hash(playQueue),
         isAudio,
         isPip,
-        const DeepCollectionEquality().hash(offset),
+        offset,
         startAt,
         position,
         bufferedPosition,
@@ -1243,7 +1243,7 @@ class __$PlayerStateCopyWithImpl<$Res> implements _$PlayerStateCopyWith<$Res> {
     Object? playQueue = null,
     Object? isAudio = null,
     Object? isPip = null,
-    Object? offset = freezed,
+    Object? offset = null,
     Object? startAt = freezed,
     Object? position = null,
     Object? bufferedPosition = null,
@@ -1348,7 +1348,7 @@ class __$PlayerStateCopyWithImpl<$Res> implements _$PlayerStateCopyWith<$Res> {
           ? _self.isPip
           : isPip // ignore: cast_nullable_to_non_nullable
               as bool,
-      offset: freezed == offset
+      offset: null == offset
           ? _self.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as Offset,

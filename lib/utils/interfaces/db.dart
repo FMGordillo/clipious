@@ -51,10 +51,11 @@ abstract class IDbClient {
   SettingsValue? getSettings(String name);
 
   Future<Server> getCurrentlySelectedServer() async {
-    var servers = await getServers();
-    var server = servers.where((element) => element.inUse).firstOrNull;
+    var server =
+        (await getServers()).where((element) => element.inUse).firstOrNull;
     if (server == null) {
       log.fine('No servers selected, we try to find one');
+      List<Server> servers = await getServers();
       if (servers.isEmpty) {
         log.fine('We don\'t have servers, we need to show the welcome screen');
         throw NoServerSelected();

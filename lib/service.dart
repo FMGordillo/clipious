@@ -595,11 +595,11 @@ class Service {
       Iterable i = handleResponse(response);
       var list = List<Playlist>.from(i.map((e) => Playlist.fromJson(e)));
       if (postProcessing) {
-        list = (await Future.wait(
-          list.map((pl) async =>
-              pl.copyWith(videos: await postProcessVideos(pl.videos))),
-        ))
-            .toList();
+        for (int i = 0; i < list.length; i++) {
+          var pl = list[i];
+          pl = pl.copyWith(videos: await postProcessVideos(pl.videos));
+          list[i] = pl;
+        }
       }
       return list.sortByReversed((e) => e.updated ?? 0).toList();
     } catch (e) {
@@ -614,11 +614,11 @@ class Service {
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     var channelPlaylists = ChannelPlaylists.fromJson(handleResponse(response));
-    channelPlaylists.playlists = (await Future.wait(
-      channelPlaylists.playlists.map((pl) async =>
-          pl.copyWith(videos: await postProcessVideos(pl.videos))),
-    ))
-        .toList();
+    for (int i = 0; i < channelPlaylists.playlists.length; i++) {
+      var pl = channelPlaylists.playlists[i];
+      pl = pl.copyWith(videos: await postProcessVideos(pl.videos));
+      channelPlaylists.playlists[i] = pl;
+    }
     return channelPlaylists;
   }
 
@@ -686,13 +686,12 @@ class Service {
   void syncHistory() async {
     try {
       if (await db.isLoggedInToCurrentServer()) {
-        final unwatched = (await getUserHistory(1, 200))
+        (await getUserHistory(1, 200))
             .where((element) => db.getVideoProgress(element) == 0)
-            .toList();
-        await Future.wait(unwatched.map((element) async {
+            .forEach((element) async {
           await db.saveProgress(Progress.named(progress: 1, videoId: element));
           log.fine('updated watch status of $element');
-        }));
+        });
       }
     } catch (err) {
       log.fine('failed to sync history, probably not logged in');
