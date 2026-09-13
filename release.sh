@@ -31,11 +31,13 @@ make build-runner
 # ---------- 2. Build release APKs --------------------------------------
 # Build signed Android (mobile) release
 echo "Building signed Android (mobile) release..."
-make android-prod   # creates build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+ANDROID_KEY_FILE=/home/fmgordillo/code/clipious/android/key.properties \
+  flutter build apk --release --split-per-abi
 
 # Build signed Android (TV) release
 echo "Building signed Android (TV) release..."
-make tv-prod        # creates build/app/outputs/flutter-apk/app-release.apk
+ANDROID_KEY_FILE=/home/fmgordillo/code/clipious/android/key.properties \
+  flutter build apk --release --target-platform android-arm
 
 # ---------- 3. Collect all APK files and generate SHA1 checksums -----------------------
 echo "Collecting APK files and generating SHA1 checksums..."
