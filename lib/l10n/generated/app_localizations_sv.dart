@@ -76,13 +76,10 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': 'Inga prenumeranter',
-        'other': '$count prenumeranter',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': 'Inga prenumeranter',
+      'other': '$count prenumeranter',
+    });
     return '$_temp0';
   }
 
@@ -693,7 +690,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$hideOrFilter filmer vars $type $operation \'$value\'.';
   }
 
@@ -1027,15 +1028,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': 'varje timme',
-        '24': 'varje dag',
-        '2': 'varannan timme',
-        'other': 'var $hours:e timme',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': 'varje timme',
+      '24': 'varje dag',
+      '2': 'varannan timme',
+      'other': 'var $hours:e timme',
+    });
     return 'Leta efter nya filmer $_temp0';
   }
 
@@ -1059,13 +1057,10 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String notificationFrequencySliderLabel(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '24': '1d',
-        'other': '${hours}h',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '24': '1d',
+      'other': '${hours}h',
+    });
     return '$_temp0';
   }
 

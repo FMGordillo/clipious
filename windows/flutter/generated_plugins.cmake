@@ -8,6 +8,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
   downloadsfolder
   dynamic_color
+  ffmpeg_kit_flutter_new_full
   flutter_volume_controller
   screen_brightness_windows
   share_plus
@@ -16,6 +17,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  jni
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

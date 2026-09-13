@@ -7,16 +7,16 @@ part of 'format_stream.dart';
 // **************************************************************************
 
 FormatStream _$FormatStreamFromJson(Map<String, dynamic> json) => FormatStream(
-      json['url'] as String,
-      json['itag'] as String,
-      json['type'] as String,
-      json['quality'] as String,
-      json['container'] as String,
-      json['encoding'] as String,
-      json['qualityLabel'] as String,
-      json['resolution'] as String,
-      json['size'] as String,
-    );
+  json['url'] as String,
+  json['itag'] as String,
+  json['type'] as String,
+  json['quality'] as String,
+  json['container'] as String,
+  json['encoding'] as String,
+  json['qualityLabel'] as String,
+  json['resolution'] as String,
+  json['size'] as String,
+);
 
 Map<String, dynamic> _$FormatStreamToJson(FormatStream instance) =>
     <String, dynamic>{

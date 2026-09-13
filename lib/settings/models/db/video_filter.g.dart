@@ -88,7 +88,6 @@ class _$VideoFilterCWProxyImpl implements _$VideoFilterCWProxy {
   VideoFilter endTime(String endTime) => call(endTime: endTime);
 
   @override
-
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `VideoFilter(...).copyWith.fieldName(value)`.
   ///
@@ -164,12 +163,15 @@ extension $VideoFilterCopyWith on VideoFilter {
 // JsonSerializableGenerator
 // **************************************************************************
 
-VideoFilter _$VideoFilterFromJson(Map<String, dynamic> json) => VideoFilter(
-      value: json['value'] as String?,
-      channelId: json['channelId'] as String?,
-    )
-      ..operation =
-          $enumDecodeNullable(_$FilterOperationEnumMap, json['operation'])
+VideoFilter _$VideoFilterFromJson(Map<String, dynamic> json) =>
+    VideoFilter(
+        value: json['value'] as String?,
+        channelId: json['channelId'] as String?,
+      )
+      ..operation = $enumDecodeNullable(
+        _$FilterOperationEnumMap,
+        json['operation'],
+      )
       ..type = $enumDecodeNullable(_$FilterTypeEnumMap, json['type'])
       ..filterAll = json['filterAll'] as bool
       ..hideFromFeed = json['hideFromFeed'] as bool

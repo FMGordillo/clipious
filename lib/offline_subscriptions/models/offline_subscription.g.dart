@@ -13,8 +13,8 @@ _OfflineSubscription _$OfflineSubscriptionFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$OfflineSubscriptionToJson(
-        _OfflineSubscription instance) =>
-    <String, dynamic>{
-      'channelId': instance.channelId,
-      'channelName': instance.channelName,
-    };
+  _OfflineSubscription instance,
+) => <String, dynamic>{
+  'channelId': instance.channelId,
+  'channelName': instance.channelName,
+};

@@ -76,13 +76,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': '没有订阅者',
-        'other': '$count位订阅者',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': '没有订阅者',
+      'other': '$count位订阅者',
+    });
     return '$_temp0';
   }
 
@@ -668,7 +665,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$hideOrFilter videos where $type $operation \'$value\'.';
   }
 
@@ -994,14 +995,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': 'per hour',
-        '24': 'a day',
-        'other': 'every $hours hours',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': 'per hour',
+      '24': 'a day',
+      'other': 'every $hours hours',
+    });
     return 'Will check for new videos once $_temp0';
   }
 
@@ -1024,13 +1022,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String notificationFrequencySliderLabel(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '24': '1d',
-        'other': '${hours}h',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '24': '1d',
+      'other': '${hours}h',
+    });
     return '$_temp0';
   }
 
@@ -1303,13 +1298,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': '無訂閱者',
-        'other': '$count位訂閱者',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': '無訂閱者',
+      'other': '$count位訂閱者',
+    });
     return '$_temp0';
   }
 
@@ -1893,7 +1885,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$hideOrFilter 影片，其中 $type $operation \'$value\'。';
   }
 
@@ -2203,14 +2199,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': '小時',
-        '24': '天',
-        'other': '每 $hours 小時',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': '小時',
+      '24': '天',
+      'other': '每 $hours 小時',
+    });
     return '將每 $_temp0 檢查一次新影片';
   }
 
@@ -2231,13 +2224,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String notificationFrequencySliderLabel(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '24': '1天',
-        'other': '$hours小時',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '24': '1天',
+      'other': '$hours小時',
+    });
     return '$_temp0';
   }
 

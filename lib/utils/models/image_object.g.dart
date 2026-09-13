@@ -7,11 +7,11 @@ part of 'image_object.dart';
 // **************************************************************************
 
 ImageObject _$ImageObjectFromJson(Map<String, dynamic> json) => ImageObject(
-      json['quality'] as String?,
-      json['url'] as String,
-      (json['width'] as num).toInt(),
-      (json['height'] as num).toInt(),
-    );
+  json['quality'] as String?,
+  json['url'] as String,
+  (json['width'] as num).toInt(),
+  (json['height'] as num).toInt(),
+);
 
 Map<String, dynamic> _$ImageObjectToJson(ImageObject instance) =>
     <String, dynamic>{

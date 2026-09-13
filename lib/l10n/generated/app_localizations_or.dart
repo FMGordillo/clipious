@@ -76,13 +76,10 @@ class AppLocalizationsOr extends AppLocalizations {
 
   @override
   String nSubscribers(String count) {
-    String _temp0 = intl.Intl.selectLogic(
-      count,
-      {
-        'no': 'କୌଣସି ଗ୍ରାହକ',
-        'other': '$count ଗ୍ରାହକ',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(count, {
+      'no': 'କୌଣସି ଗ୍ରାହକ',
+      'other': '$count ଗ୍ରାହକ',
+    });
     return '$_temp0';
   }
 
@@ -687,7 +684,11 @@ class AppLocalizationsOr extends AppLocalizations {
 
   @override
   String videoFilterDescriptionString(
-      String hideOrFilter, String type, String operation, String value) {
+    String hideOrFilter,
+    String type,
+    String operation,
+    String value,
+  ) {
     return '$hideOrFilter ଭିଡିଓଗୁଡିକ ଯେଉଁଠାରେ $type $operation \'$value\'।';
   }
 
@@ -1021,14 +1022,11 @@ class AppLocalizationsOr extends AppLocalizations {
 
   @override
   String foregroundServiceNotificationContent(String hours) {
-    String _temp0 = intl.Intl.selectLogic(
-      hours,
-      {
-        '1': 'per hour',
-        '24': 'a day',
-        'other': 'ପ୍ରତ୍ୟେକ $hours ଘଣ୍ଟା',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(hours, {
+      '1': 'per hour',
+      '24': 'a day',
+      'other': 'ପ୍ରତ୍ୟେକ $hours ଘଣ୍ଟା',
+    });
     return 'ଥରେ $_temp0ନୂତନ ଭିଡିଓଗୁଡିକ ଯାଞ୍ଚ କରିବେ';
   }
 

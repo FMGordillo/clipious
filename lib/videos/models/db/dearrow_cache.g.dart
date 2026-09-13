@@ -6,9 +6,8 @@ part of 'dearrow_cache.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-DeArrowCache _$DeArrowCacheFromJson(Map<String, dynamic> json) => DeArrowCache(
-      json['videoId'] as String,
-    )
+DeArrowCache _$DeArrowCacheFromJson(Map<String, dynamic> json) =>
+    DeArrowCache(json['videoId'] as String)
       ..title = json['title'] as String?
       ..url = json['url'] as String?;
 

@@ -1,9 +1,12 @@
+
 # Miscellaneous
 *.class
 *.log
 *.pyc
+*.jks
 *.swp
 .DS_Store
+.mcp.json
 .atom/
 .buildlog/
 .history
@@ -46,3 +49,18 @@ app.*.map.json
 /.nix-shell/
 /nix/result/
 /android/app/local.properties
+/.android
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+local.properties
+.claude/
+

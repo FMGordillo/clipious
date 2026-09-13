@@ -278,6 +278,11 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
             : isUsingDash()
                 ? '${newState.video!.dashUrl}${useProxy ? '?local=true' : ''}'
                 : formatStream?.url ?? '';
+
+        if (!videoUrl.startsWith('http')) {
+          videoUrl = '${server.url}$videoUrl';
+        }
+
         if (!isUsingDash() && formatStream != null) {
           newState =
               newState.copyWith(selectedNonDashTrack: formatStream.resolution);

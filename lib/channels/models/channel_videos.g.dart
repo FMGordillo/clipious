@@ -7,17 +7,17 @@ part of 'channel_videos.dart';
 // **************************************************************************
 
 VideosWithContinuation _$VideosWithContinuationFromJson(
-        Map<String, dynamic> json) =>
-    VideosWithContinuation(
-      (json['videos'] as List<dynamic>)
-          .map((e) => Video.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      json['continuation'] as String?,
-    );
+  Map<String, dynamic> json,
+) => VideosWithContinuation(
+  (json['videos'] as List<dynamic>)
+      .map((e) => Video.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  json['continuation'] as String?,
+);
 
 Map<String, dynamic> _$VideosWithContinuationToJson(
-        VideosWithContinuation instance) =>
-    <String, dynamic>{
-      'continuation': instance.continuation,
-      'videos': instance.videos,
-    };
+  VideosWithContinuation instance,
+) => <String, dynamic>{
+  'continuation': instance.continuation,
+  'videos': instance.videos,
+};

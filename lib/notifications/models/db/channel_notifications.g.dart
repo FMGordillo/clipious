@@ -15,10 +15,10 @@ ChannelNotification _$ChannelNotificationFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ChannelNotificationToJson(
-        ChannelNotification instance) =>
-    <String, dynamic>{
-      'channelId': instance.channelId,
-      'lastSeenVideoId': instance.lastSeenVideoId,
-      'timestamp': instance.timestamp,
-      'channelName': instance.channelName,
-    };
+  ChannelNotification instance,
+) => <String, dynamic>{
+  'channelId': instance.channelId,
+  'lastSeenVideoId': instance.lastSeenVideoId,
+  'timestamp': instance.timestamp,
+  'channelName': instance.channelName,
+};
