@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Architecture review for clipious</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { border-style: dashed; }
+      .leak { border-color: #dc2626; color: #b91c1c; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .chip { display: inline-block; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 6px; margin: 2px; background: #fff; }
+      .ghost { display: inline-block; border: 1px solid #475569; border-radius: 4px; padding: 2px 6px; margin: 2px; color: #94a3b8; }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <header class="space-y-4">
+        <p class="lbl text-slate-500">Architecture review · plan only, nothing implemented</p>
+        <h1 class="font-serif text-4xl">clipious: deepening opportunities</h1>
+        <p class="text-slate-600 max-w-3xl">
+          Scope was chosen from the last 150 commits. The hot spots are the player
+          (<code>player_controls.dart</code> 9 changes, <code>player.dart</code> and
+          <code>video_player.dart</code> 6 each), <code>models/video.dart</code> (9),
+          <code>download_manager.dart</code> (8), and phone / tablet / TV view files that change together.
+        </p>
+        <div class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm space-y-1">
+          <p class="font-semibold">How much of this was verified</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><b>Player (candidates 1 to 3):</b> a sub-agent read the player state files in full. I re-checked five of its line references by grep and they held.</li>
+            <li><b>Storage (candidate 4) and view trees (candidate 5):</b> the two sub-agents for these areas failed on the workspace budget limit. I covered them with targeted greps and short reads, not full reads. Counts are measured; anything about intent is inference.</li>
+            <li><b>Not examined:</b> <code>service.dart</code> beyond its method list, <code>settings.dart</code>, <code>download_manager.dart</code>, <code>utils.dart</code>, and the settings / search / channel view pairs.</li>
+            <li>No <code>GLOSSARY.md</code> and no <code>docs/adr/</code> exist, so domain names below are taken from the code.</li>
+            <li>Nothing was compiled or run.</li>
+          </ul>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-10">
+
+        <!-- 1 -->
+        <article id="c1" class="rounded-xl border border-slate-200 bg-white p-6 space-y-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl mr-2">1. Give the play queue its own module</h2>
+            <span class="rounded-full bg-emerald-100 text-emerald-800 text-xs px-3 py-1">Strong</span>
+            <span class="rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1">in-process</span>
+          </div>
+          <p class="font-mono text-sm text-slate-600">lib/player/states/player.dart · lib/player/states/tv_player_controls.dart · lib/player/views/components/mini_player_controls.dart</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-slate-200 p-4" style="min-height:320px">
+              <p class="lbl text-slate-500 mb-2">Before · queue spread through PlayerCubit (1065 lines)</p>
+              <div class="rounded border border-slate-300 p-3 text-xs space-y-2">
+                <p class="lbl text-slate-500">five fields kept in step by convention</p>
+                <div><span class="chip">videos</span><span class="chip">offlineVideos</span><span class="chip">playedVideos</span><span class="chip">playQueue</span><span class="chip">currentlyPlaying ×2</span></div>
+                <p class="lbl text-slate-500">about 11 methods, mixed with IO and throttles</p>
+                <div><span class="chip">queueVideos</span><span class="chip">playNext</span><span class="chip">_playNextNow</span><span class="chip">playPrevious</span><span class="chip">skipToVideo</span><span class="chip">removeVideoFromQueue</span><span class="chip">onQueueReorder</span><span class="chip">generatePlayQueue</span><span class="chip">…</span></div>
+                <p class="chip leak">online/offline branch repeated 14×</p>
+                <p class="chip leak">TV playFromQueue skips played/next bookkeeping</p>
+                <p class="chip leak">view calls toggleShuffle() then generatePlayQueue()</p>
+              </div>
+            </div>
+            <div class="rounded-lg border border-slate-200 p-4" style="min-height:320px">
+              <p class="lbl text-slate-500 mb-2">After · one deep, pure module</p>
+              <div class="rounded border border-slate-300 p-3 text-xs space-y-3">
+                <p class="lbl text-slate-500">PlayerCubit asks, then performs the switch</p>
+                <div class="deep rounded-lg border-4 border-slate-900 p-4 text-slate-100 space-y-2">
+                  <p class="lbl">Play queue</p>
+                  <p class="text-slate-300">small interface: add, remove, reorder, advance, go back, jump to</p>
+                  <div><span class="ghost">one item list</span><span class="ghost">played / upcoming split</span><span class="ghost">repeat policy</span><span class="ghost">shuffle policy</span><span class="ghost">what plays next</span></div>
+                </div>
+                <p class="text-slate-600">No db, no service, no timers. Phone and TV go through the same entry.</p>
+              </div>
+            </div>
+          </div>
+          <p><b>Problem.</b> Queue rules are maintained across five state fields and about eleven methods, so the phone and TV paths have already diverged.</p>
+          <p><b>Solution.</b> Move the item list, the played / upcoming split, and the repeat and shuffle rules into one synchronous module that <code>PlayerCubit</code> consults.</p>
+          <ul class="list-disc pl-5 text-sm grid md:grid-cols-2 gap-x-6">
+            <li>Queue tests need no platform fakes</li>
+            <li>One list instead of two</li>
+            <li>TV and phone share bookkeeping</li>
+            <li>Shuffle regenerates itself</li>
+          </ul>
+        </article>
+
+        <!-- 2 -->
+        <article id="c2" class="rounded-xl border border-slate-200 bg-white p-6 space-y-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl mr-2">2. One home for playback position and segment skipping</h2>
+            <span class="rounded-full bg-emerald-100 text-emerald-800 text-xs px-3 py-1">Strong</span>
+            <span class="rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1">local-substitutable</span>
+          </div>
+          <p class="font-mono text-sm text-slate-600">player.dart 277-301, 346-391 · video_player.dart 235-244 · audio_player.dart 131-139</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <p class="lbl text-slate-500 mb-2">Before · save in one file, resume in two others</p>
+              <pre class="mermaid">
+flowchart TD
+  P[PlayerCubit onProgress] --> S[save position, 0.9 watched rule]
+  P --> H[history sync, 10 min throttle]
+  P --> K[SponsorBlock skip decision]
+  V[VideoPlayerCubit] --> R1[resume, own 0.90 rule]
+  A[AudioPlayerCubit] --> R2[resume, own 0.90 rule, non-proxy only]
+  S --> DB[(db global)]
+  R1 --> DB
+  R2 --> DB
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class R1,R2 leak
+              </pre>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <p class="lbl text-slate-500 mb-2">After · save, resume and skip decided together</p>
+              <pre class="mermaid">
+flowchart TD
+  P[PlayerCubit] --> M[Playback position module]
+  V[video engine] --> M
+  A[audio engine] --> M
+  M --> DB[(position store, in-memory in tests)]
+  classDef deep fill:#0f172a,color:#f8fafc,stroke:#0f172a,stroke-width:3px;
+  class M deep
+              </pre>
+            </div>
+          </div>
+          <p><b>Problem.</b> The "watched" threshold is written three times, and resume lives in each engine, so proxied audio never resumes.</p>
+          <p><b>Solution.</b> One module decides when to save, where to resume, when a video counts as watched, and when to jump a SponsorBlock segment, with the store passed in.</p>
+          <ul class="list-disc pl-5 text-sm grid md:grid-cols-2 gap-x-6">
+            <li>Threshold defined once</li>
+            <li>Audio and video resume identically</li>
+            <li>Skip rule testable without time</li>
+            <li>Uses existing in-memory db</li>
+          </ul>
+          <p class="text-sm text-slate-500">Two things the agent flagged that you should confirm are intended: offline videos never save position (player.dart 277-278), and the skip adds 2 s where the comment says 1 (367, 374).</p>
+        </article>
+
+        <!-- 3 -->
+        <article id="c3" class="rounded-xl border border-slate-200 bg-white p-6 space-y-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl mr-2">3. Narrow the player-engine seam</h2>
+            <span class="rounded-full bg-amber-100 text-amber-800 text-xs px-3 py-1">Worth exploring</span>
+            <span class="rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1">ports &amp; adapters</span>
+          </div>
+          <p class="font-mono text-sm text-slate-600">lib/player/states/interfaces/media_player.dart · video_player.dart · audio_player.dart · tv_player_settings.dart · views/components/{video_player,audio_player}.dart</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-slate-200 p-4 text-xs space-y-3" style="min-height:320px">
+              <p class="lbl text-slate-500">Before · interface as wide as the adapters</p>
+              <div>
+                <p class="mb-1">MediaPlayerCubit interface: about 34 members</p>
+                <div class="h-5 bg-slate-800 rounded" style="width:100%"></div>
+              </div>
+              <div>
+                <p class="mb-1">stubbed by the audio adapter: about 12 (one throws)</p>
+                <div class="h-5 bg-red-500 rounded" style="width:35%"></div>
+              </div>
+              <div>
+                <p class="mb-1">never called through the interface: 6</p>
+                <div class="h-5 bg-red-300 rounded" style="width:18%"></div>
+              </div>
+              <div class="rounded border seam leak p-2">commands go down through a BlocListener in the view</div>
+              <div class="rounded border seam leak p-2">events come up by direct player.setEvent calls (26 sites)</div>
+              <div class="rounded border seam leak p-2">TvPlayerSettingsCubit drives the concrete video controller</div>
+            </div>
+            <div class="rounded-lg border border-slate-200 p-4 text-xs space-y-3" style="min-height:320px">
+              <p class="lbl text-slate-500">After · thin adapters behind a small interface</p>
+              <div class="deep rounded-lg border-4 border-slate-900 p-4 text-slate-100 space-y-2">
+                <p class="lbl">Playback source resolution</p>
+                <div><span class="ghost">online or offline file</span><span class="ghost">proxy and headers</span><span class="ghost">start position</span><span class="ghost">remembered speed</span></div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="rounded border border-slate-300 p-2 text-center">video adapter<br />river_player</div>
+                <div class="rounded border border-slate-300 p-2 text-center">audio adapter<br />just_audio</div>
+              </div>
+              <p class="text-slate-600">Track selection becomes optional for an adapter rather than stubbed. Commands and events travel one route.</p>
+            </div>
+          </div>
+          <p><b>Problem.</b> Both adapters repeat server, proxy, header and speed handling, and the interface forces the audio adapter to stub a third of it.</p>
+          <p><b>Solution.</b> Pull source resolution out of the adapters and shrink the interface to what both engines really do.</p>
+          <ul class="list-disc pl-5 text-sm grid md:grid-cols-2 gap-x-6">
+            <li>No throwing stubs</li>
+            <li>Proxy logic written once</li>
+            <li>Adapters swap without the view</li>
+            <li>TV settings use the seam</li>
+          </ul>
+          <p class="text-sm text-slate-500">This is the largest of the five and touches the hottest files. It gets much cheaper after candidates 1 and 2, which remove what the adapters reach back into <code>PlayerCubit</code> for.</p>
+        </article>
+
+        <!-- 4 -->
+        <article id="c4" class="rounded-xl border border-slate-200 bg-white p-6 space-y-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl mr-2">4. Replace the stubbed second db adapter with a background store</h2>
+            <span class="rounded-full bg-amber-100 text-amber-800 text-xs px-3 py-1">Worth exploring</span>
+            <span class="rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1">local-substitutable</span>
+          </div>
+          <p class="font-mono text-sm text-slate-600">lib/utils/interfaces/db.dart · lib/utils/file_db.dart · lib/utils/sembast_sqflite_database.dart · lib/workmanager.dart · lib/service.dart 235, 529, 554, 773 · lib/notifications/**</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-slate-200 p-4 text-xs space-y-3" style="min-height:320px">
+              <p class="lbl text-slate-500">Before · two adapters on paper, one in practice</p>
+              <div>
+                <p class="mb-1">IDbClient: about 40 members across 9 concepts</p>
+                <div class="h-5 bg-slate-800 rounded" style="width:100%"></div>
+              </div>
+              <div>
+                <p class="mb-1">SembastSqfDb: 37 overrides, all real</p>
+                <div class="h-5 bg-slate-500 rounded" style="width:95%"></div>
+              </div>
+              <div>
+                <p class="mb-1">FileDB: 38 overrides, 33 throw UnimplementedError</p>
+                <div class="flex h-5 rounded overflow-hidden" style="width:97%">
+                  <div class="bg-slate-500" style="width:13%"></div>
+                  <div class="bg-red-500" style="width:87%"></div>
+                </div>
+              </div>
+              <div class="rounded border seam leak p-2">14 notification methods exist only on FileDB, outside the interface</div>
+              <div class="rounded border seam leak p-2">fileDb global reached from 9 files, including service.dart inside fetch calls</div>
+              <div class="rounded border seam leak p-2">syncWithDb copies server and locale across at startup</div>
+            </div>
+            <div class="rounded-lg border border-slate-200 p-4 text-xs space-y-3" style="min-height:320px">
+              <p class="lbl text-slate-500">After · two honest modules</p>
+              <div class="rounded border border-slate-300 p-3">
+                <p class="lbl text-slate-500">App database</p>
+                <p>one adapter (Sembast), in-memory variant for tests, as today</p>
+              </div>
+              <div class="deep rounded-lg border-4 border-slate-900 p-4 text-slate-100 space-y-2">
+                <p class="lbl">Background store</p>
+                <p class="text-slate-300">what the workmanager isolate can read and write</p>
+                <div><span class="ghost">current server</span><span class="ghost">locale</span><span class="ghost">last-seen markers</span><span class="ghost">notification subscriptions</span></div>
+              </div>
+              <p class="text-slate-600">Fetching a channel no longer writes a notification marker as a side effect; the caller that knows the user viewed it does.</p>
+            </div>
+          </div>
+          <p><b>Problem.</b> <code>FileDB</code> claims the whole db interface but implements five members, so any code running in the background isolate can throw at runtime.</p>
+          <p><b>Solution.</b> Stop <code>FileDB</code> posing as a db adapter and name it for what it is: the small store shared with the background isolate.</p>
+          <ul class="list-disc pl-5 text-sm grid md:grid-cols-2 gap-x-6">
+            <li>33 throwing stubs deleted</li>
+            <li>Background code cannot hit them</li>
+            <li>Notification state has one owner</li>
+            <li>Service stops writing storage</li>
+          </ul>
+          <p class="text-sm text-slate-500">Inferred, not confirmed: that the file store exists because the Sembast database cannot be opened from the workmanager isolate. If that reason is wrong, this candidate changes shape. I did not read <code>file_db.dart</code> or the notification cubits in full.</p>
+        </article>
+
+        <!-- 5 -->
+        <article id="c5" class="rounded-xl border border-slate-200 bg-white p-6 space-y-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl mr-2">5. Decide "what plays" once for phone, tablet and TV</h2>
+            <span class="rounded-full bg-slate-200 text-slate-700 text-xs px-3 py-1">Speculative</span>
+            <span class="rounded-full bg-slate-100 text-slate-700 text-xs px-3 py-1">in-process</span>
+          </div>
+          <p class="font-mono text-sm text-slate-600">lib/videos/states/video.dart 112-121 · lib/videos/views/tv/screens/video.dart 34-39 · lib/videos/states/tv_video.dart · lib/playlists/states/playlist.dart 51</p>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <p class="lbl text-slate-500 mb-2">Before · the rule differs by tree</p>
+              <pre class="mermaid">
+flowchart TD
+  PH[phone and tablet view] --> VC[VideoCubit.playVideo]
+  VC --> S1[honours distractionFreeMode and playRecommendedNext]
+  TV[TV video screen, in the widget] --> S2[always appends recommended, drops filterHide]
+  S1 --> PC[PlayerCubit]
+  S2 --> RT[TvPlayerRoute]
+  classDef leak stroke:#dc2626,stroke-width:2px;
+  class TV,S2 leak
+              </pre>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-white p-4">
+              <p class="lbl text-slate-500 mb-2">After · views only present</p>
+              <pre class="mermaid">
+flowchart TD
+  PH[phone and tablet view] --> VC[VideoCubit decides the list]
+  TV[TV video screen] --> VC
+  VC --> OUT[list to play]
+  OUT --> PC[PlayerCubit or TvPlayerRoute]
+  classDef deep fill:#0f172a,color:#f8fafc,stroke:#0f172a,stroke-width:3px;
+  class VC deep
+              </pre>
+            </div>
+          </div>
+          <p><b>Problem.</b> The TV screen builds its own play list inside the widget and ignores two settings the phone path honours.</p>
+          <p><b>Solution.</b> Let the feature cubit decide which videos play and leave each tree to layout and focus handling.</p>
+          <ul class="list-disc pl-5 text-sm grid md:grid-cols-2 gap-x-6">
+            <li>Settings apply on every device</li>
+            <li>Rule testable without widgets</li>
+            <li>One place to change</li>
+          </ul>
+          <p class="text-sm text-slate-500">
+            Rated speculative because I verified one instance of drift, not a pattern. Supporting counts: views call <code>context.read</code> 182 times,
+            reach <code>service</code> from 10 view files and <code>db</code> from 7, and device-type checks appear 42 times (33 in views).
+            Share, add-to-playlist and download actions have no TV counterpart at all, which may be deliberate. The TV tree's separate layout and D-pad handling look like they should stay separate.
+          </p>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-xl border-2 border-emerald-600 bg-emerald-50 p-8 space-y-3">
+        <p class="lbl text-emerald-800">Top recommendation</p>
+        <h2 class="font-serif text-3xl"><a class="underline" href="#c1">1. Give the play queue its own module</a></h2>
+        <p class="max-w-3xl">
+          It sits in the most-changed file, it is pure logic with no platform dependency, and it would give the player its first real tests without standing up audio session or media handler fakes.
+          It also shrinks <code>PlayerCubit</code> enough to make candidates 2 and 3 tractable.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
