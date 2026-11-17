@@ -110,13 +110,53 @@
     );
 
   # Scripts — replaces shell aliases
-  scripts.build-runner = {
-    exec = "dart run build_runner build";
-    description = "Run code generation once";
-  };
-  scripts.build-runner-watch = {
-    exec = "dart run build_runner watch";
-    description = "Watch for changes and run code generation";
+  scripts.clipious = {
+    description = "Project CLI: clipious <command> (run without args for help)";
+    exec = ''
+      set -euo pipefail
+      cd "$DEVENV_ROOT"
+      cmd="''${1:-help}"
+      [ $# -gt 0 ] && shift
+
+      case "$cmd" in
+        gen)       flutter pub get && dart run build_runner build "$@" ;;
+        gen-clean) flutter clean && flutter pub get && dart run build_runner build --delete-conflicting-outputs ;;
+        watch)     dart run build_runner watch "$@" ;;
+        splash)    dart run flutter_native_splash:create --path flutter_native_splash.yaml ;;
+        fmt)       dart format ./lib ;;
+        lint)      dart analyze --no-fatal-warnings ./lib ;;
+        test)      flutter test "$@" ;;
+        apk)
+          mode="''${1:-debug}"
+          [ $# -gt 0 ] && shift
+          flutter build apk "--$mode" "$@"
+          echo "-> build/app/outputs/flutter-apk/" ;;
+        apk-split)
+          mode="''${1:-release}"
+          [ $# -gt 0 ] && shift
+          flutter build apk "--$mode" --split-per-abi "$@"
+          echo "-> build/app/outputs/flutter-apk/" ;;
+        apk-tv)
+          flutter build apk --release --target-platform android-arm "$@"
+          echo "-> build/app/outputs/flutter-apk/" ;;
+        release)   ./release.sh "$@" ;;
+        *)
+          echo "Usage: clipious <command> [args]"
+          echo ""
+          echo "  gen          pub get + build_runner (freezed, auto_route, json)"
+          echo "  gen-clean    flutter clean + gen (delete conflicting outputs)"
+          echo "  watch        build_runner watch"
+          echo "  splash       regenerate native splash screen"
+          echo "  fmt          dart format ./lib"
+          echo "  lint         dart analyze ./lib"
+          echo "  test [path]  flutter test"
+          echo "  apk [mode]   universal APK (debug|profile|release; default debug)"
+          echo "  apk-split    per-ABI APKs (default release; optional mode arg)"
+          echo "  apk-tv       release APK for Android TV (armv7)"
+          echo "  release      run release.sh (build, tag, publish)"
+          echo "  (also: setup, check-services)" ;;
+      esac
+    '';
   };
   scripts.check-services = {
     exec = ''${./nix/helpers/check-services.sh}'';
@@ -182,7 +222,7 @@
     export GRADLE_USER_HOME="$DEVENV_ROOT/.devenv/gradle"
     mkdir -p "$ANDROID_SDK_ROOT" "$GRADLE_USER_HOME"
 
-    echo "Available scripts: setup, build-runner, build-runner-watch, check-services"
+    echo "Run 'clipious' for dev/build commands (gen, apk, apk-split, apk-tv, test, ...). Also: setup, check-services"
     echo "Pre-commit hooks will automatically start services as needed."
     echo "Run 'devenv up' manually to start PostgreSQL and Invidious for development."
   '';

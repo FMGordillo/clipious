@@ -149,8 +149,14 @@ Use `--profile` rather than `--debug` when testing media playback — the native
 | Script | Description |
 |---|---|
 | `setup` | One-time setup |
-| `build-runner` | Run code generation once (`freezed`, `auto_route`, `json_serializable`) |
-| `build-runner-watch` | Watch mode for code generation |
+| `clipious gen` | Pub get + code generation (`freezed`, `auto_route`, `json_serializable`) |
+| `clipious watch` | Watch mode for code generation |
+| `clipious apk [debug\|profile\|release]` | Universal APK (default debug) |
+| `clipious apk-split [mode]` | Per-ABI APKs (default release) |
+| `clipious apk-tv` | Android TV release APK |
+| `clipious test` / `fmt` / `lint` | Test, format, analyze |
+
+Run `clipious` with no args for the full list.
 
 ### Translations
 

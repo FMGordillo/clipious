@@ -21,12 +21,14 @@ dart format ./lib
 dart analyze --no-fatal-warnings ./lib
 
 # Code generation (freezed models, auto_route, json_serializable)
-make build-runner
+clipious gen
 # or watch mode:
-make build-runner-watch
+clipious watch
 
-# Build APK
-flutter build apk --profile --split-per-abi
+# Build APKs (run `clipious` for all commands)
+clipious apk            # universal debug APK
+clipious apk-split      # per-ABI release APKs
+clipious apk-tv         # Android TV APK
 ```
 
 ## Architecture
@@ -49,7 +51,7 @@ feature/
 
 ### Routing
 
-`auto_route` with definitions in `lib/router.dart`. Generated file is `lib/router.gr.dart` — do not edit manually, regenerate with `make build-runner`.
+`auto_route` with definitions in `lib/router.dart`. Generated file is `lib/router.gr.dart` — do not edit manually, regenerate with `clipious gen`.
 
 ### Database
 
@@ -76,7 +78,7 @@ Initialized before the router in `main()`. Global instance at `lib/globals.dart`
 
 ### Code Generation
 
-Models use `freezed` + `json_serializable`. After modifying any model annotated with `@freezed` or `@JsonSerializable`, run `make build-runner`. Generated files end in `.freezed.dart` or `.g.dart` — do not edit.
+Models use `freezed` + `json_serializable`. After modifying any model annotated with `@freezed` or `@JsonSerializable`, run `clipious gen`. Generated files end in `.freezed.dart` or `.g.dart` — do not edit.
 
 ### Localization
 
