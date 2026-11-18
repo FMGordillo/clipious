@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   awesome_notifications_core
   desktop_webview_window
   dynamic_color
+  ffmpeg_kit_flutter_new_full
   flutter_volume_controller
   url_launcher_linux
   window_to_front

@@ -5,46 +5,48 @@ description: Client for invidious.
 environment:
   sdk: ^3.8.0
 dependencies:
-  after_layout: 1.2.0
+  after_layout: ^1.2.0
   audio_service: ^0.18.19
   audio_session: ^0.2.4
-  auto_route: ^11.1.0
+  # 11.2.0 switched to the standalone material_ui package, whose TabController
+  # is a different type from Flutter 3.44's material.dart. Revisit when Flutter ships material_ui.
+  auto_route: '>=11.1.0 <11.2.0'
   awesome_notifications: any
-  awesome_notifications_core: 0.10.1
-  back_button_interceptor: 8.0.4
+  awesome_notifications_core: ^0.10.1
+  back_button_interceptor: ^8.0.6
   bloc: ^9.2.1
-  cached_network_image: 3.4.1
+  cached_network_image: ^4.0.3 # >=4.0.4 uses material_ui
   carousel_slider: ^5.1.2
-  copy_with_extension: ^15.0.1
+  copy_with_extension: ^18.0.1
   device_info_plus: ^13.2.0
   dio: ^5.10.0
-  downloadsfolder: 1.2.0
-  duration: 4.0.3
-  dynamic_color: 1.8.1
-  easy_debounce: 2.0.3
-  feedback: 3.2.0
+  downloadsfolder: ^1.2.0
+  duration: ^4.0.3
+  dynamic_color: ^1.8.1 # 2.x uses material_ui; see auto_route note
+  easy_debounce: ^2.0.3
+  feedback: ^3.2.0
   ffmpeg_kit_flutter_new_full: ^2.4.1
-  flutter_animate: 4.5.2
-  flutter_bloc: 9.1.1
+  flutter_animate: ^4.5.2
+  flutter_bloc: ^9.1.1
   flutter_displaymode: ^0.7.0
-  flutter_fadein: 2.0.0
-  flutter_linkify: 6.0.0
+  flutter_fadein: ^2.0.0
+  flutter_linkify: ^6.0.0
   flutter_native_splash: ^2.4.8
   flutter_svg: ^2.3.0
   flutter_swipe_action_cell: ^3.1.9
   flutter_volume_controller: ^2.0.1
   flutter_web_auth_2: ^5.0.3
-  freezed_annotation: 3.1.0
-  gap: 3.0.1
+  freezed_annotation: ^3.1.0
+  gap: ^3.1.0
   http: any
   intl: any
   json_annotation: ^4.12.0
   just_audio: ^0.10.6
-  locale_names:  1.1.1
+  locale_names: ^1.1.1
   #    git:
   #      url: https://github.com/lamarios/locale_names.git
   #      ref: master
-  logging: 1.3.0
+  logging: ^1.3.0
   package_info_plus: ^10.2.1
   path: any
   path_provider: any
@@ -56,13 +58,13 @@ dependencies:
   screen_brightness: ^2.1.11
   sembast: ^3.8.9+1
   sembast_sqflite: ^2.2.2
-  settings_ui: ^3.0.1
+  settings_ui: ^4.0.2
   share_plus: ^13.2.1
   sqflite: ^2.4.3
-  url_launcher: 6.3.2
+  url_launcher: ^6.3.3
   uuid: ^4.6.0
   wakelock_plus: ^1.7.0
-  workmanager: ^0.9.0+3
+  workmanager: ^0.10.10
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -71,17 +73,17 @@ dependencies:
     git:
       url: https://github.com/lamarios/river_player.git
       ref: master
-  simple_pip_mode: 1.1.0
+  simple_pip_mode: ^1.1.0
 #    git:
 #      url: https://github.com/song011794/simple_pip_mode_flutter.git
 #      ref: main
 dev_dependencies:
   auto_route_generator: any
   build_runner: ^2.7.0
-  copy_with_extension_gen: any
-  flutter_launcher_icons: 0.14.4
-  flutter_lints: 6.0.0
-  freezed: ^4.0.0-dev.3
+  copy_with_extension_gen: ^18.0.1
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
+  freezed: ^4.0.0-dev.3 # 4.0.3 needs Dart 3.13
   json_serializable: ^6.14.0
   mockito: ^5.5.0
   pubspec_dependency_sorter: ^1.0.4
@@ -93,9 +95,6 @@ dev_dependencies:
 dependency_overrides:
   matcher: 0.12.19
   test_api: 0.7.10
-  # sqflite_android 2.4.2+ uses Build.VERSION_CODES.BAKLAVA (API 36)
-  # unavailable at compileSdk 34. Pin to 2.4.1.
-  sqflite_android: 2.4.1
 flutter:
   assets:
     - assets/icon.svg

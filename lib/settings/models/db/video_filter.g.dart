@@ -28,7 +28,8 @@ abstract class _$VideoFilterCWProxy {
   VideoFilter endTime(String endTime);
 
   /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `VideoFilter(...).copyWith.fieldName(value)`.
+  /// Omitted fields keep their values; explicit `null` clears nullable fields.
+  /// The public API rejects `null` for non-nullable fields. To update a single field use `VideoFilter(...).copyWith.fieldName(value)`.
   ///
   /// Example:
   /// ```dart
@@ -87,14 +88,15 @@ class _$VideoFilterCWProxyImpl implements _$VideoFilterCWProxy {
   @override
   VideoFilter endTime(String endTime) => call(endTime: endTime);
 
-  @override
   /// Creates a new instance with the provided field values.
-  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `VideoFilter(...).copyWith.fieldName(value)`.
+  /// Omitted fields keep their values; explicit `null` clears nullable fields.
+  /// The public API rejects `null` for non-nullable fields. To update a single field use `VideoFilter(...).copyWith.fieldName(value)`.
   ///
   /// Example:
   /// ```dart
   /// VideoFilter(...).copyWith(id: 12, name: "My name")
   /// ```
+  @override
   VideoFilter call({
     Object? uuid = const $CopyWithPlaceholder(),
     Object? channelId = const $CopyWithPlaceholder(),

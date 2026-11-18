@@ -40,14 +40,17 @@ class VideoCubit extends Cubit<VideoState> {
         log.info("Failed to get dislikes for video ${state.videoId}");
       }
 
+      final isLoggedIn = await service.isLoggedIn();
+      if (isClosed) return;
       emit(state.copyWith(
           loadingVideo: false,
           video: video,
           dislikes: dislikes,
-          isLoggedIn: await service.isLoggedIn()));
+          isLoggedIn: isLoggedIn));
 
       getDownloadStatus();
     } catch (err) {
+      if (isClosed) rethrow;
       late String error;
       if (err is InvidiousServiceError) {
         error = (err).message;
