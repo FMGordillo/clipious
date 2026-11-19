@@ -1,7 +1,7 @@
 # Android SDK / toolchain notes
 
 Current: Flutter 3.44.3 (Dart 3.12), AGP 8.12.3, Gradle 8.13, Kotlin 2.2.20,
-compileSdk 36, targetSdk 35, build-tools 36.0.0, NDK 28.2.13676358, iOS 14.
+compileSdk 36, targetSdk 35, build-tools 35.0.0, NDK 28.2.13676358, iOS 14.
 
 ## Nix/devenv specifics
 
@@ -12,7 +12,7 @@ compileSdk 36, targetSdk 35, build-tools 36.0.0, NDK 28.2.13676358, iOS 14.
 - The devenv android module sets `aapt2FromMavenOverride` (via `GRADLE_OPTS`) to the
   *first* build-tools entry. The 33.0.2 aapt2 cannot read android-35/36 resource tables
   ("RES_TABLE_TYPE_TYPE entry offsets overlap"), so `enterShell` in `devenv.nix`
-  repoints it at build-tools 36.0.0. Keep `36.0.0` in `android.buildTools.version`
+  repoints it at build-tools 35.0.0. Keep `35.0.0` in `android.buildTools.version`
   and the same version in `buildToolsVersion` of `android/app/build.gradle`.
 - `android.platforms.version` includes 33 because `awesome_notifications_core`
   still declares compileSdk 33. Drop it when that plugin is updated.
@@ -39,3 +39,7 @@ compileSdk 36, targetSdk 35, build-tools 36.0.0, NDK 28.2.13676358, iOS 14.
 - Tests need `devenv up` (local Invidious on `localhost:3000`, login test/test). With it, 9 pass; 8 still fail because they need real YouTube or the public instance list (channel, playlist, video, subscription, `save public servers`). A stale `postmaster.pid` in `.devenv/state/postgres` makes `devenv up` fail; delete it.
 - `.git-blame-ignore-revs` lists the formatting commit; enable with
   `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
+- Do not use build-tools 36.0.0 from Nix: its `aapt` fails with an undefined libc++ symbol,
+  and `flutter run`/`flutter install` always use the newest build-tools `aapt` to read the
+  APK manifest. 35.0.0 works for both `aapt` and `aapt2` (including android-36 linking).
+- Flutter warns Gradle 8.13 support will be dropped; bump the wrapper to >= 8.14.

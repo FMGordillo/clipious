@@ -10,7 +10,7 @@
   android.enable = true;
   android.platformTools.version = "latest";
   android.platforms.version = ["33" "34" "35" "36"];
-  android.buildTools.version = ["33.0.2" "35.0.0" "36.0.0"];
+  android.buildTools.version = ["33.0.2" "35.0.0"];
   android.flutter.enable = true;
 
   languages.dart.enable = true;
@@ -222,7 +222,7 @@
     export GRADLE_USER_HOME="$DEVENV_ROOT/.devenv/gradle"
     # The devenv android module points aapt2FromMavenOverride at the first build-tools
     # entry (33.0.2), whose aapt2 cannot parse android-35/36 resource tables.
-    export GRADLE_OPTS="''${GRADLE_OPTS//build-tools\/33.0.2\//build-tools/36.0.0/}"
+    export GRADLE_OPTS="''${GRADLE_OPTS//build-tools\/33.0.2\//build-tools/35.0.0/}"
     mkdir -p "$ANDROID_SDK_ROOT" "$GRADLE_USER_HOME"
 
     echo "Run 'clipious' for dev/build commands (gen, apk, apk-split, apk-tv, test, ...). Also: setup, check-services"
