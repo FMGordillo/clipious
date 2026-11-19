@@ -36,8 +36,6 @@ compileSdk 36, targetSdk 35, build-tools 36.0.0, NDK 28.2.13676358, iOS 14.
 - `simple_pip_mode` 2.0 needs compileSdk 37 + Kotlin 2.4 (not in the Nix SDK yet).
 - `river_player` tracks upstream master (already latest); `receive_sharing_intent` is
   pinned to a commit on purpose (issue #344).
-- Many tests need a local Invidious on `localhost:3000` (`devenv up`, login test/test);
-  without it ~9 tests fail with `InvidiousServiceError`. `devenv up` currently fails to
-  start Postgres here (role "kemal" missing / stale postmaster.pid).
+- Tests need `devenv up` (local Invidious on `localhost:3000`, login test/test). With it, 9 pass; 8 still fail because they need real YouTube or the public instance list (channel, playlist, video, subscription, `save public servers`). A stale `postmaster.pid` in `.devenv/state/postgres` makes `devenv up` fail; delete it.
 - `.git-blame-ignore-revs` lists the formatting commit; enable with
   `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
