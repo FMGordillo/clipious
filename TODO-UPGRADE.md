@@ -28,9 +28,16 @@ compileSdk 36, targetSdk 35, build-tools 36.0.0, NDK 28.2.13676358, iOS 14.
 
 ## Pending
 
-- Built-in Kotlin migration (`android.builtInKotlin=false`, `android.newDsl=false` in
-  `android/gradle.properties`): blocked by plugins that still apply the Kotlin Gradle plugin.
-- `dart format ./lib` produces a large diff with the devenv Dart (3.12); `lib/` was
-  not reformatted.
+- Built-in Kotlin (`android.builtInKotlin`/`android.newDsl`): needs AGP 9 (+ Gradle 9);
+  with AGP 8.12 flipping the flags fails on Kotlin metadata mismatch. Several plugins
+  (awesome_notifications_core, downloadsfolder, dynamic_color, flutter_volume_controller,
+  flutter_web_auth_2, receive_sharing_intent, river_player, simple_pip_mode,
+  workmanager_android) still apply the Kotlin Gradle plugin.
+- `simple_pip_mode` 2.0 needs compileSdk 37 + Kotlin 2.4 (not in the Nix SDK yet).
+- `river_player` tracks upstream master (already latest); `receive_sharing_intent` is
+  pinned to a commit on purpose (issue #344).
 - Many tests need a local Invidious on `localhost:3000` (`devenv up`, login test/test);
-  without it ~9 tests fail with `InvidiousServiceError`.
+  without it ~9 tests fail with `InvidiousServiceError`. `devenv up` currently fails to
+  start Postgres here (role "kemal" missing / stale postmaster.pid).
+- `.git-blame-ignore-revs` lists the formatting commit; enable with
+  `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
