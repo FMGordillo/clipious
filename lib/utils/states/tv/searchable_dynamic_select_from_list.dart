@@ -14,8 +14,9 @@ class SearchableSelectFromListCubit<T>
 
   searchItems(String query) {
     emit(state.copyWith(loading: true));
-    fetchItems(query)
-        .then((value) => emit(state.copyWith(items: value, loading: false)));
+    fetchItems(
+      query,
+    ).then((value) => emit(state.copyWith(items: value, loading: false)));
   }
 }
 

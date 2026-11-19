@@ -44,8 +44,9 @@ class VideoFilterChannelCubit extends Cubit<VideoFilterChannelState> {
 
 @freezed
 sealed class VideoFilterChannelState with _$VideoFilterChannelState {
-  const factory VideoFilterChannelState(
-      {required List<VideoFilter> filters,
-      Channel? channel,
-      @Default(false) bool loading}) = _VideoFilterChannelState;
+  const factory VideoFilterChannelState({
+    required List<VideoFilter> filters,
+    Channel? channel,
+    @Default(false) bool loading,
+  }) = _VideoFilterChannelState;
 }

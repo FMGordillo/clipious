@@ -21,17 +21,18 @@ class ManageServerState extends State<ManageServersScreen> {
     var locals = AppLocalizations.of(context)!;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-        appBar: AppBar(
-          title: Text(locals.manageServers),
+      appBar: AppBar(title: Text(locals.manageServers)),
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        bottom: false,
+        child: BlocProvider(
+          create: (BuildContext context) => ServerListSettingsCubit(
+            const ServerListSettingsState(dbServers: [], publicServers: []),
+            context.read<AppCubit>(),
+          ),
+          child: const ManagerServersView(),
         ),
-        backgroundColor: colorScheme.surface,
-        body: SafeArea(
-            bottom: false,
-            child: BlocProvider(
-                create: (BuildContext context) => ServerListSettingsCubit(
-                    const ServerListSettingsState(
-                        dbServers: [], publicServers: []),
-                    context.read<AppCubit>()),
-                child: const ManagerServersView())));
+      ),
+    );
   }
 }

@@ -1,8 +1,1 @@
-enum SearchType {
-  video,
-  playlist,
-  channel,
-  movie,
-  show,
-  all;
-}
+enum SearchType { video, playlist, channel, movie, show, all }

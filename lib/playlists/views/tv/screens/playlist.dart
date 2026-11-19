@@ -21,14 +21,20 @@ import '../../../../videos/views/components/video_thumbnail.dart';
 
 @RoutePage()
 class TvPlaylistScreen extends PlaylistViewScreen {
-  const TvPlaylistScreen(
-      {super.key, required super.playlist, required super.canDeleteVideos});
+  const TvPlaylistScreen({
+    super.key,
+    required super.playlist,
+    required super.canDeleteVideos,
+  });
 
   playPlaylist(BuildContext context, PlaylistState state) {
-    AutoRouter.of(context).push(TvPlayerRoute(
+    AutoRouter.of(context).push(
+      TvPlayerRoute(
         videos: state.playlist.videos
             .where((element) => !element.filterHide)
-            .toList()));
+            .toList(),
+      ),
+    );
   }
 
   @override
@@ -39,7 +45,9 @@ class TvPlaylistScreen extends PlaylistViewScreen {
     TextTheme textTheme = Theme.of(context).textTheme;
     return BlocProvider(
       create: (context) => PlaylistCubit(
-          PlaylistState(playlist: playlist, playlistItemHeight: 0), player),
+        PlaylistState(playlist: playlist, playlistItemHeight: 0),
+        player,
+      ),
       child: Scaffold(
         body: BlocBuilder<PlaylistCubit, PlaylistState>(
           builder: (context, playlistState) {
@@ -49,15 +57,20 @@ class TvPlaylistScreen extends PlaylistViewScreen {
                 playlistState.playlist.videos.isNotEmpty
                     ? CarouselSlider.builder(
                         itemCount: playlistState.playlist.videos.length,
-                        itemBuilder: (BuildContext context, int itemIndex,
-                            int pageViewIndex) {
-                          Video video =
-                              playlistState.playlist.videos[itemIndex];
-                          return VideoThumbnailView(
-                              videoId: video.videoId,
-                              decoration: const BoxDecoration(),
-                              thumbnails: video.thumbnails);
-                        },
+                        itemBuilder:
+                            (
+                              BuildContext context,
+                              int itemIndex,
+                              int pageViewIndex,
+                            ) {
+                              Video video =
+                                  playlistState.playlist.videos[itemIndex];
+                              return VideoThumbnailView(
+                                videoId: video.videoId,
+                                decoration: const BoxDecoration(),
+                                thumbnails: video.thumbnails,
+                              );
+                            },
                         options: CarouselOptions(
                           autoPlayCurve: Curves.easeInOutQuad,
                           viewportFraction: 1,
@@ -67,9 +80,7 @@ class TvPlaylistScreen extends PlaylistViewScreen {
                           autoPlay: playlistState.showImage,
                         ),
                       )
-                    : Container(
-                        color: colors.secondaryContainer,
-                      ),
+                    : Container(color: colors.secondaryContainer),
                 AnimatedPositioned(
                   duration: animationDuration,
                   curve: Curves.easeInOutQuad,
@@ -78,141 +89,160 @@ class TvPlaylistScreen extends PlaylistViewScreen {
                   bottom: 0,
                   right: 0,
                   child: TweenAnimationBuilder(
-                      tween: Tween<double>(
-                          begin: 0,
-                          end: playlistState.showImage ? 0 : overlayBlur),
-                      duration: animationDuration,
-                      curve: Curves.easeInOutQuad,
-                      builder: (context, value, child) {
-                        return BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: value,
-                            sigmaY: value,
-                          ),
-                          child: TvOverscan(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: colors.surface.withValues(
-                                    alpha: overlayBackgroundOpacity),
+                    tween: Tween<double>(
+                      begin: 0,
+                      end: playlistState.showImage ? 0 : overlayBlur,
+                    ),
+                    duration: animationDuration,
+                    curve: Curves.easeInOutQuad,
+                    builder: (context, value, child) {
+                      return BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: value, sigmaY: value),
+                        child: TvOverscan(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: colors.surface.withValues(
+                                alpha: overlayBackgroundOpacity,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 16),
-                                          child: playlistState.loading
-                                              // child: true
-                                              ? TvButton(
-                                                  onFocusChanged:
-                                                      cubit.setShowImage,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: SizedBox(
-                                                      width: 60,
-                                                      height: 60,
-                                                      child:
-                                                          TweenAnimationBuilder(
-                                                        tween: Tween<double>(
-                                                            begin: 0,
-                                                            end: playlistState
-                                                                .loadingProgress),
-                                                        duration:
-                                                            animationDuration,
-                                                        curve: Curves
-                                                            .easeInOutQuad,
-                                                        builder: (context,
-                                                                value, child) =>
-                                                            CircularProgressIndicator(
-                                                          value: value > 0 &&
-                                                                  value < 1
-                                                              ? value
-                                                              : null,
-                                                        ),
-                                                      ),
-                                                    ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 16,
+                                        ),
+                                        child: playlistState.loading
+                                            // child: true
+                                            ? TvButton(
+                                                onFocusChanged:
+                                                    cubit.setShowImage,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    10.0,
                                                   ),
-                                                )
-                                              : TvButton(
-                                                  autofocus: true,
-                                                  onFocusChanged: (focus) {
-                                                    cubit.setShowImage(focus);
-                                                  },
-                                                  onPressed: (context) =>
-                                                      playPlaylist(context,
-                                                          playlistState),
-                                                  child: const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(15.0),
-                                                    child: Icon(
-                                                      Icons.play_arrow,
-                                                      size: 50,
+                                                  child: SizedBox(
+                                                    width: 60,
+                                                    height: 60,
+                                                    child: TweenAnimationBuilder(
+                                                      tween: Tween<double>(
+                                                        begin: 0,
+                                                        end: playlistState
+                                                            .loadingProgress,
+                                                      ),
+                                                      duration:
+                                                          animationDuration,
+                                                      curve:
+                                                          Curves.easeInOutQuad,
+                                                      builder:
+                                                          (
+                                                            context,
+                                                            value,
+                                                            child,
+                                                          ) =>
+                                                              CircularProgressIndicator(
+                                                                value:
+                                                                    value > 0 &&
+                                                                        value <
+                                                                            1
+                                                                    ? value
+                                                                    : null,
+                                                              ),
                                                     ),
                                                   ),
                                                 ),
+                                              )
+                                            : TvButton(
+                                                autofocus: true,
+                                                onFocusChanged: (focus) {
+                                                  cubit.setShowImage(focus);
+                                                },
+                                                onPressed: (context) =>
+                                                    playPlaylist(
+                                                      context,
+                                                      playlistState,
+                                                    ),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(15.0),
+                                                  child: Icon(
+                                                    Icons.play_arrow,
+                                                    size: 50,
+                                                  ),
+                                                ),
+                                              ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            playlistState.playlist.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: textTheme.headlineLarge,
+                                          ),
+                                          Text(
+                                            locals.nVideos(
+                                              playlistState
+                                                  .playlist
+                                                  .videos
+                                                  .length,
+                                            ),
+                                            style: textTheme.bodyLarge,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  if (!playlistState.loading)
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 16.0,
                                         ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                        child: GridView.count(
+                                          controller: cubit.scrollController,
+                                          childAspectRatio: 16 / 13,
+                                          crossAxisCount: 3,
                                           children: [
-                                            Text(
-                                              playlistState.playlist.title,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: textTheme.headlineLarge,
-                                            ),
-                                            Text(
-                                              locals.nVideos(playlistState
-                                                  .playlist.videos.length),
-                                              style: textTheme.bodyLarge,
-                                            ),
+                                            ...playlistState.playlist.videos
+                                                .where(
+                                                  (element) =>
+                                                      !element.filterHide,
+                                                )
+                                                .map(
+                                                  (e) => TvVideoItem(
+                                                    video: e,
+                                                    autoFocus: false,
+                                                  ),
+                                                ),
+                                            if (playlistState.loading)
+                                              ...repeatWidget(
+                                                () =>
+                                                    const TvVideoItemPlaceHolder(),
+                                                count: 10,
+                                              ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                    if (!playlistState.loading)
-                                      Expanded(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 16.0),
-                                          child: GridView.count(
-                                            controller: cubit.scrollController,
-                                            childAspectRatio: 16 / 13,
-                                            crossAxisCount: 3,
-                                            children: [
-                                              ...playlistState.playlist.videos
-                                                  .where((element) =>
-                                                      !element.filterHide)
-                                                  .map((e) => TvVideoItem(
-                                                      video: e,
-                                                      autoFocus: false)),
-                                              if (playlistState.loading)
-                                                ...repeatWidget(
-                                                    () =>
-                                                        const TvVideoItemPlaceHolder(),
-                                                    count: 10)
-                                            ],
-                                          ),
-                                        ),
                                       ),
-                                  ],
-                                ),
+                                    ),
+                                ],
                               ),
                             ),
                           ),
-                        );
-                      }),
-                )
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             );
           },

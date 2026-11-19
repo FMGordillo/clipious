@@ -19,14 +19,15 @@ class ChannelScreen extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     var locals = AppLocalizations.of(context)!;
 
-    return OrientationBuilder(builder: (context, orientation) {
-      return BlocProvider(
-        create: (BuildContext context) =>
-            ChannelCubit(ChannelController(channelId: channelId)),
-        child: BlocBuilder<ChannelCubit, ChannelController>(
-          builder: (context, channelState) {
-            var deviceType = getDeviceType();
-            return AutoTabsRouter.tabBar(
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return BlocProvider(
+          create: (BuildContext context) =>
+              ChannelCubit(ChannelController(channelId: channelId)),
+          child: BlocBuilder<ChannelCubit, ChannelController>(
+            builder: (context, channelState) {
+              var deviceType = getDeviceType();
+              return AutoTabsRouter.tabBar(
                 key: ValueKey(channelState.channel),
                 physics: const NeverScrollableScrollPhysics(),
                 routes: [
@@ -35,16 +36,15 @@ class ChannelScreen extends StatelessWidget {
                   ChannelShortsRoute(channel: channelState.channel),
                   ChannelStreamRoute(channel: channelState.channel),
                   ChannelPlaylistsRoute(
-                      channelId: channelState.channel?.authorId)
+                    channelId: channelState.channel?.authorId,
+                  ),
                 ],
                 builder: (context, child, controller) {
                   final tabsRouter = AutoTabsRouter.of(context);
 
                   return Scaffold(
                     appBar: AppBar(
-                      title: Text(
-                        channelState.channel?.author ?? '',
-                      ),
+                      title: Text(channelState.channel?.author ?? ''),
                       actions: channelState.loading
                           ? []
                           : [
@@ -54,7 +54,9 @@ class ChannelScreen extends StatelessWidget {
                                   children: <Widget>[
                                     IconButton(
                                       onPressed: () => showSharingSheet(
-                                          context, channelState.channel!),
+                                        context,
+                                        channelState.channel!,
+                                      ),
                                       icon: const Icon(Icons.share),
                                     ),
                                   ],
@@ -63,8 +65,8 @@ class ChannelScreen extends StatelessWidget {
                             ],
                     ),
                     backgroundColor: colorScheme.surface,
-                    bottomNavigationBar: deviceType == DeviceType.tablet ||
-                            channelState.loading
+                    bottomNavigationBar:
+                        deviceType == DeviceType.tablet || channelState.loading
                         ? null
                         : FadeIn(
                             child: NavigationBar(
@@ -72,62 +74,72 @@ class ChannelScreen extends StatelessWidget {
                               selectedIndex: tabsRouter.activeIndex,
                               destinations: <Widget>[
                                 NavigationDestination(
-                                    icon: const Icon(Icons.info),
-                                    label: locals.info),
+                                  icon: const Icon(Icons.info),
+                                  label: locals.info,
+                                ),
                                 NavigationDestination(
-                                    icon: const Icon(Icons.play_arrow),
-                                    label: locals.videos),
+                                  icon: const Icon(Icons.play_arrow),
+                                  label: locals.videos,
+                                ),
                                 NavigationDestination(
-                                    icon: const Icon(Icons.videocam),
-                                    label: locals.shorts),
+                                  icon: const Icon(Icons.videocam),
+                                  label: locals.shorts,
+                                ),
                                 NavigationDestination(
-                                    icon: const Icon(Icons.stream),
-                                    label: locals.streams),
+                                  icon: const Icon(Icons.stream),
+                                  label: locals.streams,
+                                ),
                                 NavigationDestination(
-                                    icon: const Icon(Icons.playlist_play),
-                                    label: locals.playlists)
+                                  icon: const Icon(Icons.playlist_play),
+                                  label: locals.playlists,
+                                ),
                               ],
                             ),
                           ),
                     body: SafeArea(
-                        bottom: false,
-                        child: Row(
-                          children: [
-                            if (deviceType == DeviceType.tablet)
-                              NavigationRail(
-                                extended:
-                                    getOrientation() == Orientation.landscape,
-                                destinations: [
-                                  NavigationRailDestination(
-                                      icon: const Icon(Icons.info),
-                                      label: Text(locals.info)),
-                                  NavigationRailDestination(
-                                      icon: const Icon(Icons.play_arrow),
-                                      label: Text(locals.videos)),
-                                  NavigationRailDestination(
-                                      icon: const Icon(Icons.videocam),
-                                      label: Text(locals.shorts)),
-                                  NavigationRailDestination(
-                                      icon: const Icon(Icons.stream),
-                                      label: Text(locals.streams)),
-                                  NavigationRailDestination(
-                                      icon: const Icon(Icons.playlist_play),
-                                      label: Text(locals.playlists))
-                                ],
-                                selectedIndex: tabsRouter.activeIndex,
-                                onDestinationSelected:
-                                    tabsRouter.setActiveIndex,
-                              ),
-                            Expanded(
-                              child: child,
+                      bottom: false,
+                      child: Row(
+                        children: [
+                          if (deviceType == DeviceType.tablet)
+                            NavigationRail(
+                              extended:
+                                  getOrientation() == Orientation.landscape,
+                              destinations: [
+                                NavigationRailDestination(
+                                  icon: const Icon(Icons.info),
+                                  label: Text(locals.info),
+                                ),
+                                NavigationRailDestination(
+                                  icon: const Icon(Icons.play_arrow),
+                                  label: Text(locals.videos),
+                                ),
+                                NavigationRailDestination(
+                                  icon: const Icon(Icons.videocam),
+                                  label: Text(locals.shorts),
+                                ),
+                                NavigationRailDestination(
+                                  icon: const Icon(Icons.stream),
+                                  label: Text(locals.streams),
+                                ),
+                                NavigationRailDestination(
+                                  icon: const Icon(Icons.playlist_play),
+                                  label: Text(locals.playlists),
+                                ),
+                              ],
+                              selectedIndex: tabsRouter.activeIndex,
+                              onDestinationSelected: tabsRouter.setActiveIndex,
                             ),
-                          ],
-                        )),
+                          Expanded(child: child),
+                        ],
+                      ),
+                    ),
                   );
-                });
-          },
-        ),
-      );
-    });
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 }

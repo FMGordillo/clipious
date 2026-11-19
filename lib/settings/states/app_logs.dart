@@ -25,8 +25,10 @@ class AppLogsCubit extends Cubit<AppLogsState> {
     selected.sort();
     String toClipboard = state.logs
         .where((element) => selected.contains(element.uuid))
-        .map((e) =>
-            '[${e.level}] [${e.logger}] - ${e.time} - ${e.message} ${e.stacktrace != null ? '\n${e.stacktrace}' : ''}')
+        .map(
+          (e) =>
+              '[${e.level}] [${e.logger}] - ${e.time} - ${e.message} ${e.stacktrace != null ? '\n${e.stacktrace}' : ''}',
+        )
         .toList()
         .reversed
         .join("\n");
@@ -48,9 +50,10 @@ class AppLogsCubit extends Cubit<AppLogsState> {
 
 @freezed
 sealed class AppLogsState with _$AppLogsState {
-  const factory AppLogsState(
-      {@Default([]) List<AppLog> logs,
-      @Default([]) List<String> selected}) = _AppLogsState;
+  const factory AppLogsState({
+    @Default([]) List<AppLog> logs,
+    @Default([]) List<String> selected,
+  }) = _AppLogsState;
 
   static AppLogsState init() {
     return AppLogsState(logs: db.getAppLogs().reversed.toList());

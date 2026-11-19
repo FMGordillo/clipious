@@ -21,7 +21,7 @@ class TvPlayerScreen extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => PlayerCubit(PlayerState.init(videos), settings),
-        )
+        ),
       ],
       child: Theme(
         data: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),

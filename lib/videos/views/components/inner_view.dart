@@ -18,12 +18,13 @@ class VideoInnerView extends StatelessWidget {
   final VideoState videoController;
   final Widget child;
 
-  const VideoInnerView(
-      {super.key,
-      required this.video,
-      this.playNow,
-      required this.child,
-      required this.videoController});
+  const VideoInnerView({
+    super.key,
+    required this.video,
+    this.playNow,
+    required this.child,
+    required this.videoController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +32,9 @@ class VideoInnerView extends StatelessWidget {
     var textTheme = Theme.of(context).textTheme;
     var cubit = context.read<VideoCubit>();
     var settings = context.read<SettingsCubit>();
-    String? currentlyPlayingVideoId = context
-        .select((PlayerCubit player) => player.state.currentlyPlaying?.videoId);
+    String? currentlyPlayingVideoId = context.select(
+      (PlayerCubit player) => player.state.currentlyPlaying?.videoId,
+    );
     final bool restart = currentlyPlayingVideoId == video.videoId;
     var phoneLandscape = isPhoneLandscape(context);
 
@@ -57,7 +59,8 @@ class VideoInnerView extends StatelessWidget {
                   thumbnails: video.deArrowThumbnailUrl != null
                       ? [video.deArrowThumbnailUrl!]
                       : ImageObject.getThumbnailUrlsByPreferredOrder(
-                          video.videoThumbnails),
+                          video.videoThumbnails,
+                        ),
                   child: phoneLandscape
                       ? const SizedBox.shrink()
                       : Stack(
@@ -65,11 +68,10 @@ class VideoInnerView extends StatelessWidget {
                           children: [
                             playButton,
                             Positioned(
-                                right: 5,
-                                bottom: 3,
-                                child: AddToQueueButton(
-                                  videos: [video],
-                                ))
+                              right: 5,
+                              bottom: 3,
+                              child: AddToQueueButton(videos: [video]),
+                            ),
                           ],
                         ),
                 ),
@@ -77,42 +79,48 @@ class VideoInnerView extends StatelessWidget {
             ),
             if (phoneLandscape) ...[
               Expanded(
-                  flex: 2,
-                  child: Container(
-                      alignment: Alignment.centerLeft, child: playButton)),
-              AddToQueueButton(videos: [video])
+                flex: 2,
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: playButton,
+                ),
+              ),
+              AddToQueueButton(videos: [video]),
             ],
           ],
         ),
         if (!settings.state.distractionFreeMode)
           BlocBuilder<SettingsCubit, SettingsState>(
-              buildWhen: (previous, current) =>
-                  previous.playRecommendedNext != current.playRecommendedNext,
-              builder: (context, settingsState) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                        height: 25,
-                        child: Checkbox(
-                            value: settingsState.playRecommendedNext,
-                            onChanged: cubit.togglePlayRecommendedNext,
-                            visualDensity: VisualDensity.compact)),
-                    InkWell(
-                        onTap: () => cubit.togglePlayRecommendedNext(
-                            !settingsState.playRecommendedNext),
-                        child: Text(
-                          locals.addRecommendedToQueue,
-                          style: textTheme.bodySmall,
-                        ))
-                  ],
-                );
-              }),
+            buildWhen: (previous, current) =>
+                previous.playRecommendedNext != current.playRecommendedNext,
+            builder: (context, settingsState) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    height: 25,
+                    child: Checkbox(
+                      value: settingsState.playRecommendedNext,
+                      onChanged: cubit.togglePlayRecommendedNext,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => cubit.togglePlayRecommendedNext(
+                      !settingsState.playRecommendedNext,
+                    ),
+                    child: Text(
+                      locals.addRecommendedToQueue,
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         Expanded(
-            child: Padding(
-          padding: const EdgeInsets.only(top: 0),
-          child: child,
-        )),
+          child: Padding(padding: const EdgeInsets.only(top: 0), child: child),
+        ),
       ],
     );
   }

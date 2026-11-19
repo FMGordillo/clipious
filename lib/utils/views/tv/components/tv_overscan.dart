@@ -11,7 +11,9 @@ class TvOverscan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-          vertical: TvOverscan.vertical, horizontal: TvOverscan.horizontal),
+        vertical: TvOverscan.vertical,
+        horizontal: TvOverscan.horizontal,
+      ),
       child: child,
     );
   }

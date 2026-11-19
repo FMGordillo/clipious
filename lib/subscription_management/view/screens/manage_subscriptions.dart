@@ -19,9 +19,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locals.manageSubscriptions),
-      ),
+      appBar: AppBar(title: Text(locals.manageSubscriptions)),
       body: SafeArea(
         bottom: true,
         child: Center(
@@ -31,8 +29,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
             child: BlocProvider(
               create: (context) =>
                   ManageSubscriptionCubit(const ManageSubscriptionsState()),
-              child: BlocBuilder<ManageSubscriptionCubit,
-                  ManageSubscriptionsState>(
+              child: BlocBuilder<ManageSubscriptionCubit, ManageSubscriptionsState>(
                 builder: (context, state) {
                   var cubit = context.read<ManageSubscriptionCubit>();
 
@@ -40,13 +37,13 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                     length: state.isLoggedIn ? 2 : 1,
                     child: Column(
                       children: [
-                        TabBar(tabs: [
-                          if (state.isLoggedIn)
-                            Tab(
-                              text: locals.invidiousAccount,
-                            ),
-                          Tab(text: locals.onDeviceSubscriptions),
-                        ]),
+                        TabBar(
+                          tabs: [
+                            if (state.isLoggedIn)
+                              Tab(text: locals.invidiousAccount),
+                            Tab(text: locals.onDeviceSubscriptions),
+                          ],
+                        ),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -67,16 +64,22 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                                       state.subs[index];
 
                                                   return GestureDetector(
-                                                    onTap: () => AutoRouter.of(
-                                                            context)
-                                                        .push(ChannelRoute(
-                                                            channelId:
-                                                                sub.authorId))
-                                                        .then((value) => cubit
-                                                            .refreshSubs()),
+                                                    onTap: () =>
+                                                        AutoRouter.of(context)
+                                                            .push(
+                                                              ChannelRoute(
+                                                                channelId: sub
+                                                                    .authorId,
+                                                              ),
+                                                            )
+                                                            .then(
+                                                              (value) => cubit
+                                                                  .refreshSubs(),
+                                                            ),
                                                     child: SimpleListItem(
                                                       key: ValueKey(
-                                                          sub.authorId),
+                                                        sub.authorId,
+                                                      ),
                                                       index: index,
                                                       child: Row(
                                                         mainAxisAlignment:
@@ -84,27 +87,28 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                                                 .spaceBetween,
                                                         children: [
                                                           Text(sub.author),
-                                                          IconButton
-                                                              .filledTonal(
+                                                          IconButton.filledTonal(
                                                             visualDensity:
                                                                 VisualDensity
                                                                     .compact,
                                                             onPressed: () {
                                                               okCancelDialog(
-                                                                  context,
-                                                                  locals
-                                                                      .unSubscribeQuestion,
-                                                                  locals
-                                                                      .youCanSubscribeAgainLater,
-                                                                  () => cubit
-                                                                      .unsubscribe(
-                                                                          sub.authorId));
+                                                                context,
+                                                                locals
+                                                                    .unSubscribeQuestion,
+                                                                locals
+                                                                    .youCanSubscribeAgainLater,
+                                                                () => cubit
+                                                                    .unsubscribe(
+                                                                      sub.authorId,
+                                                                    ),
+                                                              );
                                                             },
                                                             icon: const Icon(
                                                               Icons.clear,
                                                               size: 15,
                                                             ),
-                                                          )
+                                                          ),
                                                         ],
                                                       ),
                                                     ),
@@ -113,7 +117,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                               ),
                                             ),
                                             if (state.loading)
-                                              const TopListLoading()
+                                              const TopListLoading(),
                                           ],
                                         ),
                                 !state.loading && state.offlineSubs.isEmpty
@@ -131,16 +135,22 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                                     state.offlineSubs[index];
 
                                                 return GestureDetector(
-                                                  onTap: () => AutoRouter.of(
-                                                          context)
-                                                      .push(ChannelRoute(
-                                                          channelId:
-                                                              sub.channelId))
-                                                      .then((value) =>
-                                                          cubit.refreshSubs()),
+                                                  onTap: () =>
+                                                      AutoRouter.of(context)
+                                                          .push(
+                                                            ChannelRoute(
+                                                              channelId:
+                                                                  sub.channelId,
+                                                            ),
+                                                          )
+                                                          .then(
+                                                            (value) => cubit
+                                                                .refreshSubs(),
+                                                          ),
                                                   child: SimpleListItem(
-                                                    key:
-                                                        ValueKey(sub.channelId),
+                                                    key: ValueKey(
+                                                      sub.channelId,
+                                                    ),
                                                     index: index,
                                                     child: Row(
                                                       mainAxisAlignment:
@@ -154,20 +164,22 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                                                   .compact,
                                                           onPressed: () {
                                                             okCancelDialog(
-                                                                context,
-                                                                locals
-                                                                    .unSubscribeQuestion,
-                                                                locals
-                                                                    .youCanSubscribeAgainLater,
-                                                                () => cubit
-                                                                    .unsubscribeOffline(
-                                                                        sub.channelId));
+                                                              context,
+                                                              locals
+                                                                  .unSubscribeQuestion,
+                                                              locals
+                                                                  .youCanSubscribeAgainLater,
+                                                              () => cubit
+                                                                  .unsubscribeOffline(
+                                                                    sub.channelId,
+                                                                  ),
+                                                            );
                                                           },
                                                           icon: const Icon(
                                                             Icons.clear,
                                                             size: 15,
                                                           ),
-                                                        )
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -176,7 +188,7 @@ class ManageSubscriptionsScreen extends StatelessWidget {
                                             ),
                                           ),
                                           if (state.loading)
-                                            const TopListLoading()
+                                            const TopListLoading(),
                                         ],
                                       ),
                               ],

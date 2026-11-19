@@ -24,10 +24,11 @@ enum HomeDataSourceAppearance { tv, phone, both }
 
 enum HomeDataSource {
   home(
-      big: false,
-      small: false,
-      route: HomeRoute(),
-      showOn: HomeDataSourceAppearance.phone), // used for app layout set-up
+    big: false,
+    small: false,
+    route: HomeRoute(),
+    showOn: HomeDataSourceAppearance.phone,
+  ), // used for app layout set-up
   popular(route: PopularRoute()),
   trending(route: TrendingRoute()),
   subscription(route: SubscriptionRoute()),
@@ -35,7 +36,9 @@ enum HomeDataSource {
   playlist(route: PlaylistsRoute()),
   downloads(showOn: HomeDataSourceAppearance.phone, route: DownloadsRoute()),
   searchHistory(
-      showOn: HomeDataSourceAppearance.phone, route: SearchHistoryRoute()),
+    showOn: HomeDataSourceAppearance.phone,
+    route: SearchHistoryRoute(),
+  ),
   search(showOn: HomeDataSourceAppearance.tv);
 
   final bool small;
@@ -43,11 +46,12 @@ enum HomeDataSource {
   final HomeDataSourceAppearance showOn;
   final PageRouteInfo? route;
 
-  const HomeDataSource(
-      {this.small = true,
-      this.big = true,
-      this.route,
-      this.showOn = HomeDataSourceAppearance.both});
+  const HomeDataSource({
+    this.small = true,
+    this.big = true,
+    this.route,
+    this.showOn = HomeDataSourceAppearance.both,
+  });
 
   static List<HomeDataSource> defaultSettings() {
     return isTv
@@ -88,31 +92,49 @@ enum HomeDataSource {
       (HomeDataSource.playlist || HomeDataSource.history) => isLoggedIn,
       (HomeDataSource.searchHistory) =>
         context.read<SettingsCubit>().state.useSearchHistory,
-      (_) => true
+      (_) => true,
     };
   }
 
   Widget getBottomBarNavigationWidget(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     return switch (this) {
-      (HomeDataSource.trending) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.popular) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.playlist) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.history) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.downloads) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.searchHistory) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.subscription) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.home) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals)),
-      (HomeDataSource.search) =>
-        NavigationDestination(icon: Icon(getIcon()), label: getLabel(locals))
+      (HomeDataSource.trending) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.popular) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.playlist) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.history) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.downloads) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.searchHistory) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.subscription) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.home) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
+      (HomeDataSource.search) => NavigationDestination(
+        icon: Icon(getIcon()),
+        label: getLabel(locals),
+      ),
     };
   }
 
@@ -120,114 +142,152 @@ enum HomeDataSource {
     var locals = AppLocalizations.of(context)!;
     return switch (this) {
       (HomeDataSource.trending) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.popular) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.playlist) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.history) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.downloads) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.searchHistory) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.subscription) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.home) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals))),
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
       (HomeDataSource.search) => NavigationRailDestination(
-          icon: Icon(getIcon()), label: Text(getLabel(locals)))
+        icon: Icon(getIcon()),
+        label: Text(getLabel(locals)),
+      ),
     };
   }
 
   Widget build(BuildContext context, bool small) {
     return switch (this) {
       (HomeDataSource.trending) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: VideoList(
-            scrollDirection: small ? Axis.horizontal : Axis.vertical,
-            small: small,
-            animateDownload: true,
-            paginatedVideoList: SingleEndpointList(service.getTrending),
-          )),
-      (HomeDataSource.subscription) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: VideoList(
-            scrollDirection: small ? Axis.horizontal : Axis.vertical,
-            small: small,
-            animateDownload: true,
-            paginatedVideoList: SubscriptionVideoList(),
-          )),
-      (HomeDataSource.popular) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: VideoList(
-            scrollDirection: small ? Axis.horizontal : Axis.vertical,
-            small: small,
-            animateDownload: true,
-            paginatedVideoList: SingleEndpointList(service.getPopular),
-          )),
-      (HomeDataSource.playlist) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: PlaylistList(
-            canDeleteVideos: true,
-            small: small,
-            paginatedList: SingleEndpointList(service.getUserPlaylists),
-          )),
-      (HomeDataSource.downloads) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: BlocBuilder<DownloadManagerCubit, DownloadManagerState>(
-              buildWhen: (previous, current) =>
-                  previous.videos != current.videos,
-              builder: (context, downloads) {
-                var videos = downloads.videos.reversed
-                    .where((e) => e.downloadComplete && !e.downloadFailed)
-                    .toList();
-                return VideoList(
-                  key: ValueKey(videos),
-                  scrollDirection: small ? Axis.horizontal : Axis.vertical,
-                  small: small,
-                  animateDownload: true,
-                  paginatedVideoList: FixedItemList(videos),
-                );
-              })),
-      (HomeDataSource.searchHistory) => SizedBox(
-          height: small ? 40 : null,
-          child: ListView(
-            scrollDirection: small ? Axis.horizontal : Axis.vertical,
-            children: db
-                .getSearchHistory()
-                .map((e) => Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 8, horizontal: small ? 8 : 0),
-                      child: FilledButton.tonal(
-                          onPressed: () => HomeView.openSearch(context, e),
-                          child: Text(e)),
-                    ))
-                .toList(),
-          )),
-      (HomeDataSource.history) => SizedBox(
-          height: small ? smallVideoViewHeight : null,
-          child: small
-              ? VideoList(
-                  scrollDirection: small ? Axis.horizontal : Axis.vertical,
-                  small: small,
-                  animateDownload: true,
-                  paginatedVideoList: PageBasedPaginatedList<Video>(
-                      getItemsFunc: (page, maxResults) =>
-                          // we get the data for each video
-                          service.getUserHistory(page, maxResults).then(
-                              (value) => Future.wait(value
-                                  .map((e) async => (await HistoryVideoCache
-                                          .fromVideoIdToVideo(e))
-                                      .toVideo())
-                                  .toList())),
-                      maxResults: 20),
-                )
-              : const HistoryView(),
+        height: small ? smallVideoViewHeight : null,
+        child: VideoList(
+          scrollDirection: small ? Axis.horizontal : Axis.vertical,
+          small: small,
+          animateDownload: true,
+          paginatedVideoList: SingleEndpointList(service.getTrending),
         ),
+      ),
+      (HomeDataSource.subscription) => SizedBox(
+        height: small ? smallVideoViewHeight : null,
+        child: VideoList(
+          scrollDirection: small ? Axis.horizontal : Axis.vertical,
+          small: small,
+          animateDownload: true,
+          paginatedVideoList: SubscriptionVideoList(),
+        ),
+      ),
+      (HomeDataSource.popular) => SizedBox(
+        height: small ? smallVideoViewHeight : null,
+        child: VideoList(
+          scrollDirection: small ? Axis.horizontal : Axis.vertical,
+          small: small,
+          animateDownload: true,
+          paginatedVideoList: SingleEndpointList(service.getPopular),
+        ),
+      ),
+      (HomeDataSource.playlist) => SizedBox(
+        height: small ? smallVideoViewHeight : null,
+        child: PlaylistList(
+          canDeleteVideos: true,
+          small: small,
+          paginatedList: SingleEndpointList(service.getUserPlaylists),
+        ),
+      ),
+      (HomeDataSource.downloads) => SizedBox(
+        height: small ? smallVideoViewHeight : null,
+        child: BlocBuilder<DownloadManagerCubit, DownloadManagerState>(
+          buildWhen: (previous, current) => previous.videos != current.videos,
+          builder: (context, downloads) {
+            var videos = downloads.videos.reversed
+                .where((e) => e.downloadComplete && !e.downloadFailed)
+                .toList();
+            return VideoList(
+              key: ValueKey(videos),
+              scrollDirection: small ? Axis.horizontal : Axis.vertical,
+              small: small,
+              animateDownload: true,
+              paginatedVideoList: FixedItemList(videos),
+            );
+          },
+        ),
+      ),
+      (HomeDataSource.searchHistory) => SizedBox(
+        height: small ? 40 : null,
+        child: ListView(
+          scrollDirection: small ? Axis.horizontal : Axis.vertical,
+          children: db
+              .getSearchHistory()
+              .map(
+                (e) => Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: small ? 8 : 0,
+                  ),
+                  child: FilledButton.tonal(
+                    onPressed: () => HomeView.openSearch(context, e),
+                    child: Text(e),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+      (HomeDataSource.history) => SizedBox(
+        height: small ? smallVideoViewHeight : null,
+        child: small
+            ? VideoList(
+                scrollDirection: small ? Axis.horizontal : Axis.vertical,
+                small: small,
+                animateDownload: true,
+                paginatedVideoList: PageBasedPaginatedList<Video>(
+                  getItemsFunc: (page, maxResults) =>
+                      // we get the data for each video
+                      service
+                          .getUserHistory(page, maxResults)
+                          .then(
+                            (value) => Future.wait(
+                              value
+                                  .map(
+                                    (e) async =>
+                                        (await HistoryVideoCache.fromVideoIdToVideo(
+                                          e,
+                                        )).toVideo(),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
+                  maxResults: 20,
+                ),
+              )
+            : const HistoryView(),
+      ),
       (HomeDataSource.home) =>
         small ? const SizedBox.shrink() : const HomeView(),
-      (_) => const SizedBox.shrink()
+      (_) => const SizedBox.shrink(),
     };
   }
 }
@@ -251,7 +311,8 @@ class HomeLayout {
   String get dbBigSource => bigSource.name;
 
   set dbBigSource(String value) {
-    bigSource = HomeDataSource.values
+    bigSource =
+        HomeDataSource.values
             .where((element) => element.name == value)
             .firstOrNull ??
         HomeDataSource.trending;
@@ -261,11 +322,13 @@ class HomeLayout {
 
   set dbSmallSources(List<String> values) {
     smallSources = values
-        .map((e) =>
-            HomeDataSource.values
-                .where((element) => element.name == e)
-                .firstOrNull ??
-            HomeDataSource.trending)
+        .map(
+          (e) =>
+              HomeDataSource.values
+                  .where((element) => element.name == e)
+                  .firstOrNull ??
+              HomeDataSource.trending,
+        )
         .toList();
   }
 

@@ -18,7 +18,8 @@ Future<List<Video>> postProcessVideos(List<Video> toProcess) async {
     videos = await DeArrow.processVideos(videos);
 
     log.fine(
-        "Filter + DeArrow took ${DateTime.now().millisecondsSinceEpoch - start}ms for ${toProcess.length} videos");
+      "Filter + DeArrow took ${DateTime.now().millisecondsSinceEpoch - start}ms for ${toProcess.length} videos",
+    );
     return videos;
   } catch (err) {
     log.severe('Issue while running post process', err);

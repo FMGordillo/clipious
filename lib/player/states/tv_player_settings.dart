@@ -20,17 +20,11 @@ const List<String> tvAvailablePlaybackSpeeds = [
   '2.25x',
   '2.5x',
   '2.75x',
-  '3x'
+  '3x',
 ];
 final Logger log = Logger('TvSettingsController');
 
-enum Tabs {
-  video,
-  audio,
-  captions,
-  playbackSpeed,
-  sleepTimer;
-}
+enum Tabs { video, audio, captions, playbackSpeed, sleepTimer }
 
 class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
   final VideoPlayerCubit player;
@@ -40,20 +34,20 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
 
   List<String> get videoTrackNames =>
       settings.state.useDash || (player.state.video?.liveNow ?? false)
-          ? player.videoController?.betterPlayerAsmsTracks
-                  .map((e) => '${e.height}p')
-                  .toSet()
-                  .toList() ??
-              []
-          : player.videoController?.betterPlayerDataSource?.resolutions?.keys
-                  .toList() ??
-              [];
+      ? player.videoController?.betterPlayerAsmsTracks
+                .map((e) => '${e.height}p')
+                .toSet()
+                .toList() ??
+            []
+      : player.videoController?.betterPlayerDataSource?.resolutions?.keys
+                .toList() ??
+            [];
 
   List<String> get audioTrackNames => settings.state.useDash
       ? player.videoController?.betterPlayerAsmsAudioTracks
-              ?.map((e) => '${e.label}')
-              .toList() ??
-          []
+                ?.map((e) => '${e.label}')
+                .toList() ??
+            []
       : [];
 
   List<String> get availableCaptions =>
@@ -148,7 +142,8 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
 
 @freezed
 sealed class TvPlayerSettingsState with _$TvPlayerSettingsState {
-  const factory TvPlayerSettingsState(
-      {@Default(Tabs.video) Tabs selected,
-      @Default(SleepTimer()) SleepTimer sleepTimer}) = _TvPlayerSettingsState;
+  const factory TvPlayerSettingsState({
+    @Default(Tabs.video) Tabs selected,
+    @Default(SleepTimer()) SleepTimer sleepTimer,
+  }) = _TvPlayerSettingsState;
 }

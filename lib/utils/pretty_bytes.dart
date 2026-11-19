@@ -2,17 +2,7 @@ import 'dart:math';
 
 import 'package:intl/intl.dart';
 
-const byteUnits = [
-  'B',
-  'KB',
-  'MB',
-  'GB',
-  'TB',
-  'PB',
-  'EB',
-  'ZB',
-  'YB',
-];
+const byteUnits = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 const bibyteUnits = [
   'B',
@@ -54,8 +44,12 @@ double log10(num x) => log(x) / ln10;
 
 var removeTrailingZerosRegex = RegExp(r'([.]*0)(?!.*\d)');
 
-String toLocaleString(double number, String? locale, int? minimumFractionDigits,
-    int? maximumFractionDigits) {
+String toLocaleString(
+  double number,
+  String? locale,
+  int? minimumFractionDigits,
+  int? maximumFractionDigits,
+) {
   if (locale == null) {
     return number.toString().replaceAll(removeTrailingZerosRegex, '');
   }
@@ -71,6 +65,7 @@ String toLocaleString(double number, String? locale, int? minimumFractionDigits,
 
 String prettyBytes(
   double number, {
+
   /// Include plus sign for positive numbers. If the difference is exactly zero a space character will be prepended instead for better alignment.
   /// Default: false.
   bool? signed,
@@ -141,22 +136,30 @@ String prettyBytes(
 
   if (number < 1) {
     final numberStr = toLocaleString(
-        number, locale, minimumFractionDigits, maximumFractionDigits);
+      number,
+      locale,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    );
     return '$prefix$numberStr ${units[0]}';
   }
 
   final exponent = min(
-          (binary != null ? log(number) / log(1024) : log10(number) / 3)
-              .floorToDouble(),
-          (units.length - 1).toDouble())
-      .toInt();
+    (binary != null ? log(number) / log(1024) : log10(number) / 3)
+        .floorToDouble(),
+    (units.length - 1).toDouble(),
+  ).toInt();
   number /= pow(binary != null ? 1024 : 1000, exponent);
   if (minimumFractionDigits == null && maximumFractionDigits == null) {
     number = double.parse(number.toStringAsPrecision(3));
   }
 
   final numberStr = toLocaleString(
-      number, locale, minimumFractionDigits, maximumFractionDigits);
+    number,
+    locale,
+    minimumFractionDigits,
+    maximumFractionDigits,
+  );
 
   final unit = units[exponent];
 

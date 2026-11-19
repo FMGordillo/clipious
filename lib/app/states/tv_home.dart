@@ -13,9 +13,12 @@ class TvHomeCubit extends Cubit<bool> {
       emit(true);
     } else {
       EasyDebounce.debounce(
-          'expand-home-menu', const Duration(milliseconds: 50), () {
-        emit(false);
-      });
+        'expand-home-menu',
+        const Duration(milliseconds: 50),
+        () {
+          emit(false);
+        },
+      );
     }
   }
 
@@ -26,7 +29,10 @@ class TvHomeCubit extends Cubit<bool> {
   }
 
   scrollToTop() {
-    scrollController.animateTo(0,
-        duration: animationDuration, curve: Curves.easeInOutQuad);
+    scrollController.animateTo(
+      0,
+      duration: animationDuration,
+      curve: Curves.easeInOutQuad,
+    );
   }
 }

@@ -46,41 +46,43 @@ class SearchFiltersButton extends StatelessWidget {
 
                   return AlertDialog(
                     content: SingleChildScrollView(
-                      child: ListBody(children: <Widget>[
-                        Text(locals.searchUploadDate),
-                        ...SearchDate.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchDate>(
-                              value: value,
-                              groupValue: state.date,
-                              onChanged: onDateChanged,
-                            ),
-                          );
-                        }),
-                        Text(locals.searchDuration),
-                        ...SearchDuration.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchDuration>(
-                              value: value,
-                              groupValue: state.duration,
-                              onChanged: onDurationChanged,
-                            ),
-                          );
-                        }),
-                        Text(locals.searchSortBy),
-                        ...SearchSortBy.values.map((value) {
-                          return ListTile(
-                            title: Text(value.getLabel(locals)),
-                            leading: Radio<SearchSortBy>(
-                              value: value,
-                              groupValue: state.sortBy,
-                              onChanged: onSortByChanged,
-                            ),
-                          );
-                        }),
-                      ]),
+                      child: ListBody(
+                        children: <Widget>[
+                          Text(locals.searchUploadDate),
+                          ...SearchDate.values.map((value) {
+                            return ListTile(
+                              title: Text(value.getLabel(locals)),
+                              leading: Radio<SearchDate>(
+                                value: value,
+                                groupValue: state.date,
+                                onChanged: onDateChanged,
+                              ),
+                            );
+                          }),
+                          Text(locals.searchDuration),
+                          ...SearchDuration.values.map((value) {
+                            return ListTile(
+                              title: Text(value.getLabel(locals)),
+                              leading: Radio<SearchDuration>(
+                                value: value,
+                                groupValue: state.duration,
+                                onChanged: onDurationChanged,
+                              ),
+                            );
+                          }),
+                          Text(locals.searchSortBy),
+                          ...SearchSortBy.values.map((value) {
+                            return ListTile(
+                              title: Text(value.getLabel(locals)),
+                              leading: Radio<SearchSortBy>(
+                                value: value,
+                                groupValue: state.sortBy,
+                                onChanged: onSortByChanged,
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                     actions: <Widget>[
                       TextButton(

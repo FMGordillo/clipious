@@ -11,7 +11,7 @@ enum MediaCommandType {
   switchToOfflineVideo,
   // those are more to let the player know if they need to do anything when the full screen status changes
   enterFullScreen,
-  exitFullScreen
+  exitFullScreen,
 }
 
 class MediaCommand<T> {

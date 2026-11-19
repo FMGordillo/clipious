@@ -15,9 +15,7 @@ class DownloadManagerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locals.downloads),
-      ),
+      appBar: AppBar(title: Text(locals.downloads)),
       body: SafeArea(
         bottom: false,
         child: BlocBuilder<DownloadManagerCubit, DownloadManagerState>(
@@ -26,22 +24,23 @@ class DownloadManagerScreen extends StatelessWidget {
             return state.videos.isNotEmpty
                 ? Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: innerHorizontalPadding),
+                      horizontal: innerHorizontalPadding,
+                    ),
                     child: Column(
                       children: [
                         FilledButton.tonal(
-                            onPressed:
-                                cubit.canPlayAll() ? cubit.playAll : null,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 8.0),
-                                  child: Icon(Icons.playlist_play),
-                                ),
-                                Text(locals.downloadsPlayAll)
-                              ],
-                            )),
+                          onPressed: cubit.canPlayAll() ? cubit.playAll : null,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(right: 8.0),
+                                child: Icon(Icons.playlist_play),
+                              ),
+                              Text(locals.downloadsPlayAll),
+                            ],
+                          ),
+                        ),
                         Expanded(
                           child: ListView.builder(
                             itemCount: state.videos.length,

@@ -14,12 +14,13 @@ class TvHorizontalItemList<T> extends StatelessWidget {
   final String? tags;
   final Widget Function(BuildContext context, int index, T item) buildItem;
 
-  const TvHorizontalItemList(
-      {super.key,
-      this.tags,
-      required this.paginatedList,
-      required this.buildItem,
-      required this.getPlaceholder});
+  const TvHorizontalItemList({
+    super.key,
+    this.tags,
+    required this.paginatedList,
+    required this.buildItem,
+    required this.getPlaceholder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +38,7 @@ class TvHorizontalItemList<T> extends StatelessWidget {
 
           return Stack(
             children: [
-              if (state.loading)
-                const LinearProgressIndicator(
-                  minHeight: 3,
-                ),
+              if (state.loading) const LinearProgressIndicator(minHeight: 3),
               !state.loading && items.isEmpty
                   ? const SizedBox.shrink()
                   : SizedBox(
@@ -73,13 +71,14 @@ class TvHorizontalVideoList extends StatelessWidget {
   final int autoFocusedIndex;
   final void Function(Video video, int index, bool focus)? onItemFocus;
 
-  const TvHorizontalVideoList(
-      {super.key,
-      this.tags,
-      required this.paginatedVideoList,
-      this.onSelect,
-      this.autoFocusedIndex = 0,
-      this.onItemFocus});
+  const TvHorizontalVideoList({
+    super.key,
+    this.tags,
+    required this.paginatedVideoList,
+    this.onSelect,
+    this.autoFocusedIndex = 0,
+    this.onItemFocus,
+  });
 
   @override
   Widget build(BuildContext context) {

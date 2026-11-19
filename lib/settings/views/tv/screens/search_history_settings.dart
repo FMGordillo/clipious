@@ -18,44 +18,43 @@ class TvSearchHistorySettingsScreen extends StatelessWidget {
     var locals = AppLocalizations.of(context)!;
 
     showTvDialog(
-        context: context,
-        builder: (BuildContext context) => [
-              Column(
-                children: [
-                  Text(locals.clearSearchHistory),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 36),
-                    child: Text(locals.irreversibleAction),
-                  )
-                ],
-              ),
-            ],
-        actions: [
-          TvButton(
-            onPressed: (context) {
+      context: context,
+      builder: (BuildContext context) => [
+        Column(
+          children: [
+            Text(locals.clearSearchHistory),
+            Padding(
+              padding: const EdgeInsets.only(top: 36),
+              child: Text(locals.irreversibleAction),
+            ),
+          ],
+        ),
+      ],
+      actions: [
+        TvButton(
+          onPressed: (context) {
+            Navigator.of(context).pop();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+            child: Text(locals.cancel),
+          ),
+        ),
+        TvButton(
+          onPressed: (context) async {
+            await db.clearSearchHistory();
+            if (context.mounted) {
               Navigator.of(context).pop();
-            },
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-              child: Text(locals.cancel),
-            ),
+            }
+          },
+          focusedColor: Colors.red,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+            child: Text(locals.ok),
           ),
-          TvButton(
-            onPressed: (context) async {
-              await db.clearSearchHistory();
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
-            focusedColor: Colors.red,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-              child: Text(locals.ok),
-            ),
-          ),
-        ]);
+        ),
+      ],
+    );
   }
 
   @override
@@ -73,7 +72,9 @@ class TvSearchHistorySettingsScreen extends StatelessWidget {
                 SettingsTile(
                   title: locals.enableSearchHistory,
                   trailing: Switch(
-                      onChanged: (value) {}, value: state.useSearchHistory),
+                    onChanged: (value) {},
+                    value: state.useSearchHistory,
+                  ),
                   onSelected: (ctx) =>
                       cubit.toggleSearchHistory(!state.useSearchHistory),
                 ),
@@ -86,7 +87,7 @@ class TvSearchHistorySettingsScreen extends StatelessWidget {
                 SettingsTile(
                   title: locals.clearSearchHistory,
                   onSelected: (context) => showClearHistoryDialog(context),
-                )
+                ),
               ],
             ),
           );

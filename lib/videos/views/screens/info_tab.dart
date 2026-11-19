@@ -10,8 +10,12 @@ class VideoInfoTab extends StatelessWidget {
   final int? dislikes;
   final bool titleAndChannelInfo;
 
-  const VideoInfoTab(
-      {super.key, this.video, this.dislikes, this.titleAndChannelInfo = true});
+  const VideoInfoTab({
+    super.key,
+    this.video,
+    this.dislikes,
+    this.titleAndChannelInfo = true,
+  });
 
   @override
   Widget build(BuildContext context) {

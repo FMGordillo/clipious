@@ -31,14 +31,15 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
   refreshServers() async {
     var dbServers = await db.getServers();
     var servers = state.publicServers
-        .where((s) =>
-            dbServers.indexWhere((element) => element.url == s.url) == -1)
+        .where(
+          (s) => dbServers.indexWhere((element) => element.url == s.url) == -1,
+        )
         .toList();
 
     emit(state.copyWith(dbServers: dbServers, publicServers: servers));
   }
 
-/*
+  /*
   getPublicServers() async {
     emit(state.copyWith(
         pinging: true, publicServersError: PublicServerErrors.none));
@@ -91,8 +92,10 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
 */
 
   bool isLoggedInToServer(String url) {
-    Server server = state.dbServers.firstWhere((s) => s.url == url,
-        orElse: () => const Server(url: 'notFound'));
+    Server server = state.dbServers.firstWhere(
+      (s) => s.url == url,
+      orElse: () => const Server(url: 'notFound'),
+    );
 
     return (server.authToken?.isNotEmpty ?? false) ||
         (server.sidCookie?.isNotEmpty ?? false);
@@ -116,11 +119,11 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
 
 @freezed
 sealed class ServerListSettingsState with _$ServerListSettingsState {
-  const factory ServerListSettingsState(
-      {required List<Server> dbServers,
-      required List<Server> publicServers,
-      @Default(0) double publicServerProgress,
-      @Default(true) bool pinging,
-      @Default(PublicServerErrors.none)
-      PublicServerErrors publicServersError}) = _ServerListSettingsState;
+  const factory ServerListSettingsState({
+    required List<Server> dbServers,
+    required List<Server> publicServers,
+    @Default(0) double publicServerProgress,
+    @Default(true) bool pinging,
+    @Default(PublicServerErrors.none) PublicServerErrors publicServersError,
+  }) = _ServerListSettingsState;
 }

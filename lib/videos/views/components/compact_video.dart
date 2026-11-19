@@ -18,15 +18,17 @@ class CompactVideo extends StatelessWidget {
   final bool? highlighted;
   final List<Widget>? trailing;
 
-  const CompactVideo(
-      {super.key,
-      this.onTap,
-      this.video,
-      this.trailing,
-      this.highlighted,
-      this.offlineVideo})
-      : assert(video == null || offlineVideo == null,
-            'cannot provide both video and offline video\n');
+  const CompactVideo({
+    super.key,
+    this.onTap,
+    this.video,
+    this.trailing,
+    this.highlighted,
+    this.offlineVideo,
+  }) : assert(
+         video == null || offlineVideo == null,
+         'cannot provide both video and offline video\n',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +43,8 @@ class CompactVideo extends StatelessWidget {
       create: (context) =>
           CompactVideoCubit(CompactVideoState(offlineVideo: offlineVideo)),
       child: BlocBuilder<CompactVideoCubit, CompactVideoState>(
-          builder: (context, state) {
-        return InkWell(
+        builder: (context, state) {
+          return InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.only(bottom: innerHorizontalPadding),
@@ -62,10 +64,11 @@ class CompactVideo extends StatelessWidget {
                         curve: Curves.easeInOutQuad,
                         child: AnimatedContainer(
                           decoration: BoxDecoration(
-                              color: (highlighted ?? false)
-                                  ? colors.secondaryContainer
-                                  : colors.surface,
-                              borderRadius: BorderRadius.circular(10)),
+                            color: (highlighted ?? false)
+                                ? colors.secondaryContainer
+                                : colors.surface,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           duration: animationDuration * 2,
                         ),
                       ),
@@ -82,29 +85,30 @@ class CompactVideo extends StatelessWidget {
                                   aspectRatio: 16 / 9,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: colors.secondaryContainer,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Icon(Icons.visibility_off_outlined,
-                                        color: colors.secondary
-                                            .withValues(alpha: 0.7),
-                                        size: 15),
+                                      color: colors.secondaryContainer,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.visibility_off_outlined,
+                                      color: colors.secondary.withValues(
+                                        alpha: 0.7,
+                                      ),
+                                      size: 15,
+                                    ),
                                   ),
                                 )
                               : video != null
-                                  ? VideoThumbnailView(
-                                      videoId: videoId,
-                                      thumbnails: video?.deArrowThumbnailUrl !=
-                                              null
-                                          ? [video!.deArrowThumbnailUrl!]
-                                          : ImageObject
-                                              .getThumbnailUrlsByPreferredOrder(
-                                                  video?.videoThumbnails))
-                                  : offlineVideo != null
-                                      ? OfflineVideoThumbnail(
-                                          video: offlineVideo!,
-                                        )
-                                      : const SizedBox.shrink(),
+                              ? VideoThumbnailView(
+                                  videoId: videoId,
+                                  thumbnails: video?.deArrowThumbnailUrl != null
+                                      ? [video!.deArrowThumbnailUrl!]
+                                      : ImageObject.getThumbnailUrlsByPreferredOrder(
+                                          video?.videoThumbnails,
+                                        ),
+                                )
+                              : offlineVideo != null
+                              ? OfflineVideoThumbnail(video: offlineVideo!)
+                              : const SizedBox.shrink(),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -118,29 +122,33 @@ class CompactVideo extends StatelessWidget {
                                         ? '**********'
                                         : title,
                                     style: TextStyle(
-                                        color: colors.primary,
-                                        overflow: TextOverflow.ellipsis),
+                                      color: colors.primary,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   Text(
                                     author,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodySmall
-                                        ?.copyWith(color: colors.secondary),
-                                  )
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colors.secondary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ),
-                          ...trailing ?? []
+                          ...trailing ?? [],
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-            ));
-      }),
+            ),
+          );
+        },
+      ),
     );
   }
 }

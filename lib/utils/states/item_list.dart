@@ -35,8 +35,11 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
     if (scrollController.hasClients) {
       if (scrollController.position.maxScrollExtent * 0.9 <
           scrollController.offset) {
-        EasyDebounce.debounce('loading-more-videos',
-            const Duration(milliseconds: 500), getMoreItems);
+        EasyDebounce.debounce(
+          'loading-more-videos',
+          const Duration(milliseconds: 500),
+          getMoreItems,
+        );
       }
     }
   }

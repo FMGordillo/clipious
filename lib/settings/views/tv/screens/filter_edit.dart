@@ -39,19 +39,26 @@ class TvFilterEditSettingsScreen extends StatelessWidget {
                 style: textTheme.bodyLarge,
               ),
               onSelected: (context) => AutoRouter.of(context).push(
-                  TvSelectFromListRoute(
-                      options: FilterType.values
-                          .map((e) => FilterType.localizedType(e, locals))
-                          .toList(),
-                      selected:
-                          FilterType.localizedType(state.filter?.type, locals),
-                      onSelect: (type) {
-                        cubit.setType(FilterType.values
-                            .where((t) =>
-                                FilterType.localizedType(t, locals) == type)
-                            .firstOrNull);
-                      },
-                      title: locals.videoFilterType)),
+                TvSelectFromListRoute(
+                  options: FilterType.values
+                      .map((e) => FilterType.localizedType(e, locals))
+                      .toList(),
+                  selected: FilterType.localizedType(
+                    state.filter?.type,
+                    locals,
+                  ),
+                  onSelect: (type) {
+                    cubit.setType(
+                      FilterType.values
+                          .where(
+                            (t) => FilterType.localizedType(t, locals) == type,
+                          )
+                          .firstOrNull,
+                    );
+                  },
+                  title: locals.videoFilterType,
+                ),
+              ),
             ),
             Visibility(
               visible: state.filter?.type != null,
@@ -59,39 +66,51 @@ class TvFilterEditSettingsScreen extends StatelessWidget {
                 title: locals.videoFilterOperation,
                 trailing: Text(
                   FilterOperation.localizedLabel(
-                      state.filter?.operation, locals),
+                    state.filter?.operation,
+                    locals,
+                  ),
                   style: textTheme.bodyLarge,
                 ),
                 onSelected: (context) => AutoRouter.of(context).push(
-                    TvSelectFromListRoute(
-                        options: cubit
-                            .getAvailableOperations()
-                            .map((e) =>
-                                FilterOperation.localizedLabel(e, locals))
-                            .toList(),
-                        selected: FilterOperation.localizedLabel(
-                            state.filter?.operation, locals),
-                        onSelect: (operation) {
-                          cubit.setOperation(FilterOperation.values
-                              .where((t) =>
+                  TvSelectFromListRoute(
+                    options: cubit
+                        .getAvailableOperations()
+                        .map((e) => FilterOperation.localizedLabel(e, locals))
+                        .toList(),
+                    selected: FilterOperation.localizedLabel(
+                      state.filter?.operation,
+                      locals,
+                    ),
+                    onSelect: (operation) {
+                      cubit.setOperation(
+                        FilterOperation.values
+                            .where(
+                              (t) =>
                                   FilterOperation.localizedLabel(t, locals) ==
-                                  operation)
-                              .firstOrNull);
-                        },
-                        title: locals.videoFilterType)),
+                                  operation,
+                            )
+                            .firstOrNull,
+                      );
+                    },
+                    title: locals.videoFilterType,
+                  ),
+                ),
               ),
             ),
             Visibility(
-                visible: state.filter?.operation != null,
-                child: TvTextField(
-                  controller: cubit.valueController,
-                  autocorrect: false,
-                  keyboardType:
-                      cubit.isNumberValue() ? TextInputType.number : null,
-                  decoration:
-                      InputDecoration(label: Text(locals.videoFilterValue)),
-                  onSubmitted: cubit.valueChanged,
-                )),
+              visible: state.filter?.operation != null,
+              child: TvTextField(
+                controller: cubit.valueController,
+                autocorrect: false,
+                keyboardType: cubit.isNumberValue()
+                    ? TextInputType.number
+                    : null,
+                decoration: InputDecoration(
+                  label: Text(locals.videoFilterValue),
+                ),
+                onSubmitted: cubit.valueChanged,
+              ),
+            ),
           ];
   }
 
@@ -108,139 +127,160 @@ class TvFilterEditSettingsScreen extends StatelessWidget {
               create: (context) =>
                   VideoFilterEditCubit(VideoFilterEditState(filter: filter)),
               child: BlocBuilder<VideoFilterEditCubit, VideoFilterEditState>(
-                  builder: (context, state) {
-                var cubit = context.read<VideoFilterEditCubit>();
-                return Stack(
-                  children: [
-                    ListView(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SettingsTitle(
+                builder: (context, state) {
+                  var cubit = context.read<VideoFilterEditCubit>();
+                  return Stack(
+                    children: [
+                      ListView(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SettingsTitle(
                                 title: filter != null
                                     ? locals.editVideoFilter
-                                    : locals.addVideoFilter),
-                            if (filter != null)
-                              TvButton(
-                                onPressed: (context) async {
-                                  await db.deleteFilter(filter!);
-                                  if (context.mounted) {
-                                    AutoRouter.of(context).maybePop();
-                                  }
-                                },
-                                unfocusedColor: Colors.transparent,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
+                                    : locals.addVideoFilter,
+                              ),
+                              if (filter != null)
+                                TvButton(
+                                  onPressed: (context) async {
+                                    await db.deleteFilter(filter!);
+                                    if (context.mounted) {
+                                      AutoRouter.of(context).maybePop();
+                                    }
+                                  },
+                                  unfocusedColor: Colors.transparent,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
-                              )
-                          ],
-                        ),
-                        SettingsTitle(title: locals.videoFilterEditDescription),
-                        state.channel == null
-                            ? SettingsTile(
-                                leading: const Icon(Icons.personal_video),
-                                title: '${locals.channel} (${locals.optional})',
-                                onSelected: (context) => Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      SearchableSelectFromListScreen<Channel>(
-                                    title: locals.channel,
-                                    fetchItems: cubit.searchChannel,
-                                    titleBuilder: (item) => item.author,
-                                    descriptionBuilder: (item) => null,
-                                    onSelect: (selected) {
-                                      cubit.selectChannel(selected);
-                                    },
-                                  ),
-                                )),
-                              )
-                            : SettingsTile(
-                                leading: const Icon(Icons.personal_video),
-                                title:
-                                    '${locals.channel}: ${state.channel?.author ?? ''}',
-                                trailing: const Icon(Icons.clear),
-                                onSelected: (context) => cubit.channelClear(),
-                              ),
-                        Visibility(
+                            ],
+                          ),
+                          SettingsTitle(
+                            title: locals.videoFilterEditDescription,
+                          ),
+                          state.channel == null
+                              ? SettingsTile(
+                                  leading: const Icon(Icons.personal_video),
+                                  title:
+                                      '${locals.channel} (${locals.optional})',
+                                  onSelected: (context) =>
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              SearchableSelectFromListScreen<
+                                                Channel
+                                              >(
+                                                title: locals.channel,
+                                                fetchItems: cubit.searchChannel,
+                                                titleBuilder: (item) =>
+                                                    item.author,
+                                                descriptionBuilder: (item) =>
+                                                    null,
+                                                onSelect: (selected) {
+                                                  cubit.selectChannel(selected);
+                                                },
+                                              ),
+                                        ),
+                                      ),
+                                )
+                              : SettingsTile(
+                                  leading: const Icon(Icons.personal_video),
+                                  title:
+                                      '${locals.channel}: ${state.channel?.author ?? ''}',
+                                  trailing: const Icon(Icons.clear),
+                                  onSelected: (context) => cubit.channelClear(),
+                                ),
+                          Visibility(
                             visible: state.filter?.channelId != null,
                             child: SettingsTile(
                               title: locals.videoFilterHideAllFromChannel,
                               onSelected: (context) => cubit.channelHideAll(
-                                  !(state.filter?.filterAll ?? false)),
+                                !(state.filter?.filterAll ?? false),
+                              ),
                               trailing: Switch(
-                                  onChanged: (value) {},
-                                  value: state.filter?.filterAll ?? false),
-                            )),
-                        ...getFilterWidgets(context),
-                        SettingsTile(
-                          title: locals.videoFilterDayOfWeek,
-                          description: locals.videoFilterDayOfWeekDescription,
-                          onSelected: (context) =>
-                              cubit.showDateSettings = !cubit.showDateSettings,
-                          trailing: Switch(
+                                onChanged: (value) {},
+                                value: state.filter?.filterAll ?? false,
+                              ),
+                            ),
+                          ),
+                          ...getFilterWidgets(context),
+                          SettingsTile(
+                            title: locals.videoFilterDayOfWeek,
+                            description: locals.videoFilterDayOfWeekDescription,
+                            onSelected: (context) => cubit.showDateSettings =
+                                !cubit.showDateSettings,
+                            trailing: Switch(
                               onChanged: (value) {},
-                              value: cubit.showDateSettings),
-                        ),
-                        Visibility(
-                          visible: cubit.showDateSettings,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 8),
-                            child: Row(
+                              value: cubit.showDateSettings,
+                            ),
+                          ),
+                          Visibility(
+                            visible: cubit.showDateSettings,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                                bottom: 8,
+                              ),
+                              child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: wholeWeek.map((e) {
-                                  String day =
-                                      getWeekdayName(e).substring(0, 1);
+                                  String day = getWeekdayName(
+                                    e,
+                                  ).substring(0, 1);
                                   var isSelected =
                                       state.filter?.daysOfWeek.contains(e) ??
-                                          false;
+                                      false;
                                   return TvButton(
                                     onPressed: (context) => cubit.toggleDay(e),
                                     child: AnimatedContainer(
-                                        duration: animationDuration,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                day,
-                                                style: textTheme.titleLarge,
+                                      duration: animationDuration,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              day,
+                                              style: textTheme.titleLarge,
+                                            ),
+                                            if (isSelected)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  left: 8.0,
+                                                ),
+                                                child: const Icon(Icons.check)
+                                                    .animate()
+                                                    .slideX(
+                                                      duration:
+                                                          animationDuration,
+                                                      curve:
+                                                          Curves.easeInOutQuad,
+                                                    )
+                                                    .fadeIn(
+                                                      duration:
+                                                          animationDuration,
+                                                    ),
                                               ),
-                                              if (isSelected)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8.0),
-                                                  child: const Icon(Icons.check)
-                                                      .animate()
-                                                      .slideX(
-                                                          duration:
-                                                              animationDuration,
-                                                          curve: Curves
-                                                              .easeInOutQuad)
-                                                      .fadeIn(
-                                                          duration:
-                                                              animationDuration),
-                                                )
-                                            ],
-                                          ),
-                                        )),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   );
-                                }).toList()),
+                                }).toList(),
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Visibility(
+                          const SizedBox(height: 8),
+                          Visibility(
                             visible: cubit.showDateSettings,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -252,13 +292,11 @@ class TvFilterEditSettingsScreen extends StatelessWidget {
                                       '${locals.from}:',
                                       style: textTheme.titleLarge,
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
+                                    const SizedBox(width: 8),
                                     TvTimePicker(
-                                        value:
-                                            state.filter?.startTime ?? '00:00',
-                                        onTimePicked: cubit.setStartTime),
+                                      value: state.filter?.startTime ?? '00:00',
+                                      onTimePicked: cubit.setStartTime,
+                                    ),
                                   ],
                                 ),
                                 Row(
@@ -268,77 +306,89 @@ class TvFilterEditSettingsScreen extends StatelessWidget {
                                       '${locals.to}:',
                                       style: textTheme.titleLarge,
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
+                                    const SizedBox(width: 8),
                                     TvTimePicker(
-                                        value: state.filter?.endTime ?? '00:00',
-                                        onTimePicked: cubit.setEndTime),
+                                      value: state.filter?.endTime ?? '00:00',
+                                      onTimePicked: cubit.setEndTime,
+                                    ),
                                   ],
                                 ),
                               ],
-                            )),
-                        SettingsTile(
-                          title: locals.videoFilterHide,
-                          description: locals.videoFilterHideDescription,
-                          onSelected: (context) => cubit.hideOnFilteredChanged(
-                              !(state.filter?.hideFromFeed ?? false)),
-                          trailing: Switch(
-                              onChanged: (value) {},
-                              value: state.filter?.hideFromFeed ?? false),
-                        ),
-                        Visibility(
-                          visible: cubit.isFilterValid(),
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                color: colors.secondaryContainer),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                  state.filter
-                                          ?.localizedLabel(locals, context) ??
-                                      '',
-                                  style: textTheme.headlineSmall,
-                                  textAlign: TextAlign.center),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TvButton(
-                              unfocusedColor: cubit.isFilterValid()
-                                  ? null
-                                  : Colors.transparent,
-                              focusedColor: cubit.isFilterValid()
-                                  ? null
-                                  : Colors.transparent,
-                              onPressed: cubit.isFilterValid()
-                                  ? (context) {
-                                      cubit.onSave();
-                                      AutoRouter.of(context).maybePop();
-                                    }
-                                  : null,
+                          SettingsTile(
+                            title: locals.videoFilterHide,
+                            description: locals.videoFilterHideDescription,
+                            onSelected: (context) =>
+                                cubit.hideOnFilteredChanged(
+                                  !(state.filter?.hideFromFeed ?? false),
+                                ),
+                            trailing: Switch(
+                              onChanged: (value) {},
+                              value: state.filter?.hideFromFeed ?? false,
+                            ),
+                          ),
+                          Visibility(
+                            visible: cubit.isFilterValid(),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(100),
+                                color: colors.secondaryContainer,
+                              ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16),
+                                padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  locals.save,
-                                  style: textTheme.titleLarge,
+                                  state.filter?.localizedLabel(
+                                        locals,
+                                        context,
+                                      ) ??
+                                      '',
+                                  style: textTheme.headlineSmall,
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                );
-              }),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TvButton(
+                                unfocusedColor: cubit.isFilterValid()
+                                    ? null
+                                    : Colors.transparent,
+                                focusedColor: cubit.isFilterValid()
+                                    ? null
+                                    : Colors.transparent,
+                                onPressed: cubit.isFilterValid()
+                                    ? (context) {
+                                        cubit.onSave();
+                                        AutoRouter.of(context).maybePop();
+                                      }
+                                    : null,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0,
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    locals.save,
+                                    style: textTheme.titleLarge,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           );
         },

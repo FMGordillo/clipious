@@ -32,56 +32,59 @@ class TvManageServersInner extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     AppLocalizations locals = AppLocalizations.of(context)!;
     return BlocBuilder<ServerListSettingsCubit, ServerListSettingsState>(
-        builder: (context, state) {
-      var cubit = context.read<ServerListSettingsCubit>();
-      var settings = context.watch<SettingsCubit>();
-/*
+      builder: (context, state) {
+        var cubit = context.read<ServerListSettingsCubit>();
+        var settings = context.watch<SettingsCubit>();
+        /*
       var filteredPublicServers = state.publicServers
           .where((s) =>
               state.dbServers.indexWhere((element) => element.url == s.url) ==
               -1)
           .toList();
 */
-      return ListView(children: [
-        SettingsTile(
-          title: locals.skipSslVerification,
-          description: locals.skipSslVerification,
-          onSelected: (context) => settings
-              .toggleSslVerification(!settings.state.skipSslVerification),
-          trailing: Switch(
-              onChanged: (value) {}, value: settings.state.skipSslVerification),
-        ),
-        SettingsTitle(title: locals.yourServers),
-        ...state.dbServers.map((s) => SettingsTile(
-              leading: InkWell(
-                onTap: () => cubit.switchServer(s),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.done,
-                    color: s.inUse
-                        ? colorScheme.primary
-                        : colorScheme.secondaryContainer,
+        return ListView(
+          children: [
+            SettingsTile(
+              title: locals.skipSslVerification,
+              description: locals.skipSslVerification,
+              onSelected: (context) => settings.toggleSslVerification(
+                !settings.state.skipSslVerification,
+              ),
+              trailing: Switch(
+                onChanged: (value) {},
+                value: settings.state.skipSslVerification,
+              ),
+            ),
+            SettingsTitle(title: locals.yourServers),
+            ...state.dbServers.map(
+              (s) => SettingsTile(
+                leading: InkWell(
+                  onTap: () => cubit.switchServer(s),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.done,
+                      color: s.inUse
+                          ? colorScheme.primary
+                          : colorScheme.secondaryContainer,
+                    ),
                   ),
                 ),
+                title: s.url,
+                description:
+                    '${cubit.isLoggedInToServer(s.url) ? '${locals.loggedIn}, ' : ''} ${locals.tapToManage}',
+                onSelected: (context) => openServer(context, s),
               ),
-              title: s.url,
-              description:
-                  '${cubit.isLoggedInToServer(s.url) ? '${locals.loggedIn}, ' : ''} ${locals.tapToManage}',
-              onSelected: (context) => openServer(context, s),
-            )),
-        SettingsTile(
-          title: locals.addServer,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.add,
-              color: colorScheme.secondary,
             ),
-          ),
-          onSelected: (context) => addServer(context),
-        ),
-/*
+            SettingsTile(
+              title: locals.addServer,
+              leading: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(Icons.add, color: colorScheme.secondary),
+              ),
+              onSelected: (context) => addServer(context),
+            ),
+            /*
         SettingsTitle(title: locals.publicServers),
         ...state.publicServersError != PublicServerErrors.none
             ? [
@@ -124,7 +127,9 @@ class TvManageServersInner extends StatelessWidget {
                             ))
                         .toList()
 */
-      ]);
-    });
+          ],
+        );
+      },
+    );
   }
 }

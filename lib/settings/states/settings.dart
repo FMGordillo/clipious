@@ -33,7 +33,7 @@ const defaultStep = 10;
 enum EnableBackGroundNotificationResponse {
   ok,
   notificationsNotAllowed,
-  needBatteryOptimization;
+  needBatteryOptimization,
 }
 
 var _log = Logger('SettingsController');
@@ -99,9 +99,12 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   Future<void> selectCountry(String selected) async {
-    await setCountry(countryCodes.firstWhere(
+    await setCountry(
+      countryCodes.firstWhere(
         (element) => element.name == selected,
-        orElse: () => state.country));
+        orElse: () => state.country,
+      ),
+    );
   }
 
   serverChanged() {
@@ -202,7 +205,10 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   setLocale(
-      List<Locale> locals, List<String> localStrings, String? locale) async {
+    List<Locale> locals,
+    List<String> localStrings,
+    String? locale,
+  ) async {
     if (locale == null) {
       await db.deleteSetting(localeSettingName);
       _setLocale(null);
@@ -260,22 +266,24 @@ class SettingsCubit extends Cubit<SettingsState> {
     Locale? l = localeString != null
         ? Locale.fromSubtags(
             languageCode: localeString[0],
-            scriptCode: localeString.length >= 2 ? localeString[1] : null)
+            scriptCode: localeString.length >= 2 ? localeString[1] : null,
+          )
         : null;
 
     return l?.nativeDisplayLanguageScript;
   }
 
   Future<EnableBackGroundNotificationResponse> setBackgroundNotifications(
-      bool b) async {
+    bool b,
+  ) async {
     if (!b) {
       await stopTasks();
       await _setBackgroundNotifications(b);
     } else {
       var isAllowed = await AwesomeNotifications().isNotificationAllowed();
       if (!isAllowed) {
-        var allowed =
-            await AwesomeNotifications().requestPermissionToSendNotifications();
+        var allowed = await AwesomeNotifications()
+            .requestPermissionToSendNotifications();
         if (!allowed) {
           return EnableBackGroundNotificationResponse.notificationsNotAllowed;
         }
@@ -294,9 +302,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     if (i > 0 && i <= 24) {
       await setBackgroundNotificationFrequency(i);
       EasyDebounce.debounce(
-          'restarting-background-service', const Duration(seconds: 2), () {
-        setupTasks(this);
-      });
+        'restarting-background-service',
+        const Duration(seconds: 2),
+        () {
+          setupTasks(this);
+        },
+      );
     }
   }
 
@@ -351,8 +362,10 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   setCountry(Country c) {
     String code = countryCodes
-        .firstWhere((element) => element.name == c.name,
-            orElse: () => state.country)
+        .firstWhere(
+          (element) => element.name == c.name,
+          orElse: () => state.country,
+        )
         .code;
     _set(browsingCountry, code);
   }
@@ -385,8 +398,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   setNavigationBarLabelBehavior(
-          NavigationDestinationLabelBehavior behavior) async =>
-      await _set(navigationBarLabelBehaviorSettingName, behavior.name);
+    NavigationDestinationLabelBehavior behavior,
+  ) async => await _set(navigationBarLabelBehaviorSettingName, behavior.name);
 
   setDistractionFreeMode(bool b) async =>
       await _set(distractionFreeModeSettingName, b);
@@ -437,9 +450,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   _getSubscriptionNotification() async {
-    emit(state.copyWith(
-        subscriptionNotifications:
-            await fileDb.getSubscriptionNotifications()));
+    emit(
+      state.copyWith(
+        subscriptionNotifications: await fileDb.getSubscriptionNotifications(),
+      ),
+    );
   }
 
   sendFeedBack(UserFeedback feedback) async {
@@ -459,8 +474,9 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       body += '\n\n\n**Feedback:**\n${feedback.text}\n\n\n';
 
-      String screenshotUrl =
-          await service.uploadImageToImgur(base64Encode(feedback.screenshot));
+      String screenshotUrl = await service.uploadImageToImgur(
+        base64Encode(feedback.screenshot),
+      );
       body += '\n**Screenshot:**\n![app screenshot]($screenshotUrl)';
 
       final url =
@@ -477,14 +493,19 @@ class SettingsCubit extends Cubit<SettingsState> {
 
 @freezed
 sealed class SettingsState with _$SettingsState {
-  const factory SettingsState(
-      {required Map<String, SettingsValue> settings,
-      required PackageInfo packageInfo,
-      @Default(false) subscriptionNotifications}) = _SettingsState;
+  const factory SettingsState({
+    required Map<String, SettingsValue> settings,
+    required PackageInfo packageInfo,
+    @Default(false) subscriptionNotifications,
+  }) = _SettingsState;
 
   static SettingsState init() {
-    PackageInfo packageInfo =
-        PackageInfo(appName: '', packageName: '', version: '', buildNumber: '');
+    PackageInfo packageInfo = PackageInfo(
+      appName: '',
+      packageName: '',
+      version: '',
+      buildNumber: '',
+    );
     var allSettings = db.getAllSettings();
     var settings = {for (var s in allSettings) s.name: s};
 
@@ -510,7 +531,8 @@ sealed class SettingsState with _$SettingsState {
   String? get locale => _get(localeSettingName)?.value;
 
   int get searchHistoryLimit => int.parse(
-      _get(searchHistoryLimitSettingName)?.value ?? searchHistoryDefaultLength);
+    _get(searchHistoryLimitSettingName)?.value ?? searchHistoryDefaultLength,
+  );
 
   double get lastSpeed =>
       double.parse(_get(lastSpeedSettingName)?.value ?? "1.0");
@@ -556,8 +578,9 @@ sealed class SettingsState with _$SettingsState {
       (_get(skipExponentialSettingName)?.value ?? 'true') == 'true';
 
   ThemeMode get themeMode => ThemeMode.values.firstWhere(
-      (element) => element.name == _get(themeModeSettingName)?.value,
-      orElse: () => ThemeMode.system);
+    (element) => element.name == _get(themeModeSettingName)?.value,
+    orElse: () => ThemeMode.system,
+  );
 
   bool get useSearchHistory =>
       _get(useSearchHistorySettingName)?.value == 'true';
@@ -575,16 +598,20 @@ sealed class SettingsState with _$SettingsState {
     return (savedLayout ?? defaultLayout.map((e) => e.name).join(","))
         .split(',')
         .where((element) => element.isNotEmpty)
-        .map((e) =>
-            HomeDataSource.values.firstWhere((element) => element.name == e))
+        .map(
+          (e) =>
+              HomeDataSource.values.firstWhere((element) => element.name == e),
+        )
         .toList();
   }
 
   NavigationDestinationLabelBehavior get navigationBarLabelBehavior =>
-      NavigationDestinationLabelBehavior.values.firstWhere((e) =>
-          e.name ==
-          (_get(navigationBarLabelBehaviorSettingName)?.value ??
-              NavigationDestinationLabelBehavior.onlyShowSelected.name));
+      NavigationDestinationLabelBehavior.values.firstWhere(
+        (e) =>
+            e.name ==
+            (_get(navigationBarLabelBehaviorSettingName)?.value ??
+                NavigationDestinationLabelBehavior.onlyShowSelected.name),
+      );
 
   bool get distractionFreeMode =>
       _get(distractionFreeModeSettingName)?.value == "true";

@@ -1,16 +1,19 @@
 import 'package:flutter_linkify/flutter_linkify.dart';
 
 final _timeStampRegex = RegExp(
-    r'^(.*?)(((([01])?[0-9]|2[0-3]):)?(([0-5])?[0-9](:[0-5][0-9])))',
-    caseSensitive: false,
-    dotAll: true);
+  r'^(.*?)(((([01])?[0-9]|2[0-3]):)?(([0-5])?[0-9](:[0-5][0-9])))',
+  caseSensitive: false,
+  dotAll: true,
+);
 
 class TimestampLinkifier extends Linkifier {
   const TimestampLinkifier();
 
   @override
   List<LinkifyElement> parse(
-      List<LinkifyElement> elements, LinkifyOptions options) {
+    List<LinkifyElement> elements,
+    LinkifyOptions options,
+  ) {
     final list = <LinkifyElement>[];
 
     for (var element in elements) {

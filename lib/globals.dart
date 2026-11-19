@@ -17,7 +17,7 @@ const youtubeHosts = [
   'youtube.com',
   'www.youtube.com',
   'm.youtube.com',
-  'youtu.be'
+  'youtu.be',
 ];
 
 const animationDuration = Duration(milliseconds: 250);
@@ -282,5 +282,5 @@ List<Country> countryCodes = [
   Country('YT', 'Mayotte'),
   Country('ZA', 'South Africa'),
   Country('ZM', 'Zambia'),
-  Country('ZW', 'Zimbabwe')
+  Country('ZW', 'Zimbabwe'),
 ];

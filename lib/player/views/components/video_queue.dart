@@ -23,16 +23,14 @@ class VideoQueue extends StatelessWidget {
           ? []
           : [
               SwipeAction(
-                  performsFirstActionWithFullSwipe: true,
-                  onTap: (handler) async {
-                    await handler(true);
-                    return controller.removeVideoFromQueue(video.videoId);
-                  },
-                  color: Colors.red.shade400,
-                  icon: const Icon(
-                    Icons.clear,
-                    color: Colors.white,
-                  ))
+                performsFirstActionWithFullSwipe: true,
+                onTap: (handler) async {
+                  await handler(true);
+                  return controller.removeVideoFromQueue(video.videoId);
+                },
+                color: Colors.red.shade400,
+                icon: const Icon(Icons.clear, color: Colors.white),
+              ),
             ],
       child: CompactVideo(
         onTap: isPlaying ? () {} : () => controller.skipToVideo(index),
@@ -54,16 +52,14 @@ class VideoQueue extends StatelessWidget {
           ? []
           : [
               SwipeAction(
-                  performsFirstActionWithFullSwipe: true,
-                  onTap: (handler) async {
-                    await handler(true);
-                    return controller.removeVideoFromQueue(v.videoId);
-                  },
-                  color: Colors.red.shade400,
-                  icon: const Icon(
-                    Icons.clear,
-                    color: Colors.white,
-                  ))
+                performsFirstActionWithFullSwipe: true,
+                onTap: (handler) async {
+                  await handler(true);
+                  return controller.removeVideoFromQueue(v.videoId);
+                },
+                color: Colors.red.shade400,
+                icon: const Icon(Icons.clear, color: Colors.white),
+              ),
             ],
       child: CompactVideo(
         onTap: isPlaying ? () {} : () => controller.skipToVideo(index),
@@ -71,10 +67,7 @@ class VideoQueue extends StatelessWidget {
         highlighted: isPlaying,
         trailing: [
           v.audioOnly
-              ? Icon(
-                  Icons.audiotrack,
-                  color: colors.secondary,
-                )
+              ? Icon(Icons.audiotrack, color: colors.secondary)
               : const SizedBox.shrink(),
         ],
       ),
@@ -90,50 +83,55 @@ class VideoQueue extends StatelessWidget {
             create: (BuildContext context) =>
                 VideoQueueCubit(ScrollController()),
             child: BlocBuilder<VideoQueueCubit, ScrollController>(
-                builder: (context, scrollController) {
-              return BlocConsumer<PlayerCubit, PlayerState>(
-                listenWhen: (previous, current) =>
-                    (previous.currentlyPlaying?.videoId ??
-                        previous.offlineCurrentlyPlaying?.videoId) !=
-                    (current.currentlyPlaying?.videoId ??
-                        current.offlineCurrentlyPlaying?.videoId),
-                listener: (context, state) {
-                  List<IdedVideo> videos = (state.videos.isNotEmpty
-                      ? state.videos
-                      : state.offlineVideos);
+              builder: (context, scrollController) {
+                return BlocConsumer<PlayerCubit, PlayerState>(
+                  listenWhen: (previous, current) =>
+                      (previous.currentlyPlaying?.videoId ??
+                          previous.offlineCurrentlyPlaying?.videoId) !=
+                      (current.currentlyPlaying?.videoId ??
+                          current.offlineCurrentlyPlaying?.videoId),
+                  listener: (context, state) {
+                    List<IdedVideo> videos = (state.videos.isNotEmpty
+                        ? state.videos
+                        : state.offlineVideos);
 
-                  final offset = ((videos.indexWhere((element) =>
-                              element.videoId ==
-                              (state.currentlyPlaying?.videoId ??
-                                  state.offlineCurrentlyPlaying?.videoId))) -
-                          1) *
-                      (compactVideoHeight + innerHorizontalPadding);
-                  bool goingDown = offset > scrollController.offset;
+                    final offset =
+                        ((videos.indexWhere(
+                              (element) =>
+                                  element.videoId ==
+                                  (state.currentlyPlaying?.videoId ??
+                                      state.offlineCurrentlyPlaying?.videoId),
+                            )) -
+                            1) *
+                        (compactVideoHeight + innerHorizontalPadding);
+                    bool goingDown = offset > scrollController.offset;
 
-                  // if we want to go up and we're already at the top we don't do anything
-                  if ((!goingDown && scrollController.offset == 0)
-                      // if we want to go down and we're already at the bottom we don't do anything
-                      ||
-                      (goingDown &&
-                          scrollController.offset ==
-                              scrollController.position.maxScrollExtent)) {
-                    return;
-                  }
-                  scrollController.animateTo(offset,
+                    // if we want to go up and we're already at the top we don't do anything
+                    if ((!goingDown && scrollController.offset == 0)
+                        // if we want to go down and we're already at the bottom we don't do anything
+                        ||
+                        (goingDown &&
+                            scrollController.offset ==
+                                scrollController.position.maxScrollExtent)) {
+                      return;
+                    }
+                    scrollController.animateTo(
+                      offset,
                       duration: animationDuration * 4,
-                      curve: Curves.easeInOutQuad);
-                },
-                buildWhen: (previous, current) =>
-                    previous.videos != current.videos ||
-                    previous.videos.length != current.videos.length ||
-                    previous.offlineVideos != current.offlineVideos ||
-                    previous.offlineVideos.length !=
-                        current.offlineVideos.length ||
-                    // previous.currentIndex != current.currentIndex ||
-                    previous.currentlyPlaying != current.currentlyPlaying ||
-                    previous.offlineCurrentlyPlaying !=
-                        current.offlineCurrentlyPlaying,
-                builder: (context, state) => ReorderableListView.builder(
+                      curve: Curves.easeInOutQuad,
+                    );
+                  },
+                  buildWhen: (previous, current) =>
+                      previous.videos != current.videos ||
+                      previous.videos.length != current.videos.length ||
+                      previous.offlineVideos != current.offlineVideos ||
+                      previous.offlineVideos.length !=
+                          current.offlineVideos.length ||
+                      // previous.currentIndex != current.currentIndex ||
+                      previous.currentlyPlaying != current.currentlyPlaying ||
+                      previous.offlineCurrentlyPlaying !=
+                          current.offlineCurrentlyPlaying,
+                  builder: (context, state) => ReorderableListView.builder(
                     scrollController: scrollController,
                     itemCount: state.videos.isNotEmpty
                         ? state.videos.length
@@ -142,9 +140,14 @@ class VideoQueue extends StatelessWidget {
                     itemBuilder: (context, index) => state.videos.isNotEmpty
                         ? onlineVideoQueue(context, index, state.videos[index])
                         : offlineVideoQueue(
-                            context, index, state.offlineVideos[index])),
-              );
-            }),
+                            context,
+                            index,
+                            state.offlineVideos[index],
+                          ),
+                  ),
+                );
+              },
+            ),
           )
         : const Text('empty queue, should never be displayed');
   }

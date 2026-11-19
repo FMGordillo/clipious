@@ -24,135 +24,157 @@ class NotificationSettingsScreen extends StatelessWidget {
     SettingsThemeData theme = settingsTheme(colorScheme);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locals.notifications),
-      ),
-      body: SafeArea(child:
-          BlocBuilder<SettingsCubit, SettingsState>(builder: (context, state) {
-        var cubit = context.read<SettingsCubit>();
-        return DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              SettingsList(
-                lightTheme: theme,
-                darkTheme: theme,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                sections: [
-                  SettingsSection(
-                    tiles: [
-                      SettingsTile.switchTile(
-                        initialValue: state.backgroundNotifications,
-                        onToggle: (value) =>
-                            enableBackgroundService(context, value),
-                        title: Text(locals.notifications),
-                        description:
-                            Text(locals.enableNotificationDescriptions),
-                      ),
-                      CustomSettingsTile(
-                        child: Padding(
-                          padding: const EdgeInsetsDirectional.only(
-                            start: 24,
-                            end: 24,
-                            bottom: 19,
-                            top: 19,
+      appBar: AppBar(title: Text(locals.notifications)),
+      body: SafeArea(
+        child: BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, state) {
+            var cubit = context.read<SettingsCubit>();
+            return DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  SettingsList(
+                    lightTheme: theme,
+                    darkTheme: theme,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    sections: [
+                      SettingsSection(
+                        tiles: [
+                          SettingsTile.switchTile(
+                            initialValue: state.backgroundNotifications,
+                            onToggle: (value) =>
+                                enableBackgroundService(context, value),
+                            title: Text(locals.notifications),
+                            description: Text(
+                              locals.enableNotificationDescriptions,
+                            ),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(locals.notificationFrequencySettingsTitle,
-                                  style: TextStyle(
-                                    color: theme.settingsTileTextColor,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                  )),
-                              Text(
-                                  locals
-                                      .notificationFrequencySettingsDescription,
-                                  style: TextStyle(
-                                      color: theme.tileDescriptionTextColor)),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                          CustomSettingsTile(
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.only(
+                                start: 24,
+                                end: 24,
+                                bottom: 19,
+                                top: 19,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Slider(
-                                      value: state
-                                          .backgroundNotificationFrequency
-                                          .toDouble(),
-                                      min: 1,
-                                      max: 24,
-                                      divisions: 23,
-                                      label: locals
-                                          .notificationFrequencySliderLabel(state
-                                              .backgroundNotificationFrequency
-                                              .toString()),
-                                      onChanged: state.backgroundNotifications
-                                          ? (value) =>
-                                              cubit.setBackgroundCheckFrequency(
-                                                  value.toInt())
-                                          : null,
-                                      onChangeEnd: state.backgroundNotifications
-                                          ? (value) =>
-                                              cubit.setBackgroundCheckFrequency(
-                                                  value.toInt())
-                                          : null,
+                                  Text(
+                                    locals.notificationFrequencySettingsTitle,
+                                    style: TextStyle(
+                                      color: theme.settingsTileTextColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 30,
-                                    child: Text(
-                                      locals.notificationFrequencySliderLabel(
-                                          state.backgroundNotificationFrequency
-                                              .toString()),
+                                  Text(
+                                    locals
+                                        .notificationFrequencySettingsDescription,
+                                    style: TextStyle(
+                                      color: theme.tileDescriptionTextColor,
                                     ),
-                                  )
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Slider(
+                                          value: state
+                                              .backgroundNotificationFrequency
+                                              .toDouble(),
+                                          min: 1,
+                                          max: 24,
+                                          divisions: 23,
+                                          label: locals
+                                              .notificationFrequencySliderLabel(
+                                                state
+                                                    .backgroundNotificationFrequency
+                                                    .toString(),
+                                              ),
+                                          onChanged:
+                                              state.backgroundNotifications
+                                              ? (value) => cubit
+                                                    .setBackgroundCheckFrequency(
+                                                      value.toInt(),
+                                                    )
+                                              : null,
+                                          onChangeEnd:
+                                              state.backgroundNotifications
+                                              ? (value) => cubit
+                                                    .setBackgroundCheckFrequency(
+                                                      value.toInt(),
+                                                    )
+                                              : null,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 30,
+                                        child: Text(
+                                          locals.notificationFrequencySliderLabel(
+                                            state
+                                                .backgroundNotificationFrequency
+                                                .toString(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
-                              )
+                              ),
+                            ),
+                          ),
+                          SettingsTile.switchTile(
+                            enabled: state.backgroundNotifications,
+                            initialValue: state.subscriptionNotifications,
+                            onToggle: cubit.setSubscriptionsNotifications,
+                            title: Text(locals.subscriptionNotification),
+                            description: Text(
+                              locals.subscriptionNotificationDescription,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        Text(locals.otherNotifications),
+                        TabBar(
+                          tabs: [
+                            Tab(
+                              icon: const Icon(Icons.people),
+                              text: locals.channels,
+                            ),
+                            Tab(
+                              icon: const Icon(Icons.playlist_play),
+                              text: locals.playlists,
+                            ),
+                          ],
+                        ),
+                        const Expanded(
+                          child: TabBarView(
+                            children: [
+                              ChannelNotificationList(),
+                              PlaylistNotificationList(),
                             ],
                           ),
                         ),
-                      ),
-                      SettingsTile.switchTile(
-                        enabled: state.backgroundNotifications,
-                        initialValue: state.subscriptionNotifications,
-                        onToggle: cubit.setSubscriptionsNotifications,
-                        title: Text(locals.subscriptionNotification),
-                        description:
-                            Text(locals.subscriptionNotificationDescription),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              Expanded(
-                child: Column(children: [
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Text(locals.otherNotifications),
-                  TabBar(tabs: [
-                    Tab(icon: const Icon(Icons.people), text: locals.channels),
-                    Tab(
-                        icon: const Icon(Icons.playlist_play),
-                        text: locals.playlists)
-                  ]),
-                  const Expanded(
-                      child: TabBarView(
-                    children: [
-                      ChannelNotificationList(),
-                      PlaylistNotificationList()
-                    ],
-                  ))
-                ]),
-              )
-            ],
-          ),
-        );
-      })),
+            );
+          },
+        ),
+      ),
     );
   }
 }

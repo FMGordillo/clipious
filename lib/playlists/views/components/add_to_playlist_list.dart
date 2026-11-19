@@ -18,10 +18,11 @@ class AddToPlaylistList extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-            child: PlaylistList(
-          canDeleteVideos: canDeleteVideos,
-          paginatedList: SingleEndpointList(service.getUserPlaylists),
-        ))
+          child: PlaylistList(
+            canDeleteVideos: canDeleteVideos,
+            paginatedList: SingleEndpointList(service.getUserPlaylists),
+          ),
+        ),
       ],
     );
   }
@@ -33,13 +34,14 @@ class AddPlayListButton extends StatelessWidget {
   addPlaylistDialog(BuildContext context) {
     var cubit = context.read<PlaylistListCubit>();
     showDialog<String>(
-        useRootNavigator: false,
-        context: context,
-        builder: (BuildContext context) => Dialog(
-              child: AddPlayListForm(
-                afterAdd: (playlistId) => cubit.refreshPlaylists(),
-              ),
-            ));
+      useRootNavigator: false,
+      context: context,
+      builder: (BuildContext context) => Dialog(
+        child: AddPlayListForm(
+          afterAdd: (playlistId) => cubit.refreshPlaylists(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -67,8 +69,10 @@ class _AddPlayListFormState extends State<AddPlayListForm> {
   addPlaylist(BuildContext context) async {
     var locals = AppLocalizations.of(context)!;
     try {
-      var id =
-          await service.createPlayList(nameController.value.text, privacyValue);
+      var id = await service.createPlayList(
+        nameController.value.text,
+        privacyValue,
+      );
 
       if (context.mounted) {
         Navigator.pop(context);
@@ -115,12 +119,17 @@ class _AddPlayListFormState extends State<AddPlayListForm> {
                     value: privacyValue,
                     items: [
                       DropdownMenuItem(
-                          value: 'public', child: Text(locals.publicPlaylist)),
+                        value: 'public',
+                        child: Text(locals.publicPlaylist),
+                      ),
                       DropdownMenuItem(
-                          value: 'unlisted',
-                          child: Text(locals.unlistedPlaylist)),
+                        value: 'unlisted',
+                        child: Text(locals.unlistedPlaylist),
+                      ),
                       DropdownMenuItem(
-                          value: 'private', child: Text(locals.privatePlaylist))
+                        value: 'private',
+                        child: Text(locals.privatePlaylist),
+                      ),
                     ],
                     onChanged: (value) {
                       setState(() {

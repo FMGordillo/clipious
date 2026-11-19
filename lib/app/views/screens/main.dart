@@ -15,47 +15,51 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final deviceType = getDeviceType();
-      final orientation =
-          context.select((PlayerCubit value) => value.state.orientation);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final deviceType = getDeviceType();
+        final orientation = context.select(
+          (PlayerCubit value) => value.state.orientation,
+        );
 
-      final bool globalLoading =
-          context.select((AppCubit value) => value.state.globalLoading);
-      final playerHorizontalPosition = orientation == Orientation.landscape &&
-              deviceType == DeviceType.tablet
-          ? getFractionOfAvailableSpace(context, tabletMiniPlayerFraction)
-          : const Size(0, 0);
-      var colors = Theme.of(context).colorScheme;
-      return Container(
-        color: colors.surface,
-        child: Stack(
-          children: [
-            const Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: MiniPlayerAware(
-                child: AutoRouter(),
+        final bool globalLoading = context.select(
+          (AppCubit value) => value.state.globalLoading,
+        );
+        final playerHorizontalPosition =
+            orientation == Orientation.landscape &&
+                deviceType == DeviceType.tablet
+            ? getFractionOfAvailableSpace(context, tabletMiniPlayerFraction)
+            : const Size(0, 0);
+        var colors = Theme.of(context).colorScheme;
+        return Container(
+          color: colors.surface,
+          child: Stack(
+            children: [
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: MiniPlayerAware(child: AutoRouter()),
               ),
-            ),
-            Positioned(
+              Positioned(
                 left: playerHorizontalPosition.width,
                 bottom: 0,
                 right: playerHorizontalPosition.width,
-                child: SafeArea(child: const PlayerPlaceHolder())),
-            Player(constraints.maxHeight),
-            if (globalLoading)
-              Positioned(
+                child: SafeArea(child: const PlayerPlaceHolder()),
+              ),
+              Player(constraints.maxHeight),
+              if (globalLoading)
+                Positioned(
                   child: Container(
-                      color: colors.surface.withValues(alpha: 0.5),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      )))
-          ],
-        ),
-      );
-    });
+                    color: colors.surface.withValues(alpha: 0.5),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

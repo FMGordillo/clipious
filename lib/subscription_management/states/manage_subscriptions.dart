@@ -26,7 +26,8 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
 
     if (!success || isSubscribed) {
       logger.fine(
-          'Issue setting subscription unsub request: $success  isSubscribed: $isSubscribed');
+        'Issue setting subscription unsub request: $success  isSubscribed: $isSubscribed',
+      );
       return unsubscribe(authorId);
     }
 
@@ -38,15 +39,19 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
     emit(state.copyWith(loading: true));
     List<Subscription> subs = [];
     if (isLoggedIn) {
-      subs =
-          (await service.getSubscriptions()).sortBy((e) => e.author).toList();
+      subs = (await service.getSubscriptions())
+          .sortBy((e) => e.author)
+          .toList();
     }
     final offlineSubs = await db.getOfflineSubscriptions();
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         subs: subs,
         loading: false,
         isLoggedIn: isLoggedIn,
-        offlineSubs: offlineSubs));
+        offlineSubs: offlineSubs,
+      ),
+    );
   }
 
   unsubscribeOffline(String channelId) async {
@@ -57,9 +62,10 @@ class ManageSubscriptionCubit extends Cubit<ManageSubscriptionsState> {
 
 @freezed
 sealed class ManageSubscriptionsState with _$ManageSubscriptionsState {
-  const factory ManageSubscriptionsState(
-      {@Default([]) List<Subscription> subs,
-      @Default([]) List<OfflineSubscription> offlineSubs,
-      @Default(false) isLoggedIn,
-      @Default(true) bool loading}) = _ManageSubscriptionsState;
+  const factory ManageSubscriptionsState({
+    @Default([]) List<Subscription> subs,
+    @Default([]) List<OfflineSubscription> offlineSubs,
+    @Default(false) isLoggedIn,
+    @Default(true) bool loading,
+  }) = _ManageSubscriptionsState;
 }

@@ -31,30 +31,40 @@ class AppCubit extends Cubit<AppState> {
       server = null;
     }
     HomeLayout homeLayout = db.getHomeLayout();
-    bool isLoggedIn = (server?.authToken?.isNotEmpty ?? false) ||
+    bool isLoggedIn =
+        (server?.authToken?.isNotEmpty ?? false) ||
         (server?.sidCookie?.isNotEmpty ?? false);
 
     var firstIndex = int.parse(db.getSettings(onOpenSettingName)?.value ?? '0');
     if (!isLoggedIn && firstIndex > 1 || firstIndex < 0) {
       firstIndex = 0;
     }
-    emit(state.copyWith(
-        firstIndex: firstIndex, homeLayout: homeLayout, server: server));
+    emit(
+      state.copyWith(
+        firstIndex: firstIndex,
+        homeLayout: homeLayout,
+        server: server,
+      ),
+    );
   }
 
   onReady() async {
-    intentDataStreamSubscription =
-        ReceiveSharingIntent.instance.getMediaStream().listen((shared) {
-      final String? value = shared
-          .where((element) => element.type == SharedMediaType.url)
-          .map((e) => e.path)
-          .firstOrNull;
-      if (value != null) {
-        openAppLink(value, false);
-      }
-    }, onError: (err) {
-      log.warning("getLinkStream error: $err");
-    });
+    intentDataStreamSubscription = ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen(
+          (shared) {
+            final String? value = shared
+                .where((element) => element.type == SharedMediaType.url)
+                .map((e) => e.path)
+                .firstOrNull;
+            if (value != null) {
+              openAppLink(value, false);
+            }
+          },
+          onError: (err) {
+            log.warning("getLinkStream error: $err");
+          },
+        );
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.instance.getInitialMedia().then((shared) {
@@ -95,10 +105,12 @@ class AppCubit extends Cubit<AppState> {
         if (videoId != null) {
           if (fullStack) {
             appRouter.replaceAll([
-              MainRoute(children: [
-                const MainContentRoute(),
-                VideoRoute(videoId: videoId)
-              ])
+              MainRoute(
+                children: [
+                  const MainContentRoute(),
+                  VideoRoute(videoId: videoId),
+                ],
+              ),
             ]);
           } else {
             appRouter.push(VideoRoute(videoId: videoId));
@@ -139,6 +151,10 @@ class AppCubit extends Cubit<AppState> {
 
 @freezed
 sealed class AppState with _$AppState {
-  const factory AppState(int firstIndex, Server? server, HomeLayout homeLayout,
-      {@Default(false) bool globalLoading}) = _AppState;
+  const factory AppState(
+    int firstIndex,
+    Server? server,
+    HomeLayout homeLayout, {
+    @Default(false) bool globalLoading,
+  }) = _AppState;
 }

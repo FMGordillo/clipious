@@ -12,19 +12,21 @@ class MiniPlayerAware extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Builder(
-        builder: (
-          context,
-        ) {
-          bool isHidden =
-              context.select((PlayerCubit cubit) => cubit.state.isHidden);
-          bool isClosing =
-              context.select((PlayerCubit cubit) => cubit.state.isClosing);
-          bool isMini =
-              context.select((PlayerCubit cubit) => cubit.state.isMini);
+        builder: (context) {
+          bool isHidden = context.select(
+            (PlayerCubit cubit) => cubit.state.isHidden,
+          );
+          bool isClosing = context.select(
+            (PlayerCubit cubit) => cubit.state.isClosing,
+          );
+          bool isMini = context.select(
+            (PlayerCubit cubit) => cubit.state.isMini,
+          );
 
           return AnimatedContainer(
             padding: EdgeInsets.only(
-                bottom: !isHidden && isMini && !isClosing ? targetHeight : 0),
+              bottom: !isHidden && isMini && !isClosing ? targetHeight : 0,
+            ),
             duration: animationDuration,
             curve: Curves.easeInOutQuad,
             child: child,

@@ -8,12 +8,11 @@ class TopListLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: height,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: LinearProgressIndicator(
-            minHeight: height,
-          ),
-        ));
+      height: height,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: LinearProgressIndicator(minHeight: height),
+      ),
+    );
   }
 }

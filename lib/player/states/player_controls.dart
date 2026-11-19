@@ -28,10 +28,13 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
   void onReady() {
     log.fine("Controls ready!");
 
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         duration: player.duration,
         muted: player.state.muted,
-        fullScreenState: player.state.fullScreenState));
+        fullScreenState: player.state.fullScreenState,
+      ),
+    );
     showControls();
   }
 
@@ -61,8 +64,13 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
         break;
       case MediaEventType.progress:
         if (!state.draggingPositionSlider) {
-          emit(state.copyWith(
-              position: event.value, buffering: false, errored: false));
+          emit(
+            state.copyWith(
+              position: event.value,
+              buffering: false,
+              errored: false,
+            ),
+          );
         }
         break;
       case MediaEventType.seek:
@@ -86,10 +94,13 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
         break;
       case MediaEventType.sponsorSkipped:
         emit(state.copyWith(showSponsorBlocked: true));
-        EasyDebounce.debounce('player-control-sponsor-blocked',
-            (animationDuration * 2) + const Duration(seconds: 1), () {
-          emit(state.copyWith(showSponsorBlocked: false));
-        });
+        EasyDebounce.debounce(
+          'player-control-sponsor-blocked',
+          (animationDuration * 2) + const Duration(seconds: 1),
+          () {
+            emit(state.copyWith(showSponsorBlocked: false));
+          },
+        );
       default:
         break;
     }
@@ -167,54 +178,80 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
 
   void doubleTapFastForward() {
     player.fastForward();
-    emit(state.copyWith(
-        doubleTapFastForwardedOpacity: 1, justDoubleTappedSkip: true));
-    EasyDebounce.debounce('fast-forward', const Duration(milliseconds: 250),
-        () {
-      emit(state.copyWith(doubleTapFastForwardedOpacity: 0));
-    });
+    emit(
+      state.copyWith(
+        doubleTapFastForwardedOpacity: 1,
+        justDoubleTappedSkip: true,
+      ),
+    );
+    EasyDebounce.debounce(
+      'fast-forward',
+      const Duration(milliseconds: 250),
+      () {
+        emit(state.copyWith(doubleTapFastForwardedOpacity: 0));
+      },
+    );
     // we prevent controls showing to avoid issues where if hte user taps 3 times it will show the controls right after
-    EasyDebounce.debounce('preventControlsShowing', const Duration(seconds: 1),
-        () {
-      emit(state.copyWith(justDoubleTappedSkip: false));
-    });
+    EasyDebounce.debounce(
+      'preventControlsShowing',
+      const Duration(seconds: 1),
+      () {
+        emit(state.copyWith(justDoubleTappedSkip: false));
+      },
+    );
   }
 
   void doubleTapRewind() {
     player.rewind();
-    emit(state.copyWith(
-        doubleTapRewindedOpacity: 1, justDoubleTappedSkip: true));
+    emit(
+      state.copyWith(doubleTapRewindedOpacity: 1, justDoubleTappedSkip: true),
+    );
     EasyDebounce.debounce('fast-rewind', const Duration(milliseconds: 250), () {
       emit(state.copyWith(doubleTapRewindedOpacity: 0));
     });
-    EasyDebounce.debounce('preventControlsShowing', const Duration(seconds: 1),
-        () {
-      // we prevent controls showing to avoid issues where if hte user taps 3 times it will show the controls right after
-      emit(state.copyWith(justDoubleTappedSkip: false));
-    });
+    EasyDebounce.debounce(
+      'preventControlsShowing',
+      const Duration(seconds: 1),
+      () {
+        // we prevent controls showing to avoid issues where if hte user taps 3 times it will show the controls right after
+        emit(state.copyWith(justDoubleTappedSkip: false));
+      },
+    );
   }
 
   Future<void> startBrightnessAdjustments(DragStartDetails details) async {
     final currentBrightness = await ScreenBrightness().current;
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         systemBrightness: currentBrightness,
         screenControlStartValue: currentBrightness,
-        screenControlStart: details.localPosition.dy));
+        screenControlStart: details.localPosition.dy,
+      ),
+    );
   }
 
   Future<void> updateBrightness(
-      DragUpdateDetails details, BoxConstraints constraints) async {
+    DragUpdateDetails details,
+    BoxConstraints constraints,
+  ) async {
     // percentage of the screen we moved since we started dragging
-    double movedBy = (state.screenControlStart - details.localPosition.dy) /
+    double movedBy =
+        (state.screenControlStart - details.localPosition.dy) /
         constraints.maxHeight;
 
     if (movedBy.abs() > 0.05 || state.showBrightnessSlider) {
-      double screenBrightness =
-          min(1, max(0, state.screenControlStartValue + movedBy));
+      double screenBrightness = min(
+        1,
+        max(0, state.screenControlStartValue + movedBy),
+      );
 
       await ScreenBrightness().setScreenBrightness(screenBrightness);
-      emit(state.copyWith(
-          systemBrightness: screenBrightness, showBrightnessSlider: true));
+      emit(
+        state.copyWith(
+          systemBrightness: screenBrightness,
+          showBrightnessSlider: true,
+        ),
+      );
     }
   }
 
@@ -225,17 +262,23 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
   Future<void> startVolumeAdjustments(DragStartDetails details) async {
     await FlutterVolumeController.updateShowSystemUI(false);
     final currentVolume = await FlutterVolumeController.getVolume();
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         systemVolume: currentVolume ?? 0,
         screenControlStartValue: currentVolume ?? 0,
-        screenControlStart: details.localPosition.dy));
+        screenControlStart: details.localPosition.dy,
+      ),
+    );
   }
 
   Future<void> updateVolume(
-      DragUpdateDetails details, BoxConstraints constraints) async {
+    DragUpdateDetails details,
+    BoxConstraints constraints,
+  ) async {
     // Set upper and lower bounds (75% of the screen for full volume, bottom 25% for zero volume)
     // percentage of the screen we moved since we started dragging
-    double movedBy = (state.screenControlStart - details.localPosition.dy) /
+    double movedBy =
+        (state.screenControlStart - details.localPosition.dy) /
         constraints.maxHeight;
 
     if (movedBy.abs() > 0.05 || state.showVolumeSlider) {
@@ -253,25 +296,26 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
 
 @freezed
 sealed class PlayerControlsState with _$PlayerControlsState {
-  const factory PlayerControlsState(
-      {@Default(false) bool errored,
-      @Default(Duration.zero) Duration position,
-      @Default(Duration(seconds: 1)) Duration duration,
-      @Default(Duration.zero) Duration buffer,
-      @Default(FullScreenState.notFullScreen) FullScreenState fullScreenState,
-      @Default(false) bool displayControls,
-      @Default(false) bool muted,
-      @Default(false) bool buffering,
-      @Default(false) bool draggingPositionSlider,
-      @Default(0) double doubleTapFastForwardedOpacity,
-      @Default(0) double doubleTapRewindedOpacity,
-      @Default(false) bool justDoubleTappedSkip,
-      @Default(false) bool showSponsorBlocked,
-      @Default(0) double screenControlStart,
-      @Default(0) double screenControlStartValue,
-      // system setting adjustments
-      @Default(false) bool showBrightnessSlider,
-      @Default(0) double systemBrightness,
-      @Default(false) bool showVolumeSlider,
-      @Default(0) double systemVolume}) = _PlayercontrolsState;
+  const factory PlayerControlsState({
+    @Default(false) bool errored,
+    @Default(Duration.zero) Duration position,
+    @Default(Duration(seconds: 1)) Duration duration,
+    @Default(Duration.zero) Duration buffer,
+    @Default(FullScreenState.notFullScreen) FullScreenState fullScreenState,
+    @Default(false) bool displayControls,
+    @Default(false) bool muted,
+    @Default(false) bool buffering,
+    @Default(false) bool draggingPositionSlider,
+    @Default(0) double doubleTapFastForwardedOpacity,
+    @Default(0) double doubleTapRewindedOpacity,
+    @Default(false) bool justDoubleTappedSkip,
+    @Default(false) bool showSponsorBlocked,
+    @Default(0) double screenControlStart,
+    @Default(0) double screenControlStartValue,
+    // system setting adjustments
+    @Default(false) bool showBrightnessSlider,
+    @Default(0) double systemBrightness,
+    @Default(false) bool showVolumeSlider,
+    @Default(0) double systemVolume,
+  }) = _PlayercontrolsState;
 }

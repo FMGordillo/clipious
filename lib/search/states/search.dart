@@ -63,19 +63,26 @@ class SearchCubit<T extends SearchState> extends Cubit<SearchState> {
     emit(state.copyWith(showResults: !hideResult));
     if (!settings.state.distractionFreeMode) {
       EasyDebounce.debounce(
-          'search-suggestions', const Duration(milliseconds: 500), () async {
-        var suggestions = (await service
-                .getSearchSuggestion(state.queryController.value.text))
-            .suggestions;
-        emit(state.copyWith(suggestions: suggestions));
-      });
+        'search-suggestions',
+        const Duration(milliseconds: 500),
+        () async {
+          var suggestions = (await service.getSearchSuggestion(
+            state.queryController.value.text,
+          )).suggestions;
+          emit(state.copyWith(suggestions: suggestions));
+        },
+      );
     }
   }
 
   getHistory() {
-    emit(state.copyWith(
-        searchHistory:
-            settings.state.useSearchHistory ? db.getSearchHistory() : []));
+    emit(
+      state.copyWith(
+        searchHistory: settings.state.useSearchHistory
+            ? db.getSearchHistory()
+            : [],
+      ),
+    );
   }
 
   search(String value) async {
@@ -83,8 +90,12 @@ class SearchCubit<T extends SearchState> extends Cubit<SearchState> {
 
     final query = state.queryController.text;
     if (query.isNotEmpty && settings.state.useSearchHistory) {
-      await db.addToSearchHistory(SearchHistoryItem(
-          query, (DateTime.now().millisecondsSinceEpoch / 1000).round()));
+      await db.addToSearchHistory(
+        SearchHistoryItem(
+          query,
+          (DateTime.now().millisecondsSinceEpoch / 1000).round(),
+        ),
+      );
     }
     getHistory();
   }
@@ -102,44 +113,46 @@ class SearchCubit<T extends SearchState> extends Cubit<SearchState> {
 
 @freezed
 sealed class SearchState with _$SearchState {
-  const factory SearchState(
-          {required TextEditingController queryController,
-          @Default(false) bool searchNow,
-          @Default([]) List<String> suggestions,
-          @Default(SearchSortBy.relevance) SearchSortBy sortBy,
-          @Default(false) bool showResults,
-          @Default(1) int videoPage,
-          @Default(1) int channelPage,
-          @Default(1) int playlistPage,
-          @Default([]) List<String> searchHistory,
-          @Default(SearchFiltersState()) SearchFiltersState filters}) =
-      _SearchState;
+  const factory SearchState({
+    required TextEditingController queryController,
+    @Default(false) bool searchNow,
+    @Default([]) List<String> suggestions,
+    @Default(SearchSortBy.relevance) SearchSortBy sortBy,
+    @Default(false) bool showResults,
+    @Default(1) int videoPage,
+    @Default(1) int channelPage,
+    @Default(1) int playlistPage,
+    @Default([]) List<String> searchHistory,
+    @Default(SearchFiltersState()) SearchFiltersState filters,
+  }) = _SearchState;
 
-  static SearchState init(
-      {TextEditingController? queryController,
-      int? selectedIndex,
-      List<Video>? videos,
-      List<Channel>? channels,
-      List<Playlist>? playlists,
-      bool? useHistory,
-      bool? searchNow,
-      List<String>? suggestions,
-      SearchSortBy? sortBy,
-      bool? showResults,
-      bool? loading,
-      int? videoPage,
-      channelPage,
-      playlistPage,
-      String? query}) {
+  static SearchState init({
+    TextEditingController? queryController,
+    int? selectedIndex,
+    List<Video>? videos,
+    List<Channel>? channels,
+    List<Playlist>? playlists,
+    bool? useHistory,
+    bool? searchNow,
+    List<String>? suggestions,
+    SearchSortBy? sortBy,
+    bool? showResults,
+    bool? loading,
+    int? videoPage,
+    channelPage,
+    playlistPage,
+    String? query,
+  }) {
     return SearchState(
-        queryController:
-            queryController ?? TextEditingController(text: query ?? ''),
-        searchNow: searchNow ?? false,
-        suggestions: suggestions ?? [],
-        sortBy: sortBy ?? SearchSortBy.relevance,
-        showResults: showResults ?? false,
-        videoPage: videoPage ?? 1,
-        channelPage: channelPage ?? 1,
-        playlistPage: playlistPage ?? 1);
+      queryController:
+          queryController ?? TextEditingController(text: query ?? ''),
+      searchNow: searchNow ?? false,
+      suggestions: suggestions ?? [],
+      sortBy: sortBy ?? SearchSortBy.relevance,
+      showResults: showResults ?? false,
+      videoPage: videoPage ?? 1,
+      channelPage: channelPage ?? 1,
+      playlistPage: playlistPage ?? 1,
+    );
   }
 }

@@ -9,14 +9,17 @@ class PlayerPlaceHolder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var colors = Theme.of(context).colorScheme;
-    return Material(child: Builder(
-      builder: (context) {
-        var showPlaceHolder = context.select((PlayerCubit value) =>
-            value.state.showMiniPlaceholder && value.state.isMini);
-        return AnimatedOpacity(
-          opacity: showPlaceHolder ? 1 : 0,
-          duration: animationDuration,
-          child: AnimatedContainer(
+    return Material(
+      child: Builder(
+        builder: (context) {
+          var showPlaceHolder = context.select(
+            (PlayerCubit value) =>
+                value.state.showMiniPlaceholder && value.state.isMini,
+          );
+          return AnimatedOpacity(
+            opacity: showPlaceHolder ? 1 : 0,
+            duration: animationDuration,
+            child: AnimatedContainer(
               duration: animationDuration,
               curve: Curves.easeInOut,
               height: showPlaceHolder ? targetHeight : 0,
@@ -29,17 +32,19 @@ class PlayerPlaceHolder extends StatelessWidget {
                 ),
                 child: Center(
                   child: AnimatedOpacity(
-                      duration: animationDuration * 4,
-                      opacity: showPlaceHolder ? 1 : 0,
-                      child: Icon(
-                        Icons.play_arrow_outlined,
-                        color:
-                            colors.onSecondaryContainer.withValues(alpha: 0.3),
-                      )),
+                    duration: animationDuration * 4,
+                    opacity: showPlaceHolder ? 1 : 0,
+                    child: Icon(
+                      Icons.play_arrow_outlined,
+                      color: colors.onSecondaryContainer.withValues(alpha: 0.3),
+                    ),
+                  ),
                 ),
-              )),
-        );
-      },
-    ));
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

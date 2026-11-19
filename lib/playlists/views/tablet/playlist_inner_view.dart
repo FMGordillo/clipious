@@ -18,67 +18,70 @@ class TabletPlaylistInnerView extends StatelessWidget {
   final Function(BuildContext context, Video video) removeVideoFromPlaylist;
   final Function(BuildContext context, String videoId) openVideo;
 
-  const TabletPlaylistInnerView(
-      {super.key,
-      required this.canDeleteVideos,
-      required this.removeVideoFromPlaylist,
-      required this.openVideo});
+  const TabletPlaylistInnerView({
+    super.key,
+    required this.canDeleteVideos,
+    required this.removeVideoFromPlaylist,
+    required this.openVideo,
+  });
 
   void showVideoModalSheet(BuildContext parentContext, Video video) {
     showSafeModalBottomSheet<void>(
-        context: parentContext,
-        showDragHandle: true,
-        builder: (BuildContext context) {
-          var locals = AppLocalizations.of(context)!;
-          return FractionallySizedBox(
-            widthFactor: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton.filledTonal(
-                            onPressed: () async {
-                              await removeVideoFromPlaylist(
-                                  parentContext, video);
-                              if (context.mounted) {
-                                Navigator.of(context).pop();
-                              }
-                            },
-                            icon: const Icon(Icons.delete)),
-                        Text(locals.removeFromPlayList)
-                      ],
-                    ),
-                  )
-                ],
-              ),
+      context: parentContext,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        var locals = AppLocalizations.of(context)!;
+        return FractionallySizedBox(
+          widthFactor: 1,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton.filledTonal(
+                        onPressed: () async {
+                          await removeVideoFromPlaylist(parentContext, video);
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        icon: const Icon(Icons.delete),
+                      ),
+                      Text(locals.removeFromPlayList),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colors = Theme.of(context).colorScheme;
-    return OrientationBuilder(builder: (context, widgetOrientation) {
-      final deviceOrientation = getOrientation();
-      return BlocBuilder<PlaylistCubit, PlaylistState>(
+    return OrientationBuilder(
+      builder: (context, widgetOrientation) {
+        final deviceOrientation = getOrientation();
+        return BlocBuilder<PlaylistCubit, PlaylistState>(
           builder: (context, playlistState) {
-        final cubit = context.read<PlaylistCubit>();
-        final videos = playlistState.playlist.videos
-            .where((element) => !element.filterHide)
-            .toList();
+            final cubit = context.read<PlaylistCubit>();
+            final videos = playlistState.playlist.videos
+                .where((element) => !element.filterHide)
+                .toList();
 
-        return Row(
-          children: [
-            Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
+            return Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
@@ -90,64 +93,79 @@ class TabletPlaylistInnerView extends StatelessWidget {
                           children: playlistState.loading
                               ? [
                                   Center(
-                                      child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                        color: colors.surface
-                                            .withValues(alpha: 0.5),
-                                        shape: BoxShape.circle),
-                                    child: TweenAnimationBuilder(
-                                      tween: Tween<double>(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: colors.surface.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: TweenAnimationBuilder(
+                                        tween: Tween<double>(
                                           begin: 0,
-                                          end: playlistState.loadingProgress),
-                                      duration: animationDuration,
-                                      curve: Curves.easeInOutQuad,
-                                      builder: (context, value, child) =>
-                                          CircularProgressIndicator(
-                                        value: value > 0 && value < 1
-                                            ? value
-                                            : null,
+                                          end: playlistState.loadingProgress,
+                                        ),
+                                        duration: animationDuration,
+                                        curve: Curves.easeInOutQuad,
+                                        builder: (context, value, child) =>
+                                            CircularProgressIndicator(
+                                              value: value > 0 && value < 1
+                                                  ? value
+                                                  : null,
+                                            ),
                                       ),
                                     ),
-                                  ))
+                                  ),
                                 ]
                               : [
                                   PlayButton(
                                     onPressed: (isAudio) => cubit.play(isAudio),
                                   ),
-                                  Builder(builder: (context) {
-                                    return Positioned(
+                                  Builder(
+                                    builder: (context) {
+                                      return Positioned(
                                         right: 5,
                                         bottom: 3,
                                         child: AddToQueueButton(
                                           videos: playlistState.playlist.videos,
-                                        ));
-                                  })
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                         ),
-                      )
-                    ])),
-            if (playlistState.loading)
-              Expanded(
-                  child: VideoGridPlaceHolder(
-                      scrollController: cubit.scrollController)),
-            if (!playlistState.loading)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: innerHorizontalPadding),
-                  child: VideoList(
-                    paginatedVideoList: FixedItemList(videos),
-                    showMetrics: false,
-                    showVideoModalSheet: showVideoModalSheet,
-                    allowModalSheet: canDeleteVideos,
-                    openVideoOverride: (context, video) =>
-                        openVideo(context, video.videoId),
+                      ),
+                    ],
                   ),
                 ),
-              )
-          ],
+                if (playlistState.loading)
+                  Expanded(
+                    child: VideoGridPlaceHolder(
+                      scrollController: cubit.scrollController,
+                    ),
+                  ),
+                if (!playlistState.loading)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        right: innerHorizontalPadding,
+                      ),
+                      child: VideoList(
+                        paginatedVideoList: FixedItemList(videos),
+                        showMetrics: false,
+                        showVideoModalSheet: showVideoModalSheet,
+                        allowModalSheet: canDeleteVideos,
+                        openVideoOverride: (context, video) =>
+                            openVideo(context, video.videoId),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         );
-      });
-    });
+      },
+    );
   }
 }

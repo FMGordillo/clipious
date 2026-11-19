@@ -14,16 +14,22 @@ class EditHomeLayoutScreen extends StatelessWidget {
   const EditHomeLayoutScreen({super.key});
 
   List<SmallSource> buildSmallSources(
-      BuildContext context, HomeLayout layout, EditLayoutCubit editLayout) {
+    BuildContext context,
+    HomeLayout layout,
+    EditLayoutCubit editLayout,
+  ) {
     var widgets = <SmallSource>[];
     for (int i = 0; i < layout.smallSources.length; i++) {
       HomeDataSource source = layout.smallSources[i];
 
-      widgets.add(SmallSource(
-        source: source,
-        onSourceChange: (newSource) => editLayout.editSmallSource(i, newSource),
-        onDelete: () => editLayout.deleteSmallSource(i),
-      ));
+      widgets.add(
+        SmallSource(
+          source: source,
+          onSourceChange: (newSource) =>
+              editLayout.editSmallSource(i, newSource),
+          onDelete: () => editLayout.deleteSmallSource(i),
+        ),
+      );
     }
 
     return widgets;
@@ -36,14 +42,13 @@ class EditHomeLayoutScreen extends StatelessWidget {
     var textStyle = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locals.homeLayoutEditor),
-      ),
+      appBar: AppBar(title: Text(locals.homeLayoutEditor)),
       body: SafeArea(
         bottom: false,
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: innerHorizontalPadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: innerHorizontalPadding,
+          ),
           child: Column(
             children: [
               Text(
@@ -52,82 +57,92 @@ class EditHomeLayoutScreen extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Expanded(
-                  child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border:
-                      Border.all(color: colors.secondaryContainer, width: 2),
-                ),
-                child: BlocProvider(
-                  create: (context) => EditLayoutCubit(db.getHomeLayout()),
-                  child: BlocBuilder<EditLayoutCubit, HomeLayout>(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: colors.secondaryContainer,
+                      width: 2,
+                    ),
+                  ),
+                  child: BlocProvider(
+                    create: (context) => EditLayoutCubit(db.getHomeLayout()),
+                    child: BlocBuilder<EditLayoutCubit, HomeLayout>(
                       builder: (context, layout) {
-                    var editLayout = context.read<EditLayoutCubit>();
+                        var editLayout = context.read<EditLayoutCubit>();
 
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ...buildSmallSources(context, layout, editLayout),
-                        if (layout.smallSources.length < maxSmallSources)
-                          SizedBox(
-                              height: 20,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FilledButton.tonal(
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ...buildSmallSources(context, layout, editLayout),
+                            if (layout.smallSources.length < maxSmallSources)
+                              SizedBox(
+                                height: 20,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    FilledButton.tonal(
                                       onPressed: editLayout.addSmallSource,
                                       child: Text(
                                         locals.layoutEditorAddVideoSource,
                                         style: textStyle.bodySmall,
-                                      )),
-                                ],
-                              )),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SourceSwitcher(
-                              onChange: editLayout.editBigSource,
-                              source: layout.bigSource,
-                              textStyle: textStyle.bodyLarge,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SourceSwitcher(
+                                  onChange: editLayout.editBigSource,
+                                  source: layout.bigSource,
+                                  textStyle: textStyle.bodyLarge,
+                                ),
+                                IconButton(
+                                  onPressed: editLayout.toggleShowBigSource,
+                                  icon: Icon(
+                                    layout.showBigSource
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                                onPressed: editLayout.toggleShowBigSource,
-                                icon: Icon(
-                                  layout.showBigSource
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ))
-                          ],
-                        ),
-                        Expanded(
-                            child: AnimatedOpacity(
-                          opacity: layout.showBigSource ? 1 : 0.1,
-                          duration: animationDuration,
-                          child: GridView.count(
-                            crossAxisCount: getGridCount(context),
-                            crossAxisSpacing: 5,
-                            mainAxisSpacing: 5,
-                            childAspectRatio: getGridAspectRatio(context),
-                            children: repeatWidget(
-                                () => const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8.0),
+                            Expanded(
+                              child: AnimatedOpacity(
+                                opacity: layout.showBigSource ? 1 : 0.1,
+                                duration: animationDuration,
+                                child: GridView.count(
+                                  crossAxisCount: getGridCount(context),
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 5,
+                                  childAspectRatio: getGridAspectRatio(context),
+                                  children: repeatWidget(
+                                    () => const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
                                       child: VideoListItemPlaceHolder(
                                         animate: false,
                                       ),
                                     ),
-                                count: 10),
-                          ),
-                        ))
-                      ],
-                    );
-                  }),
+                                    count: 10,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ))
+              ),
             ],
           ),
         ),
@@ -141,11 +156,12 @@ class SmallSource extends StatelessWidget {
   final void Function(HomeDataSource? newSource) onSourceChange;
   final Function() onDelete;
 
-  const SmallSource(
-      {super.key,
-      required this.source,
-      required this.onSourceChange,
-      required this.onDelete});
+  const SmallSource({
+    super.key,
+    required this.source,
+    required this.onSourceChange,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -163,12 +179,10 @@ class SmallSource extends StatelessWidget {
               big: false,
             ),
             IconButton(
-                onPressed: onDelete,
-                padding: EdgeInsets.zero,
-                icon: const Icon(
-                  Icons.clear,
-                  size: 15,
-                ))
+              onPressed: onDelete,
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.clear, size: 15),
+            ),
           ],
         ),
         SizedBox(
@@ -176,19 +190,17 @@ class SmallSource extends StatelessWidget {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: repeatWidget(
-                () => const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 75,
-                        child: VideoListItemPlaceHolder(
-                          small: true,
-                          animate: false,
-                        ),
-                      ),
-                    ),
-                count: 10),
+              () => const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: 75,
+                  child: VideoListItemPlaceHolder(small: true, animate: false),
+                ),
+              ),
+              count: 10,
+            ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -200,12 +212,13 @@ class SourceSwitcher extends StatelessWidget {
   final HomeDataSource source;
   final TextStyle? textStyle;
 
-  const SourceSwitcher(
-      {super.key,
-      required this.onChange,
-      required this.source,
-      this.textStyle,
-      this.big = true});
+  const SourceSwitcher({
+    super.key,
+    required this.onChange,
+    required this.source,
+    this.textStyle,
+    this.big = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -221,18 +234,21 @@ class SourceSwitcher extends StatelessWidget {
           .where((element) => big ? element.big : element.small)
           // .where((e) => e == source || layout.bigSource != e && !layout.smallSources.contains(e))
           .map((e) {
-        bool enabled = e == source ||
-            layout.bigSource != e && !layout.smallSources.contains(e);
-        return DropdownMenuItem<HomeDataSource>(
-            enabled: enabled,
-            value: e,
-            child: Text(
-              e.getLabel(locals),
-              style: !enabled
-                  ? TextStyle(color: colors.secondary.withValues(alpha: 0.5))
-                  : null,
-            ));
-      }).toList(),
+            bool enabled =
+                e == source ||
+                layout.bigSource != e && !layout.smallSources.contains(e);
+            return DropdownMenuItem<HomeDataSource>(
+              enabled: enabled,
+              value: e,
+              child: Text(
+                e.getLabel(locals),
+                style: !enabled
+                    ? TextStyle(color: colors.secondary.withValues(alpha: 0.5))
+                    : null,
+              ),
+            );
+          })
+          .toList(),
       onChanged: onChange,
     );
   }

@@ -12,20 +12,19 @@ class VideoMetrics extends StatelessWidget {
   final double iconSize;
   final bool showDuration;
 
-  const VideoMetrics(
-      {super.key,
-      this.video,
-      this.dislikes,
-      this.style,
-      this.showDuration = true,
-      this.iconSize = 20});
+  const VideoMetrics({
+    super.key,
+    this.video,
+    this.dislikes,
+    this.style,
+    this.showDuration = true,
+    this.iconSize = 20,
+  });
 
   Widget get separator => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Text(
-        '•',
-        style: style,
-      ));
+    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    child: Text('•', style: style),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +33,15 @@ class VideoMetrics extends StatelessWidget {
     List<Widget> metrics = [];
     if ((video?.isUpcoming ?? false) && video?.premiereTimestamp != null) {
       final range = DateTimeRange(
-          end: DateTime.fromMillisecondsSinceEpoch(
-              video!.premiereTimestamp! * 1000),
-          start: DateTime.now());
+        end: DateTime.fromMillisecondsSinceEpoch(
+          video!.premiereTimestamp! * 1000,
+        ),
+        start: DateTime.now(),
+      );
 
       metrics = [
         Text(locals.premieresIn(prettyDuration(range.duration, maxUnits: 1))),
-        const SizedBox.shrink()
+        const SizedBox.shrink(),
       ];
     } else {
       var length = video?.lengthSeconds ?? 0;
@@ -54,7 +55,7 @@ class VideoMetrics extends StatelessWidget {
               style: style,
             ),
           ),
-          separator
+          separator,
         ]);
       }
 
@@ -64,12 +65,9 @@ class VideoMetrics extends StatelessWidget {
           Icon(Icons.visibility, size: iconSize),
           Padding(
             padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              compactCurrency.format(views),
-              style: style,
-            ),
+            child: Text(compactCurrency.format(views), style: style),
           ),
-          separator
+          separator,
         ]);
       }
 
@@ -79,12 +77,9 @@ class VideoMetrics extends StatelessWidget {
           Icon(Icons.thumb_up, size: iconSize),
           Padding(
             padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              compactCurrency.format(likes),
-              style: style,
-            ),
+            child: Text(compactCurrency.format(likes), style: style),
           ),
-          separator
+          separator,
         ]);
       }
 
@@ -98,7 +93,7 @@ class VideoMetrics extends StatelessWidget {
               style: style,
             ),
           ),
-          separator
+          separator,
         ]);
       }
 
@@ -116,32 +111,25 @@ class VideoMetrics extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 2),
+                        horizontal: 8.0,
+                        vertical: 2,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.podcasts,
-                            size: iconSize,
-                          ),
+                          Icon(Icons.podcasts, size: iconSize),
                           Padding(
                             padding: const EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              locals.streamIsLive,
-                              style: style,
-                            ),
+                            child: Text(locals.streamIsLive, style: style),
                           ),
                         ],
                       ),
                     ),
                   ),
                 )
-              : Text(
-                  date,
-                  style: style,
-                ),
-          separator
+              : Text(date, style: style),
+          separator,
         ]);
       }
 

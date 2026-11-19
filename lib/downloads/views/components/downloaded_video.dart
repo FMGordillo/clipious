@@ -26,77 +26,85 @@ class DownloadedVideoView extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Wrap(
-              alignment: WrapAlignment.center,
-              runSpacing: 16,
-              spacing: 16,
-              children: [
-                if (!v.downloadFailed && !v.downloadComplete)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton.filledTonal(
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await cubit.deleteVideo(v);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(locals.videoDeleted)));
-                            }
-                          },
-                          icon: const Icon(Icons.clear)),
-                      Text(locals.cancel)
-                    ],
-                  ),
-                if (v.downloadComplete)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton.filledTonal(
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await cubit.copyToDownloadFolder(v);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          locals.fileCopiedToDownloadFolder)));
-                            }
-                          },
-                          icon: const Icon(Icons.copy)),
-                      Text(locals.copyToDownloadFolder)
-                    ],
-                  ),
-                if (v.downloadFailed)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton.filledTonal(
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await cubit.retryDownload(v);
-                          },
-                          icon: const Icon(Icons.refresh)),
-                      Text(locals.retry)
-                    ],
-                  ),
-                if (v.downloadComplete || v.downloadFailed)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton.filledTonal(
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await cubit.deleteVideo(v);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(locals.videoDeleted)));
-                            }
-                          },
-                          icon: const Icon(Icons.delete)),
-                      Text(locals.delete)
-                    ],
-                  )
-              ]),
+            alignment: WrapAlignment.center,
+            runSpacing: 16,
+            spacing: 16,
+            children: [
+              if (!v.downloadFailed && !v.downloadComplete)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        await cubit.deleteVideo(v);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(locals.videoDeleted)),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.clear),
+                    ),
+                    Text(locals.cancel),
+                  ],
+                ),
+              if (v.downloadComplete)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        await cubit.copyToDownloadFolder(v);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(locals.fileCopiedToDownloadFolder),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.copy),
+                    ),
+                    Text(locals.copyToDownloadFolder),
+                  ],
+                ),
+              if (v.downloadFailed)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        await cubit.retryDownload(v);
+                      },
+                      icon: const Icon(Icons.refresh),
+                    ),
+                    Text(locals.retry),
+                  ],
+                ),
+              if (v.downloadComplete || v.downloadFailed)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        await cubit.deleteVideo(v);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(locals.videoDeleted)),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.delete),
+                    ),
+                    Text(locals.delete),
+                  ],
+                ),
+            ],
+          ),
         );
       },
     );
@@ -112,42 +120,44 @@ class DownloadedVideoView extends StatelessWidget {
     var player = context.read<PlayerCubit>();
     return BlocProvider(
       create: (BuildContext context) => DownloadedVideoCubit(
-          downloadManager, DownloadedVideoState.init(video.videoId), player),
+        downloadManager,
+        DownloadedVideoState.init(video.videoId),
+        player,
+      ),
       child: BlocBuilder<DownloadedVideoCubit, DownloadedVideoState>(
-          builder: (context, state) {
-        bool downloadFailed = state.video?.downloadFailed ?? false;
-        var cubit = context.read<DownloadedVideoCubit>();
+        builder: (context, state) {
+          bool downloadFailed = state.video?.downloadFailed ?? false;
+          var cubit = context.read<DownloadedVideoCubit>();
 
-        return state.video != null
-            ? Stack(
-                children: [
-                  AnimatedOpacity(
-                    opacity: (downloadFailed) ? 0.5 : 1,
-                    duration: animationDuration,
-                    child: CompactVideo(
-                      offlineVideo: state.video,
-                      onTap: downloadFailed || !state.video!.downloadComplete
-                          ? () => openVideoSheet(context, state.video!)
-                          : cubit.playVideo,
-                      trailing: [
-                        (state.video?.audioOnly ?? false)
-                            ? Icon(
-                                Icons.audiotrack,
-                                color: colors.secondary,
-                              )
-                            : const SizedBox.shrink(),
-                        (state.video?.downloadComplete ?? false) ||
-                                downloadFailed
-                            ? const SizedBox.shrink()
-                            : Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: TweenAnimationBuilder(
+          return state.video != null
+              ? Stack(
+                  children: [
+                    AnimatedOpacity(
+                      opacity: (downloadFailed) ? 0.5 : 1,
+                      duration: animationDuration,
+                      child: CompactVideo(
+                        offlineVideo: state.video,
+                        onTap: downloadFailed || !state.video!.downloadComplete
+                            ? () => openVideoSheet(context, state.video!)
+                            : cubit.playVideo,
+                        trailing: [
+                          (state.video?.audioOnly ?? false)
+                              ? Icon(Icons.audiotrack, color: colors.secondary)
+                              : const SizedBox.shrink(),
+                          (state.video?.downloadComplete ?? false) ||
+                                  downloadFailed
+                              ? const SizedBox.shrink()
+                              : Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: TweenAnimationBuilder(
                                       duration: animationDuration,
                                       tween: Tween<double>(
-                                          begin: 0, end: state.progress),
+                                        begin: 0,
+                                        end: state.progress,
+                                      ),
                                       builder: (context, value, child) {
                                         return CircularProgressIndicator(
                                           strokeWidth: 2,
@@ -155,54 +165,58 @@ class DownloadedVideoView extends StatelessWidget {
                                               ? null
                                               : value,
                                         );
-                                      }),
+                                      },
+                                    ),
+                                  ),
+                                ),
+                          if (state.video?.downloadComplete ?? false)
+                            IconButton(
+                              onPressed: () => openVideoSheet(context, video),
+                              icon: Icon(
+                                Icons.more_vert,
+                                color: colors.secondary,
+                              ),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                        ],
+                      ),
+                    ),
+                    downloadFailed
+                        ? Positioned(
+                            right: 10,
+                            bottom: 5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: colors.secondaryContainer,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.error,
+                                      color: Colors.red,
+                                      size: 15,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4.0),
+                                      child: Text(
+                                        locals.videoFailedDownloadRetry,
+                                        style: textTheme.bodySmall,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                        if (state.video?.downloadComplete ?? false)
-                          IconButton(
-                            onPressed: () => openVideoSheet(context, video),
-                            icon: Icon(
-                              Icons.more_vert,
-                              color: colors.secondary,
                             ),
-                            visualDensity: VisualDensity.compact,
                           )
-                      ],
-                    ),
-                  ),
-                  downloadFailed
-                      ? Positioned(
-                          right: 10,
-                          bottom: 5,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: colors.secondaryContainer,
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.error,
-                                    color: Colors.red,
-                                    size: 15,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 4.0),
-                                    child: Text(
-                                      locals.videoFailedDownloadRetry,
-                                      style: textTheme.bodySmall,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ))
-                      : const SizedBox.shrink()
-                ],
-              )
-            : const Icon(Icons.clear);
-      }),
+                        : const SizedBox.shrink(),
+                  ],
+                )
+              : const Icon(Icons.clear);
+        },
+      ),
     );
   }
 }

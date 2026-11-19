@@ -13,7 +13,11 @@ class PlaylistNotification {
   String playlistName;
 
   PlaylistNotification(
-      this.playlistId, this.lastVideoCount, this.timestamp, this.playlistName);
+    this.playlistId,
+    this.lastVideoCount,
+    this.timestamp,
+    this.playlistName,
+  );
 
   factory PlaylistNotification.fromJson(Map<String, dynamic> json) =>
       _$PlaylistNotificationFromJson(json);

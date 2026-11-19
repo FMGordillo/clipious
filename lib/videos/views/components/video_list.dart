@@ -27,19 +27,20 @@ class VideoList<T extends IdedVideo> extends StatelessWidget {
   final Function(BuildContext context, Video video)? showVideoModalSheet;
   final Function(BuildContext context, Video video)? openVideoOverride;
 
-  const VideoList(
-      {super.key,
-      required this.paginatedVideoList,
-      this.tags,
-      this.animateDownload = false,
-      this.scrollDirection = Axis.vertical,
-      this.showMetrics = true,
-      this.allowModalSheet = true,
-      this.showVideoModalSheet,
-      this.openVideoOverride,
-      this.small = false});
+  const VideoList({
+    super.key,
+    required this.paginatedVideoList,
+    this.tags,
+    this.animateDownload = false,
+    this.scrollDirection = Axis.vertical,
+    this.showMetrics = true,
+    this.allowModalSheet = true,
+    this.showVideoModalSheet,
+    this.openVideoOverride,
+    this.small = false,
+  });
 
-/*
+  /*
   @override
   void initState() {
     super.initState();
@@ -77,70 +78,72 @@ class VideoList<T extends IdedVideo> extends StatelessWidget {
                       alignment: Alignment.center,
                       color: colorScheme.surface,
                       child: InkWell(
-                          onTap: () => cubit.getItems(),
-                          child: Text(
-                            locals.couldntFetchVideos,
-                            style: small
-                                ? textTheme.labelSmall
-                                : textTheme.bodyMedium,
-                          )),
+                        onTap: () => cubit.getItems(),
+                        child: Text(
+                          locals.couldntFetchVideos,
+                          style: small
+                              ? textTheme.labelSmall
+                              : textTheme.bodyMedium,
+                        ),
+                      ),
                     )
                   : items.isEmpty && !state.loading
-                      ? FilledButton.tonal(
-                          onPressed: cubit.refreshItems,
-                          child: Text(locals.refresh))
-                      : Padding(
-                          padding: EdgeInsets.only(top: small ? 0.0 : 4.0),
-                          child: RefreshIndicator(
-                            onRefresh: () async =>
-                                !small && state.itemList.hasRefresh()
-                                    ? await cubit.refreshItems()
-                                    : Future.delayed(Duration.zero),
-                            child: GridView.count(
-                              crossAxisCount: gridCount,
-                              controller: cubit.scrollController,
-                              scrollDirection: scrollDirection,
-                              crossAxisSpacing: small ? 8 : 5,
-                              mainAxisSpacing: small ? 8 : 5,
-                              childAspectRatio: small
-                                  ? smallVideoAspectRatio
-                                  : getGridAspectRatio(context),
-                              children: [
-                                ...items.map((v) {
-                                  Video? onlineVideo;
-                                  DownloadedVideo? offlineVideo;
+                  ? FilledButton.tonal(
+                      onPressed: cubit.refreshItems,
+                      child: Text(locals.refresh),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.only(top: small ? 0.0 : 4.0),
+                      child: RefreshIndicator(
+                        onRefresh: () async =>
+                            !small && state.itemList.hasRefresh()
+                            ? await cubit.refreshItems()
+                            : Future.delayed(Duration.zero),
+                        child: GridView.count(
+                          crossAxisCount: gridCount,
+                          controller: cubit.scrollController,
+                          scrollDirection: scrollDirection,
+                          crossAxisSpacing: small ? 8 : 5,
+                          mainAxisSpacing: small ? 8 : 5,
+                          childAspectRatio: small
+                              ? smallVideoAspectRatio
+                              : getGridAspectRatio(context),
+                          children: [
+                            ...items.map((v) {
+                              Video? onlineVideo;
+                              DownloadedVideo? offlineVideo;
 
-                                  if (v is Video) {
-                                    onlineVideo = v;
-                                  }
+                              if (v is Video) {
+                                onlineVideo = v;
+                              }
 
-                                  if (v is DownloadedVideo) {
-                                    offlineVideo = v;
-                                  }
+                              if (v is DownloadedVideo) {
+                                offlineVideo = v;
+                              }
 
-                                  return VideoListItem(
-                                    small: small,
-                                    showMetrics: showMetrics,
-                                    key: ValueKey(
-                                        '${v.videoId}-${small.toString()}'),
-                                    video: onlineVideo,
-                                    offlineVideo: offlineVideo,
-                                    animateDownload: animateDownload,
-                                    showVideoModalSheet: showVideoModalSheet,
-                                    allowModalSheet: allowModalSheet,
-                                    openVideoOverride: openVideoOverride,
-                                  );
-                                }),
-                                if (state.loading)
-                                  ...repeatWidget(
-                                      () => VideoListItemPlaceHolder(
-                                            small: small,
-                                          ),
-                                      count: 5 * gridCount)
-                              ],
-                            ),
-                          ),
-                        )
+                              return VideoListItem(
+                                small: small,
+                                showMetrics: showMetrics,
+                                key: ValueKey(
+                                  '${v.videoId}-${small.toString()}',
+                                ),
+                                video: onlineVideo,
+                                offlineVideo: offlineVideo,
+                                animateDownload: animateDownload,
+                                showVideoModalSheet: showVideoModalSheet,
+                                allowModalSheet: allowModalSheet,
+                                openVideoOverride: openVideoOverride,
+                              );
+                            }),
+                            if (state.loading)
+                              ...repeatWidget(
+                                () => VideoListItemPlaceHolder(small: small),
+                                count: 5 * gridCount,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
             ],
           );
         },

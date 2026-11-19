@@ -17,22 +17,20 @@ class VideoInfo extends StatelessWidget {
   final int? dislikes;
   final bool titleAndChannelInfo, descriptionAndTags;
 
-  const VideoInfo(
-      {super.key,
-      required this.video,
-      this.dislikes,
-      this.titleAndChannelInfo = true,
-      this.descriptionAndTags = true});
+  const VideoInfo({
+    super.key,
+    required this.video,
+    this.dislikes,
+    this.titleAndChannelInfo = true,
+    this.descriptionAndTags = true,
+  });
 
   openChannel(BuildContext context) {
     AutoRouter.of(context).push(ChannelRoute(channelId: video.authorId!));
   }
 
   showSearchWindow(BuildContext context, String query) {
-    AutoRouter.of(context).push(SearchRoute(
-      query: query,
-      searchNow: true,
-    ));
+    AutoRouter.of(context).push(SearchRoute(query: query, searchNow: true));
   }
 
   @override
@@ -72,11 +70,13 @@ class VideoInfo extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Thumbnail(
                       thumbnails: ImageObject.getThumbnailUrlsByPreferredOrder(
-                          video.authorThumbnails),
+                        video.authorThumbnails,
+                      ),
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20)),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ) /*Container(
                     width: 40,
                     height: 40,
@@ -84,17 +84,18 @@ class VideoInfo extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         color: colorScheme.onSurface,
                         image: DecorationImage(image: NetworkImage(ImageObject.getBestThumbnail(video?.authorThumbnails)?.url ?? ''), fit: BoxFit.cover)),
-                  )*/
-                    ,
+                  )*/,
                   ),
                 ),
                 Expanded(
-                    child: InkWell(
-                        onTap: () => openChannel(context),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(video.author ?? ''),
-                        ))),
+                  child: InkWell(
+                    onTap: () => openChannel(context),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(video.author ?? ''),
+                    ),
+                  ),
+                ),
               ],
             ),
           if (titleAndChannelInfo)
@@ -106,7 +107,7 @@ class VideoInfo extends StatelessWidget {
                     channelId: video.authorId ?? '',
                     subCount: video.subCountText ?? '',
                   ),
-                )
+                ),
               ],
             ),
           if (descriptionAndTags)
@@ -121,67 +122,75 @@ class VideoInfo extends StatelessWidget {
               children: [
                 const Padding(
                   padding: EdgeInsets.only(right: 4.0),
-                  child: Icon(
-                    Icons.remove_red_eye,
-                    size: 15,
-                  ),
+                  child: Icon(Icons.remove_red_eye, size: 15),
                 ),
-                Text((video.isListed ?? true)
-                    ? locals.videoListed
-                    : locals.videoUnlisted),
+                Text(
+                  (video.isListed ?? true)
+                      ? locals.videoListed
+                      : locals.videoUnlisted,
+                ),
                 Visibility(
                   visible: video.isFamilyFriendly ?? true,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Icon(
-                      Icons.child_care,
-                      size: 15,
-                    ),
+                    child: Icon(Icons.child_care, size: 15),
                   ),
                 ),
                 Visibility(
-                    visible: video.isFamilyFriendly ?? true,
-                    child: Text(locals.videoIsFamilyFriendly))
+                  visible: video.isFamilyFriendly ?? true,
+                  child: Text(locals.videoIsFamilyFriendly),
+                ),
               ],
             ),
           if (descriptionAndTags)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  children: video.keywords
-                      .map((e) => InkWell(
+                spacing: 5,
+                runSpacing: 5,
+                children:
+                    video.keywords
+                        .map(
+                          (e) => InkWell(
                             onTap: () => showSearchWindow(context, e),
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: colorScheme.secondaryContainer,
-                                  borderRadius: BorderRadius.circular(20)),
+                                color: colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 4),
+                                  horizontal: 8.0,
+                                  vertical: 4,
+                                ),
                                 child: Text(e),
                               ),
                             ),
-                          ))
-                      .toList(growable: true)
-                    ..insert(
+                          ),
+                        )
+                        .toList(growable: true)
+                      ..insert(
                         0,
                         InkWell(
                           onTap: () =>
                               showSearchWindow(context, video.genre ?? ''),
                           child: Container(
                             decoration: BoxDecoration(
-                                color: colorScheme.secondaryContainer,
-                                borderRadius: BorderRadius.circular(20)),
+                              color: colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0, vertical: 4),
+                                horizontal: 8.0,
+                                vertical: 4,
+                              ),
                               child: Text(video.genre ?? ''),
                             ),
                           ),
-                        ))),
-            )
+                        ),
+                      ),
+              ),
+            ),
         ],
       ),
     );

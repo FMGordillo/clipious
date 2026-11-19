@@ -15,11 +15,12 @@ class TvGridScreen extends StatelessWidget {
   final String? tags;
   final String title;
 
-  const TvGridScreen(
-      {super.key,
-      required this.paginatedVideoList,
-      this.tags,
-      required this.title});
+  const TvGridScreen({
+    super.key,
+    required this.paginatedVideoList,
+    this.tags,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,48 +31,54 @@ class TvGridScreen extends StatelessWidget {
       child: Scaffold(
         body: TvOverscan(
           child: BlocBuilder<ItemListCubit<Video>, ItemListState<Video>>(
-              builder: (context, state) {
-            var cubit = context.read<ItemListCubit<Video>>();
-            return Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      title,
-                      style: textTheme.titleLarge,
-                    ),
-                    state.loading
-                        ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: SizedBox(
+            builder: (context, state) {
+              var cubit = context.read<ItemListCubit<Video>>();
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(title, style: textTheme.titleLarge),
+                      state.loading
+                          ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: SizedBox(
                                 width: 15,
                                 height: 15,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                )),
-                          )
-                        : const SizedBox.shrink()
-                  ],
-                ),
-                Expanded(
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                  Expanded(
                     child: GridView.count(
-                  controller: cubit.scrollController,
-                  childAspectRatio: 16 / 13,
-                  crossAxisCount: 3,
-                  children: [
-                    ...state.items.where((element) => !element.filterHide).map(
-                        (e) => TvVideoItem(
-                            key: ValueKey(e.videoId),
-                            video: e,
-                            autoFocus: false)),
-                    if (state.loading)
-                      ...repeatWidget(() => const TvVideoItemPlaceHolder(),
-                          count: 10)
-                  ],
-                ))
-              ],
-            );
-          }),
+                      controller: cubit.scrollController,
+                      childAspectRatio: 16 / 13,
+                      crossAxisCount: 3,
+                      children: [
+                        ...state.items
+                            .where((element) => !element.filterHide)
+                            .map(
+                              (e) => TvVideoItem(
+                                key: ValueKey(e.videoId),
+                                video: e,
+                                autoFocus: false,
+                              ),
+                            ),
+                        if (state.loading)
+                          ...repeatWidget(
+                            () => const TvVideoItemPlaceHolder(),
+                            count: 10,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

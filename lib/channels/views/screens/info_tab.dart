@@ -8,10 +8,7 @@ import '../../models/channel.dart';
 @RoutePage()
 class ChannelInfoTab extends StatelessWidget {
   final Channel? channel;
-  const ChannelInfoTab({
-    super.key,
-    this.channel,
-  });
+  const ChannelInfoTab({super.key, this.channel});
 
   @override
   Widget build(BuildContext context) {

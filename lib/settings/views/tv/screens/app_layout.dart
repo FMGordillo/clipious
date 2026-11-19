@@ -25,7 +25,8 @@ class TvAppLayoutSettingsScreen extends StatelessWidget {
     }
     // use defaaults to keep original order
     await settings.setAppLayout(
-        defaults.where((element) => current.contains(element)).toList());
+      defaults.where((element) => current.contains(element)).toList(),
+    );
   }
 
   @override
@@ -37,15 +38,19 @@ class TvAppLayoutSettingsScreen extends StatelessWidget {
         builder: (context, state) {
           return TvOverscan(
             child: ListView(
-                children: HomeDataSource.defaultSettings()
-                    .map((e) => SettingsTile(
-                          title: e.getLabel(locals),
-                          onSelected: (context) => toggleDataSource(context, e),
-                          trailing: Switch(
-                              onChanged: (value) {},
-                              value: state.appLayout.contains(e)),
-                        ))
-                    .toList()),
+              children: HomeDataSource.defaultSettings()
+                  .map(
+                    (e) => SettingsTile(
+                      title: e.getLabel(locals),
+                      onSelected: (context) => toggleDataSource(context, e),
+                      trailing: Switch(
+                        onChanged: (value) {},
+                        value: state.appLayout.contains(e),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
           );
         },
       ),

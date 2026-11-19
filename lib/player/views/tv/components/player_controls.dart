@@ -19,7 +19,10 @@ class TvPlayerControls extends StatelessWidget {
   const TvPlayerControls({super.key});
 
   onVideoQueueSelected(
-      BuildContext context, TvPlayerControlsCubit cubit, Video video) {
+    BuildContext context,
+    TvPlayerControlsCubit cubit,
+    Video video,
+  ) {
     cubit.playFromQueue(video);
   }
 
@@ -34,14 +37,18 @@ class TvPlayerControls extends StatelessWidget {
       child: BlocBuilder<TvPlayerControlsCubit, TvPlayerControlsState>(
         builder: (context, playerState) {
           var cubit = context.read<TvPlayerControlsCubit>();
-          var currentlyPlaying = context
-              .select((PlayerCubit value) => value.state.currentlyPlaying);
-          var videos =
-              context.select((PlayerCubit value) => value.state.videos);
-          var isPlaying =
-              context.select((PlayerCubit value) => value.state.isPlaying);
-          var position =
-              context.select((PlayerCubit value) => value.state.position);
+          var currentlyPlaying = context.select(
+            (PlayerCubit value) => value.state.currentlyPlaying,
+          );
+          var videos = context.select(
+            (PlayerCubit value) => value.state.videos,
+          );
+          var isPlaying = context.select(
+            (PlayerCubit value) => value.state.isPlaying,
+          );
+          var position = context.select(
+            (PlayerCubit value) => value.state.position,
+          );
 
           return BlocListener<PlayerCubit, PlayerState>(
             listenWhen: (previous, current) =>
@@ -65,75 +72,84 @@ class TvPlayerControls extends StatelessWidget {
                       duration: animationDuration,
                       child: Container(
                         decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
                               Colors.black.withValues(alpha: 1),
                               Colors.black.withValues(alpha: 0),
-                              Colors.black.withValues(alpha: 1)
-                            ])),
+                              Colors.black.withValues(alpha: 1),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   Positioned(
-                      child: TvOverscan(
-                    child: playerState.showSettings
-                        ? const TvPlayerSettings()
-                        : const SizedBox.shrink(),
-                  )),
-                  Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
+                    child: TvOverscan(
                       child: playerState.showSettings
-                          ? const SizedBox.shrink()
-                          : AnimatedOpacity(
-                              opacity: playerState.controlsOpacity,
-                              duration: animationDuration,
-                              child: TvOverscan(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currentlyPlaying?.title ?? '',
-                                      style: textTheme.headlineLarge
-                                          ?.copyWith(color: Colors.white),
+                          ? const TvPlayerSettings()
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: playerState.showSettings
+                        ? const SizedBox.shrink()
+                        : AnimatedOpacity(
+                            opacity: playerState.controlsOpacity,
+                            duration: animationDuration,
+                            child: TvOverscan(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    currentlyPlaying?.title ?? '',
+                                    style: textTheme.headlineLarge?.copyWith(
+                                      color: Colors.white,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16.0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Thumbnail(
-                                            thumbnails: ImageObject
-                                                .getThumbnailUrlsByPreferredOrder(
-                                                    currentlyPlaying
-                                                        ?.authorThumbnails),
-                                            width: 40,
-                                            height: 40,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0, right: 20),
-                                            child: Text(
-                                              currentlyPlaying?.author ?? '',
-                                              style: textTheme.headlineSmall
-                                                  ?.copyWith(
-                                                      color: Colors.white),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Thumbnail(
+                                          thumbnails:
+                                              ImageObject.getThumbnailUrlsByPreferredOrder(
+                                                currentlyPlaying
+                                                    ?.authorThumbnails,
+                                              ),
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 8.0,
+                                            right: 20,
+                                          ),
+                                          child: Text(
+                                            currentlyPlaying?.author ?? '',
+                                            style: textTheme.headlineSmall
+                                                ?.copyWith(color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            )),
+                            ),
+                          ),
+                  ),
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -148,13 +164,16 @@ class TvPlayerControls extends StatelessWidget {
                             playerState.displayControls
                                 ? Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 16),
+                                      horizontal: 8.0,
+                                      vertical: 16,
+                                    ),
                                     child: FocusScope(
                                       child: Row(
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 16.0),
+                                              right: 16.0,
+                                            ),
                                             child: TvButton(
                                               onPressed: (context) =>
                                                   player.togglePlaying(),
@@ -162,8 +181,9 @@ class TvPlayerControls extends StatelessWidget {
                                                   Colors.transparent,
                                               autofocus: true,
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
+                                                padding: const EdgeInsets.all(
+                                                  8.0,
+                                                ),
                                                 child: Icon(
                                                   isPlaying
                                                       ? Icons.pause
@@ -177,7 +197,8 @@ class TvPlayerControls extends StatelessWidget {
                                             visible: videos.length > 1,
                                             child: Padding(
                                               padding: const EdgeInsets.only(
-                                                  right: 16.0),
+                                                right: 16.0,
+                                              ),
                                               child: TvButton(
                                                 onPressed: (context) =>
                                                     player.playPrevious(),
@@ -195,7 +216,8 @@ class TvPlayerControls extends StatelessWidget {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 16.0),
+                                              right: 16.0,
+                                            ),
                                             child: TvButton(
                                               unfocusedColor:
                                                   Colors.transparent,
@@ -212,7 +234,8 @@ class TvPlayerControls extends StatelessWidget {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 16.0),
+                                              right: 16.0,
+                                            ),
                                             child: TvButton(
                                               onPressed: (context) =>
                                                   cubit.fastForward(),
@@ -246,7 +269,8 @@ class TvPlayerControls extends StatelessWidget {
                                           Expanded(child: Container()),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 16.0),
+                                              right: 16.0,
+                                            ),
                                             child: TvButton(
                                               onPressed: (context) =>
                                                   cubit.displayQueue(),
@@ -263,7 +287,8 @@ class TvPlayerControls extends StatelessWidget {
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                right: 16.0),
+                                              right: 16.0,
+                                            ),
                                             child: TvButton(
                                               onPressed: (context) =>
                                                   cubit.displaySettings(),
@@ -290,12 +315,15 @@ class TvPlayerControls extends StatelessWidget {
                                     ? Container(
                                         decoration: BoxDecoration(
                                           color: Colors.red,
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0, vertical: 2),
+                                            horizontal: 8.0,
+                                            vertical: 2,
+                                          ),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.end,
@@ -308,7 +336,8 @@ class TvPlayerControls extends StatelessWidget {
                                               ),
                                               Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 8.0),
+                                                  left: 8.0,
+                                                ),
                                                 child: Text(
                                                   locals.streamIsLive,
                                                   style: textTheme.bodyLarge,
@@ -322,13 +351,12 @@ class TvPlayerControls extends StatelessWidget {
                                         child: player.progress >= 0
                                             ? Container(
                                                 decoration: BoxDecoration(
-                                                    color: Colors.black
-                                                        .withValues(alpha: 0.5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5)),
-                                                child:
-                                                    AnimatedFractionallySizedBox(
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: AnimatedFractionallySizedBox(
                                                   alignment:
                                                       Alignment.centerLeft,
                                                   duration: animationDuration,
@@ -336,57 +364,67 @@ class TvPlayerControls extends StatelessWidget {
                                                   child: Container(
                                                     height: 8,
                                                     decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            5,
+                                                          ),
+                                                    ),
                                                   ),
-                                                ))
-                                            : const SizedBox.shrink()),
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                      ),
                                 if (!(currentlyPlaying?.liveNow ?? false))
                                   Padding(
                                     padding: const EdgeInsets.only(left: 16.0),
                                     child: Text(
                                       '${prettyDurationCustom(position)} / ${prettyDurationCustom(player.duration)}',
-                                      style: textTheme.titleLarge
-                                          ?.copyWith(color: Colors.white),
+                                      style: textTheme.titleLarge?.copyWith(
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  )
+                                  ),
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                      left: 0,
-                      bottom: 50,
-                      right: 0,
-                      child: AnimatedSwitcher(
-                          duration: animationDuration,
-                          child: playerState.showQueue
-                              ? TvOverscan(
-                                  child: FocusScope(
-                                  autofocus: true,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        locals.videoQueue,
-                                        style: textTheme.titleLarge,
-                                      ),
-                                      TvHorizontalVideoList(
-                                          onSelect: (ctx, video) =>
-                                              onVideoQueueSelected(
-                                                  ctx, cubit, video),
-                                          paginatedVideoList:
-                                              FixedItemList(videos)),
-                                    ],
-                                  ),
-                                ))
-                              : const SizedBox.shrink()))
+                    left: 0,
+                    bottom: 50,
+                    right: 0,
+                    child: AnimatedSwitcher(
+                      duration: animationDuration,
+                      child: playerState.showQueue
+                          ? TvOverscan(
+                              child: FocusScope(
+                                autofocus: true,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      locals.videoQueue,
+                                      style: textTheme.titleLarge,
+                                    ),
+                                    TvHorizontalVideoList(
+                                      onSelect: (ctx, video) =>
+                                          onVideoQueueSelected(
+                                            ctx,
+                                            cubit,
+                                            video,
+                                          ),
+                                      paginatedVideoList: FixedItemList(videos),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                  ),
                 ],
               ),
             ),

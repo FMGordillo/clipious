@@ -20,24 +20,26 @@ class TvTextField extends StatelessWidget {
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
 
-  const TvTextField(
-      {super.key,
-      required this.controller,
-      this.autofocus,
-      this.autocorrect,
-      this.focusNode,
-      this.onSubmitted,
-      this.textInputAction,
-      this.onFocusChanged,
-      this.leading,
-      this.trailing,
-      this.obscureText,
-      this.autofillHints,
-      this.decoration,
-      this.keyboardType});
+  const TvTextField({
+    super.key,
+    required this.controller,
+    this.autofocus,
+    this.autocorrect,
+    this.focusNode,
+    this.onSubmitted,
+    this.textInputAction,
+    this.onFocusChanged,
+    this.leading,
+    this.trailing,
+    this.obscureText,
+    this.autofillHints,
+    this.decoration,
+    this.keyboardType,
+  });
 
   openTextField(BuildContext context) {
-    AutoRouter.of(context).push(TvTextFieldRoute(
+    AutoRouter.of(context).push(
+      TvTextFieldRoute(
         controller: controller,
         autocorrect: autocorrect,
         autofocus: autofocus,
@@ -46,7 +48,9 @@ class TvTextField extends StatelessWidget {
         obscureText: obscureText,
         autofillHints: autofillHints,
         decoration: decoration,
-        keyboardType: keyboardType));
+        keyboardType: keyboardType,
+      ),
+    );
   }
 
   @override
@@ -60,30 +64,35 @@ class TvTextField extends StatelessWidget {
       focusNode: focusNode,
       onKeyEvent: (node, event) =>
           onTvSelect(event, context, (context) => openTextField(context)),
-      child: Builder(builder: (ctx) {
-        bool hasFocus = Focus.of(ctx).hasFocus;
+      child: Builder(
+        builder: (ctx) {
+          bool hasFocus = Focus.of(ctx).hasFocus;
 
-        bool showLabel = controller.text.isEmpty && decoration?.label != null;
+          bool showLabel = controller.text.isEmpty && decoration?.label != null;
 
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AnimatedContainer(
-            duration: animationDuration ~/ 2,
-            decoration: BoxDecoration(
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AnimatedContainer(
+              duration: animationDuration ~/ 2,
+              decoration: BoxDecoration(
                 color: hasFocus ? colors.secondaryContainer : colors.surface,
-                borderRadius: hasFocus ? BorderRadius.circular(10) : null),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  leading ?? const SizedBox.shrink(),
-                  Expanded(
-                    child: Container(
+                borderRadius: hasFocus ? BorderRadius.circular(10) : null,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    leading ?? const SizedBox.shrink(),
+                    Expanded(
+                      child: Container(
                         decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    width: 2,
-                                    color: colors.secondaryContainer))),
+                          border: Border(
+                            bottom: BorderSide(
+                              width: 2,
+                              color: colors.secondaryContainer,
+                            ),
+                          ),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: showLabel
@@ -94,15 +103,17 @@ class TvTextField extends StatelessWidget {
                                       : controller.text,
                                   style: textTheme.bodyLarge,
                                 ),
-                        )),
-                  ),
-                  trailing ?? const SizedBox.shrink()
-                ],
+                        ),
+                      ),
+                    ),
+                    trailing ?? const SizedBox.shrink(),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }
@@ -120,18 +131,19 @@ class TvTextFieldScreen extends StatelessWidget {
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
 
-  const TvTextFieldScreen(
-      {super.key,
-      required this.controller,
-      this.autofocus,
-      this.autocorrect,
-      this.focusNode,
-      this.onSubmitted,
-      this.textInputAction,
-      this.obscureText,
-      this.autofillHints,
-      this.decoration,
-      this.keyboardType});
+  const TvTextFieldScreen({
+    super.key,
+    required this.controller,
+    this.autofocus,
+    this.autocorrect,
+    this.focusNode,
+    this.onSubmitted,
+    this.textInputAction,
+    this.obscureText,
+    this.autofillHints,
+    this.decoration,
+    this.keyboardType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -143,25 +155,26 @@ class TvTextFieldScreen extends StatelessWidget {
           child: Column(
             children: [
               Expanded(
-                  child: Container(
-                alignment: Alignment.center,
-                child: TextField(
-                  autofocus: true,
-                  autocorrect: autocorrect ?? true,
-                  controller: controller,
-                  keyboardType: keyboardType,
-                  onSubmitted: (value) {
-                    if (onSubmitted != null) {
-                      onSubmitted!(value);
-                    }
-                    Navigator.of(context).pop();
-                  },
-                  textInputAction: textInputAction,
-                  autofillHints: autofillHints,
-                  decoration: decoration ?? const InputDecoration(),
-                  obscureText: obscureText ?? false,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: TextField(
+                    autofocus: true,
+                    autocorrect: autocorrect ?? true,
+                    controller: controller,
+                    keyboardType: keyboardType,
+                    onSubmitted: (value) {
+                      if (onSubmitted != null) {
+                        onSubmitted!(value);
+                      }
+                      Navigator.of(context).pop();
+                    },
+                    textInputAction: textInputAction,
+                    autofillHints: autofillHints,
+                    decoration: decoration ?? const InputDecoration(),
+                    obscureText: obscureText ?? false,
+                  ),
                 ),
-              ))
+              ),
             ],
           ),
         ),

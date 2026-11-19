@@ -17,15 +17,17 @@ class SubscriptionScreen extends StatelessWidget {
         title: Text(locals.subscriptions),
         actions: [
           IconButton(
-              onPressed: () =>
-                  AutoRouter.of(context).push(const ManageSubscriptionsRoute()),
-              icon: const Icon(Icons.checklist))
+            onPressed: () =>
+                AutoRouter.of(context).push(const ManageSubscriptionsRoute()),
+            icon: const Icon(Icons.checklist),
+          ),
         ],
       ),
       body: const SafeArea(
         child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: innerHorizontalPadding),
-            child: Subscriptions()),
+          padding: EdgeInsets.symmetric(horizontal: innerHorizontalPadding),
+          child: Subscriptions(),
+        ),
       ),
     );
   }

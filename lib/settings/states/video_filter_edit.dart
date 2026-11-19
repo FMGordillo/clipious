@@ -103,7 +103,8 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
     if (state.filter != null) {
       state.filter?.channelId = state.channel?.authorId;
       log.fine(
-          'hide all ? ${state.filter?.filterAll} filter id: ${state.filter?.uuid}');
+        'hide all ? ${state.filter?.filterAll} filter id: ${state.filter?.uuid}',
+      );
       await db.saveFilter(state.filter!);
       // VideoFilterController.to()?.refreshFilters();
     }
@@ -111,8 +112,11 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
 
   Future<List<Channel>> searchChannel(String query) async {
     if (query.trim() == '') return [];
-    var searchResults = await service.search(query,
-        type: SearchType.channel, page: state.searchPage);
+    var searchResults = await service.search(
+      query,
+      type: SearchType.channel,
+      page: state.searchPage,
+    );
     return searchResults.channels;
   }
 
@@ -189,8 +193,9 @@ class VideoFilterEditCubit extends Cubit<VideoFilterEditState> {
   }
 
   setEndTime(String newTime) {
-    var comparison =
-        newTime.compareTo(state.filter?.startTime ?? defaultStartTime);
+    var comparison = newTime.compareTo(
+      state.filter?.startTime ?? defaultStartTime,
+    );
     if (comparison > 0) {
       var filter = state.filter?.copyWith();
       filter?.endTime = newTime;

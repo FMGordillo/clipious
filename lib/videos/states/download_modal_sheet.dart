@@ -22,13 +22,17 @@ class DownloadModalSheetCubit extends Cubit<DownloadModalSheetState> {
         .where((f) => f.encoding == 'vp9' && f.type.contains("video/webm"))
         .sortBy((f) => int.parse(f.resolution?.replaceAll('p', '') ?? '0'))
         .where(
-            (f) => f.qualityLabel != null && f.qualityLabel!.trim().isNotEmpty)
+          (f) => f.qualityLabel != null && f.qualityLabel!.trim().isNotEmpty,
+        )
         .toList();
 
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         availableQualities: qualities,
         loading: false,
-        quality: qualities.last.qualityLabel!));
+        quality: qualities.last.qualityLabel!,
+      ),
+    );
   }
 
   setAudioOnly(bool value) {
@@ -44,9 +48,10 @@ class DownloadModalSheetCubit extends Cubit<DownloadModalSheetState> {
 
 @freezed
 sealed class DownloadModalSheetState with _$DownloadModalSheetState {
-  const factory DownloadModalSheetState(
-      {@Default(false) bool audioOnly,
-      @Default(false) bool loading,
-      @Default([]) List<AdaptiveFormat> availableQualities,
-      @Default('720p') String quality}) = _DownloadModalSheetState;
+  const factory DownloadModalSheetState({
+    @Default(false) bool audioOnly,
+    @Default(false) bool loading,
+    @Default([]) List<AdaptiveFormat> availableQualities,
+    @Default('720p') String quality,
+  }) = _DownloadModalSheetState;
 }

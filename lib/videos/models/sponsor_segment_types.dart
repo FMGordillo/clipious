@@ -39,7 +39,9 @@ enum SponsorSegmentType {
   }
 
   static String getDescription(
-      SponsorSegmentType type, AppLocalizations locals) {
+    SponsorSegmentType type,
+    AppLocalizations locals,
+  ) {
     switch (type) {
       case SponsorSegmentType.sponsor:
         return locals.sponsorBlockCategorySponsorDescription;

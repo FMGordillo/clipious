@@ -37,9 +37,9 @@ class _MainScreenState extends State<MainContentScreen> {
 
   openLayoutEditor(BuildContext context) {
     var app = context.read<AppCubit>();
-    AutoRouter.of(context)
-        .push(const EditHomeLayoutRoute())
-        .then((value) => app.updateLayout());
+    AutoRouter.of(
+      context,
+    ).push(const EditHomeLayoutRoute()).then((value) => app.updateLayout());
   }
 
   @override
@@ -49,27 +49,27 @@ class _MainScreenState extends State<MainContentScreen> {
     // Only after at least the action method is set, the notification events are delivered
     AwesomeNotifications()
         .setListeners(
-            onActionReceivedMethod:
-                NotificationController.onActionReceivedMethod,
-            onNotificationCreatedMethod:
-                NotificationController.onNotificationCreatedMethod,
-            onNotificationDisplayedMethod:
-                NotificationController.onNotificationDisplayedMethod,
-            onDismissActionReceivedMethod:
-                NotificationController.onDismissActionReceivedMethod)
-        .then(
-      (value) {
-        AwesomeNotifications()
-            .getInitialNotificationAction()
-            .then((initialNotification) {
-          log.fine('Initial notification ${initialNotification?.payload}');
+          onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+          onNotificationCreatedMethod:
+              NotificationController.onNotificationCreatedMethod,
+          onNotificationDisplayedMethod:
+              NotificationController.onNotificationDisplayedMethod,
+          onDismissActionReceivedMethod:
+              NotificationController.onDismissActionReceivedMethod,
+        )
+        .then((value) {
+          AwesomeNotifications().getInitialNotificationAction().then((
+            initialNotification,
+          ) {
+            log.fine('Initial notification ${initialNotification?.payload}');
 
-          if (initialNotification != null) {
-            NotificationController.onActionReceivedMethod(initialNotification);
-          }
+            if (initialNotification != null) {
+              NotificationController.onActionReceivedMethod(
+                initialNotification,
+              );
+            }
+          });
         });
-      },
-    );
   }
 
   @override
@@ -84,58 +84,60 @@ class _MainScreenState extends State<MainContentScreen> {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
     var locals = AppLocalizations.of(context)!;
 
-    return BlocBuilder<AppCubit, AppState>(buildWhen: (previous, current) {
-      return previous.server != current.server;
-    }, builder: (context, appState) {
-      var app = context.read<AppCubit>();
-      var settings = context.watch<SettingsCubit>().state;
+    return BlocBuilder<AppCubit, AppState>(
+      buildWhen: (previous, current) {
+        return previous.server != current.server;
+      },
+      builder: (context, appState) {
+        var app = context.read<AppCubit>();
+        var settings = context.watch<SettingsCubit>().state;
 
-      var allowedPages = settings.appLayout
-          .where((element) =>
-              element.isPermitted(context, app.isLoggedIn) &&
-              element.route != null)
-          .toList();
-      var navigationWidgets = allowedPages
-          .map((e) => e.getBottomBarNavigationWidget(context))
-          .toList();
+        var allowedPages = settings.appLayout
+            .where(
+              (element) =>
+                  element.isPermitted(context, app.isLoggedIn) &&
+                  element.route != null,
+            )
+            .toList();
+        var navigationWidgets = allowedPages
+            .map((e) => e.getBottomBarNavigationWidget(context))
+            .toList();
 
-      var selectedIndex = appState.firstIndex;
-      if (selectedIndex >= allowedPages.length) {
-        selectedIndex = 0;
-      }
+        var selectedIndex = appState.firstIndex;
+        if (selectedIndex >= allowedPages.length) {
+          selectedIndex = 0;
+        }
 
-      final deviceType = getDeviceType();
+        final deviceType = getDeviceType();
 
-      return allowedPages.isEmpty
-          ? Scaffold(
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Center(
-                      child: AppIcon(
-                    width: 150,
-                    height: 150,
-                  )),
-                  FilledButton.tonalIcon(
+        return allowedPages.isEmpty
+            ? Scaffold(
+                body: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Center(child: AppIcon(width: 150, height: 150)),
+                    FilledButton.tonalIcon(
                       onPressed: () => openSettings(context),
                       icon: const Icon(Icons.settings),
-                      label: Text(locals.settings))
-                ],
-              ),
-            )
-          : AutoTabsRouter.tabBar(
-              key: ValueKey(appState.server?.url),
-              homeIndex: selectedIndex,
-              routes: allowedPages.map((e) => e.route!).toList(),
-              physics: const NeverScrollableScrollPhysics(),
-              builder: (context, child, controller) {
-                final tabsRouter = AutoTabsRouter.of(context);
-                final selectedPage = allowedPages[tabsRouter.activeIndex];
-                return Scaffold(
+                      label: Text(locals.settings),
+                    ),
+                  ],
+                ),
+              )
+            : AutoTabsRouter.tabBar(
+                key: ValueKey(appState.server?.url),
+                homeIndex: selectedIndex,
+                routes: allowedPages.map((e) => e.route!).toList(),
+                physics: const NeverScrollableScrollPhysics(),
+                builder: (context, child, controller) {
+                  final tabsRouter = AutoTabsRouter.of(context);
+                  final selectedPage = allowedPages[tabsRouter.activeIndex];
+                  return Scaffold(
                     // so we rebuild the view if the server changes
                     backgroundColor: colorScheme.surface,
-                    bottomNavigationBar: deviceType == DeviceType.phone &&
+                    bottomNavigationBar:
+                        deviceType == DeviceType.phone &&
                             allowedPages.length >= 2
                         ? NavigationBar(
                             onDestinationSelected: tabsRouter.setActiveIndex,
@@ -150,12 +152,13 @@ class _MainScreenState extends State<MainContentScreen> {
                           Text(selectedPage.getLabel(locals)),
                           if (selectedPage == HomeDataSource.home)
                             IconButton(
-                                iconSize: 15,
-                                onPressed: () => openLayoutEditor(context),
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: colorScheme.secondary,
-                                ))
+                              iconSize: 15,
+                              onPressed: () => openLayoutEditor(context),
+                              icon: Icon(
+                                Icons.edit,
+                                color: colorScheme.secondary,
+                              ),
+                            ),
                         ],
                       ),
                       actions: [
@@ -163,7 +166,8 @@ class _MainScreenState extends State<MainContentScreen> {
                             ? IconButton(
                                 onPressed: () =>
                                     openSubscriptionManagement(context),
-                                icon: const Icon(Icons.checklist))
+                                icon: const Icon(Icons.checklist),
+                              )
                             : const SizedBox.shrink(),
                         const AppBarDownloadButton(),
                         IconButton(
@@ -184,29 +188,34 @@ class _MainScreenState extends State<MainContentScreen> {
                             allowedPages.length > 2)
                           OrientationBuilder(
                             builder: (context, orientation) => NavigationRail(
-                                extended:
-                                    getOrientation() == Orientation.landscape,
-                                onDestinationSelected:
-                                    tabsRouter.setActiveIndex,
-                                destinations: allowedPages
-                                    .map((e) =>
-                                        e.getNavigationRailWidget(context))
-                                    .toList(),
-                                selectedIndex: tabsRouter.activeIndex),
+                              extended:
+                                  getOrientation() == Orientation.landscape,
+                              onDestinationSelected: tabsRouter.setActiveIndex,
+                              destinations: allowedPages
+                                  .map(
+                                    (e) => e.getNavigationRailWidget(context),
+                                  )
+                                  .toList(),
+                              selectedIndex: tabsRouter.activeIndex,
+                            ),
                           ),
                         Expanded(
                           child: Container(
-                              // home handles its own padding because we don't want to cut horizontal scroll lists on the right
-                              padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      selectedPage == HomeDataSource.home
-                                          ? 0
-                                          : innerHorizontalPadding),
-                              child: child),
+                            // home handles its own padding because we don't want to cut horizontal scroll lists on the right
+                            padding: EdgeInsets.symmetric(
+                              horizontal: selectedPage == HomeDataSource.home
+                                  ? 0
+                                  : innerHorizontalPadding,
+                            ),
+                            child: child,
+                          ),
                         ),
                       ],
-                    ));
-              });
-    });
+                    ),
+                  );
+                },
+              );
+      },
+    );
   }
 }

@@ -20,27 +20,34 @@ class PlaylistViewScreen extends StatelessWidget {
   final Playlist playlist;
   final bool canDeleteVideos;
 
-  const PlaylistViewScreen(
-      {super.key, required this.playlist, required this.canDeleteVideos});
+  const PlaylistViewScreen({
+    super.key,
+    required this.playlist,
+    required this.canDeleteVideos,
+  });
 
   deletePlayList(BuildContext context) {
     var cubit = context.read<PlaylistCubit>();
     var locals = AppLocalizations.of(context)!;
-    okCancelDialog(context, locals.deletePlayListQ, locals.irreversibleAction,
-        () async {
-      await cubit.deletePlaylist();
+    okCancelDialog(
+      context,
+      locals.deletePlayListQ,
+      locals.irreversibleAction,
+      () async {
+        await cubit.deletePlaylist();
 
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
-    });
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+    );
   }
 
   openVideo(BuildContext context, String videoId) {
     AutoRouter.of(context).push(VideoRoute(videoId: videoId)).then((value) {
-      context
-          .read<PlaylistCubit>()
-          .refreshPlaylist(userPlaylist: canDeleteVideos);
+      context.read<PlaylistCubit>().refreshPlaylist(
+        userPlaylist: canDeleteVideos,
+      );
     });
   }
 
@@ -69,50 +76,53 @@ class PlaylistViewScreen extends StatelessWidget {
     var player = context.read<PlayerCubit>();
     return BlocProvider(
       create: (context) => PlaylistCubit(
-          PlaylistState(playlist: playlist, playlistItemHeight: 100), player),
+        PlaylistState(playlist: playlist, playlistItemHeight: 100),
+        player,
+      ),
       child: BlocBuilder<PlaylistCubit, PlaylistState>(
         builder: (context, playlistState) {
           return Scaffold(
-              appBar: AppBar(
-                title: Text(
-                  playlistState.playlist.title,
-                ),
-                actions: [
-                  canDeleteVideos
-                      ? InkWell(
-                          onTap: () => deletePlayList(context),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.delete,
-                              color: colors.secondary,
-                            ),
-                          ),
-                        )
-                      : BellIcon(
-                          itemId: playlist.playlistId,
-                          type: BellIconType.playlist)
-                ],
-              ),
-              backgroundColor: colors.surface,
-              body: SafeArea(
-                  bottom: false,
-                  child: playlistState.loading ||
-                          playlistState.playlist.videos.isNotEmpty
-                      ? DeviceWidget(
-                          phone: PlaylistInnerView(
-                            canDeleteVideos: canDeleteVideos,
-                            openVideo: openVideo,
-                            removeVideoFromPlaylist: removeVideoFromPlayList,
-                          ),
-                          tablet: TabletPlaylistInnerView(
-                            canDeleteVideos: canDeleteVideos,
-                            openVideo: openVideo,
-                            removeVideoFromPlaylist: removeVideoFromPlayList,
-                          ))
-                      : Container(
-                          alignment: Alignment.center,
-                          child: Text(locals.noVideoInPlayList))));
+            appBar: AppBar(
+              title: Text(playlistState.playlist.title),
+              actions: [
+                canDeleteVideos
+                    ? InkWell(
+                        onTap: () => deletePlayList(context),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(Icons.delete, color: colors.secondary),
+                        ),
+                      )
+                    : BellIcon(
+                        itemId: playlist.playlistId,
+                        type: BellIconType.playlist,
+                      ),
+              ],
+            ),
+            backgroundColor: colors.surface,
+            body: SafeArea(
+              bottom: false,
+              child:
+                  playlistState.loading ||
+                      playlistState.playlist.videos.isNotEmpty
+                  ? DeviceWidget(
+                      phone: PlaylistInnerView(
+                        canDeleteVideos: canDeleteVideos,
+                        openVideo: openVideo,
+                        removeVideoFromPlaylist: removeVideoFromPlayList,
+                      ),
+                      tablet: TabletPlaylistInnerView(
+                        canDeleteVideos: canDeleteVideos,
+                        openVideo: openVideo,
+                        removeVideoFromPlaylist: removeVideoFromPlayList,
+                      ),
+                    )
+                  : Container(
+                      alignment: Alignment.center,
+                      child: Text(locals.noVideoInPlayList),
+                    ),
+            ),
+          );
         },
       ),
     );

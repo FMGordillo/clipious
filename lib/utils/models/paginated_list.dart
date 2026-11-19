@@ -141,8 +141,10 @@ class SubscriptionVideoList extends PaginatedVideoList {
     List<Video> videos = [];
 
     if (isLoggedIn) {
-      UserFeed feed =
-          await service.getUserFeed(page: page, maxResults: maxResults);
+      UserFeed feed = await service.getUserFeed(
+        page: page,
+        maxResults: maxResults,
+      );
       videos.addAll(feed.notifications ?? []);
       videos.addAll(feed.videos ?? []);
       hasMoreOnline = videos.length >= maxResults;
@@ -157,14 +159,19 @@ class SubscriptionVideoList extends PaginatedVideoList {
       // if there is a continuation but it's null, then there's no more videos to fetch
       if (!hasContinuation ||
           (hasContinuation && continuations[offlineSub.channelId] != _done)) {
-        futures.add(service.getChannelVideos(offlineSub.channelId,
-            hasContinuation ? continuations[offlineSub.channelId] : null));
+        futures.add(
+          service.getChannelVideos(
+            offlineSub.channelId,
+            hasContinuation ? continuations[offlineSub.channelId] : null,
+          ),
+        );
       }
     }
 
     if (futures.isNotEmpty) {
-      List<VideosWithContinuation> offlineSubVideos =
-          await Future.wait(futures);
+      List<VideosWithContinuation> offlineSubVideos = await Future.wait(
+        futures,
+      );
       for (final v in offlineSubVideos) {
         if (v.videos.isNotEmpty) {
           videos.addAll(v.videos);
@@ -175,9 +182,7 @@ class SubscriptionVideoList extends PaginatedVideoList {
       }
     }
 
-    videos = videos.unique(
-      (element) => element.videoId,
-    );
+    videos = videos.unique((element) => element.videoId);
     videos.sort((a, b) => (b.published ?? 0).compareTo(a.published ?? 0));
 
     return videos;
@@ -218,12 +223,13 @@ class SearchPaginatedList<T> extends PaginatedList<T> {
 
   List<T> Function(SearchResults res) getFromResults;
 
-  SearchPaginatedList(
-      {required this.query,
-      required this.items,
-      required this.type,
-      required this.getFromResults,
-      required this.sortBy});
+  SearchPaginatedList({
+    required this.query,
+    required this.items,
+    required this.type,
+    required this.getFromResults,
+    required this.sortBy,
+  });
 
   @override
   bool getHasMore() {
@@ -232,8 +238,12 @@ class SearchPaginatedList<T> extends PaginatedList<T> {
 
   @override
   Future<List<T>> getItems() async {
-    SearchResults results =
-        await service.search(query, type: type, page: page, sortBy: sortBy);
+    SearchResults results = await service.search(
+      query,
+      type: type,
+      page: page,
+      sortBy: sortBy,
+    );
     return getFromResults(results);
   }
 
@@ -256,12 +266,13 @@ class SearchPaginatedList<T> extends PaginatedList<T> {
 
 // Force refresh to fetch all videos as search endpoint only returns 2 videos for each playlist
 class PlaylistSearchPaginatedList<T> extends SearchPaginatedList<T> {
-  PlaylistSearchPaginatedList(
-      {required super.query,
-      required super.items,
-      required super.type,
-      required super.getFromResults,
-      required super.sortBy});
+  PlaylistSearchPaginatedList({
+    required super.query,
+    required super.items,
+    required super.type,
+    required super.getFromResults,
+    required super.sortBy,
+  });
 
   @override
   bool getHasMore() {
@@ -285,8 +296,10 @@ class PageBasedPaginatedList<T> extends PaginatedList<T> {
   bool hasMore = true;
   final Future<List<T>> Function(int page, int maxResults) getItemsFunc;
 
-  PageBasedPaginatedList(
-      {required this.maxResults, required this.getItemsFunc});
+  PageBasedPaginatedList({
+    required this.maxResults,
+    required this.getItemsFunc,
+  });
 
   @override
   bool getHasMore() {

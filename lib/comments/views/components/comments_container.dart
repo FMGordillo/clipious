@@ -31,8 +31,9 @@ class CommentsContainer extends StatelessWidget {
                   Expanded(
                     child: Text(
                       locals.comments,
-                      style: textTheme.titleMedium
-                          ?.copyWith(color: colorScheme.secondary),
+                      style: textTheme.titleMedium?.copyWith(
+                        color: colorScheme.secondary,
+                      ),
                     ),
                   ),
                   DropdownButton<String>(
@@ -48,8 +49,8 @@ class CommentsContainer extends StatelessWidget {
                         child: Text(locals.newSorting),
                       ),
                     ],
-                  )
-/*
+                  ),
+                  /*
                   DropdownButton<String>(
                     value: source,
                     onChanged: (String? value) {
@@ -74,11 +75,13 @@ class CommentsContainer extends StatelessWidget {
                 ],
               ),
               CommentsView(
-                  key: ValueKey<String>(
-                      'comments-${state.sortBy}-${state.source}'),
-                  video: video,
-                  source: state.source,
-                  sortBy: state.sortBy),
+                key: ValueKey<String>(
+                  'comments-${state.sortBy}-${state.source}',
+                ),
+                video: video,
+                source: state.source,
+                sortBy: state.sortBy,
+              ),
             ],
           );
         },

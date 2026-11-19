@@ -16,7 +16,8 @@ class AddToQueueButton extends StatelessWidget {
         (videos.length > 1 ||
             (videos.length == 1 &&
                 state.videos.indexWhere(
-                        (element) => element.videoId == videos[0].videoId) <
+                      (element) => element.videoId == videos[0].videoId,
+                    ) <
                     0));
   }
 
@@ -30,28 +31,27 @@ class AddToQueueButton extends StatelessWidget {
     AppLocalizations locals = AppLocalizations.of(context)!;
     var textTheme = Theme.of(context).textTheme;
     return BlocBuilder<PlayerCubit, PlayerState>(
-        buildWhen: (previous, current) => previous.videos != current.videos,
-        builder: (context, state) {
-          return FilledButton.tonal(
-              style: const ButtonStyle(visualDensity: VisualDensity.compact),
-              onPressed: canAddToQueue(context, videos)
-                  ? () => addToQueue(context)
-                  : null,
-              child: Row(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: Icon(
-                      Icons.playlist_add,
-                      size: 13,
-                    ),
-                  ),
-                  Text(
-                    locals.addToQueueList,
-                    style: TextStyle(fontSize: textTheme.labelSmall?.fontSize),
-                  ),
-                ],
-              ));
-        });
+      buildWhen: (previous, current) => previous.videos != current.videos,
+      builder: (context, state) {
+        return FilledButton.tonal(
+          style: const ButtonStyle(visualDensity: VisualDensity.compact),
+          onPressed: canAddToQueue(context, videos)
+              ? () => addToQueue(context)
+              : null,
+          child: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.playlist_add, size: 13),
+              ),
+              Text(
+                locals.addToQueueList,
+                style: TextStyle(fontSize: textTheme.labelSmall?.fontSize),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

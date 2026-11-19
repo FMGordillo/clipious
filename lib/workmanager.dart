@@ -19,8 +19,10 @@ const taskName = "Clipious background refresh task";
 
 Future<void> configureBackgroundService(SettingsCubit settings) async {
   if (settings.state.backgroundNotifications) {
-    await Workmanager()
-        .initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: kDebugMode,
+    );
   }
 }
 
@@ -31,12 +33,17 @@ Future<void> setupTasks(SettingsCubit settings) async {
     log.fine('task not registered');
     // fail silently in case no tasks have been already defined
   }
-  await Workmanager().registerPeriodicTask(taskName, taskName,
-      frequency: kDebugMode
-          ? const Duration(seconds: 15)
-          : Duration(hours: settings.state.backgroundNotificationFrequency),
-      constraints: Constraints(
-          networkType: NetworkType.connected, requiresBatteryNotLow: true));
+  await Workmanager().registerPeriodicTask(
+    taskName,
+    taskName,
+    frequency: kDebugMode
+        ? const Duration(seconds: 15)
+        : Duration(hours: settings.state.backgroundNotificationFrequency),
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+      requiresBatteryNotLow: true,
+    ),
+  );
 }
 
 Future<void> stopTasks() async {
@@ -44,11 +51,13 @@ Future<void> stopTasks() async {
 }
 
 @pragma(
-    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+  'vm:entry-point',
+) // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     log.info(
-        "Native called background task: $task"); //simpleTask will be emitted here.
+      "Native called background task: $task",
+    ); //simpleTask will be emitted here.
     if (task == taskName) {
       await _backgroundCheck();
     }
@@ -58,11 +67,13 @@ void callbackDispatcher() {
 
 _backgroundCheck() async {
   try {
-    Logger.root.level =
-        kDebugMode ? Level.FINEST : Level.INFO; // defaults to Level.INFO
+    Logger.root.level = kDebugMode
+        ? Level.FINEST
+        : Level.INFO; // defaults to Level.INFO
     Logger.root.onRecord.listen((record) async {
       debugPrint(
-          '[${record.level.name}] [${record.loggerName}] ${record.message}');
+        '[${record.level.name}] [${record.loggerName}] ${record.message}',
+      );
     });
     db = FileDB();
     await _handleSubscriptionsNotifications();
@@ -80,8 +91,9 @@ Future<AppLocalizations> getLocalization() async {
   localeString = dbLocale.split('_');
 
   Locale locale = Locale.fromSubtags(
-      languageCode: localeString[0],
-      scriptCode: localeString.length >= 2 ? localeString[1] : null);
+    languageCode: localeString[0],
+    scriptCode: localeString.length >= 2 ? localeString[1] : null,
+  );
 
   return await AppLocalizations.delegate.load(locale);
 }
@@ -90,8 +102,10 @@ _handlePlaylistNotifications() async {
   var notifs = await fileDb.getAllPlaylistNotifications();
   for (var n in notifs) {
     // we get the latest video,
-    var videos =
-        await service.getPublicPlaylists(n.playlistId, saveLastSeen: false);
+    var videos = await service.getPublicPlaylists(
+      n.playlistId,
+      saveLastSeen: false,
+    );
 
     if (videos.videos.isNotEmpty) {
       if (n.lastVideoCount > 0) {
@@ -103,14 +117,15 @@ _handlePlaylistNotifications() async {
 
         if (kDebugMode || videosToNotifyAbout > 0) {
           sendNotification(
-              locals.playlistNotificationTitle(n.playlistName),
-              locals.playlistNotificationContent(
-                  n.playlistName, videosToNotifyAbout),
-              type: NotificationTypes.playlist,
-              payload: {
-                playlistId: n.playlistId,
-              },
-              id: n.playlistId.hashCode);
+            locals.playlistNotificationTitle(n.playlistName),
+            locals.playlistNotificationContent(
+              n.playlistName,
+              videosToNotifyAbout,
+            ),
+            type: NotificationTypes.playlist,
+            payload: {playlistId: n.playlistId},
+            id: n.playlistId.hashCode,
+          );
         }
       }
     }
@@ -122,16 +137,20 @@ _handleChannelNotifications() async {
 
   for (var n in notifs) {
     // we get the latest video,
-    var videos =
-        await service.getChannelVideos(n.channelId, null, saveLastSeen: false);
+    var videos = await service.getChannelVideos(
+      n.channelId,
+      null,
+      saveLastSeen: false,
+    );
 
     if (videos.videos.isNotEmpty) {
       if (n.lastSeenVideoId.isNotEmpty) {
         // if in list, we calculate
         int videosToNotifyAbout = 0;
 
-        int index = videos.videos
-            .indexWhere((element) => element.videoId == n.lastSeenVideoId);
+        int index = videos.videos.indexWhere(
+          (element) => element.videoId == n.lastSeenVideoId,
+        );
 
         if (index >= 0) {
           videosToNotifyAbout = index;
@@ -144,15 +163,18 @@ _handleChannelNotifications() async {
 
         if (kDebugMode || videosToNotifyAbout > 0) {
           sendNotification(
-              locals.channelNotificationTitle(n.channelName),
-              locals.channelNotificationContent(
-                  n.channelName, videosToNotifyAbout),
-              type: NotificationTypes.channel,
-              payload: {
-                channelId: n.channelId,
-                lastSeenVideo: videos.videos.first.videoId
-              },
-              id: n.channelId.hashCode);
+            locals.channelNotificationTitle(n.channelName),
+            locals.channelNotificationContent(
+              n.channelName,
+              videosToNotifyAbout,
+            ),
+            type: NotificationTypes.channel,
+            payload: {
+              channelId: n.channelId,
+              lastSeenVideo: videos.videos.first.videoId,
+            },
+            id: n.channelId.hashCode,
+          );
         }
       }
     }
@@ -174,12 +196,15 @@ _handleSubscriptionsNotifications() async {
       // we don't send notification for the first run ever to avoid weird behavior
       if (lastNotification == null) {
         var toSave = SubscriptionNotification(
-            videos.last.videoId, DateTime.now().millisecondsSinceEpoch);
+          videos.last.videoId,
+          DateTime.now().millisecondsSinceEpoch,
+        );
         await fileDb.setLastSubscriptionNotification(toSave);
       } else {
         late int videosToNotifyAbout;
         int index = videos.indexWhere(
-            (element) => element.videoId == lastNotification.lastSeenVideoId);
+          (element) => element.videoId == lastNotification.lastSeenVideoId,
+        );
         //more than 100 videos
         if (index == -1) {
           videosToNotifyAbout = videos.length;
@@ -190,10 +215,12 @@ _handleSubscriptionsNotifications() async {
         var locals = await getLocalization();
 
         if (kDebugMode || videosToNotifyAbout > 0) {
-          sendNotification(locals.subscriptionNotificationTitle,
-              locals.subscriptionNotificationContent(videosToNotifyAbout),
-              type: NotificationTypes.subscription,
-              payload: {lastSeenVideo: videos.first.videoId});
+          sendNotification(
+            locals.subscriptionNotificationTitle,
+            locals.subscriptionNotificationContent(videosToNotifyAbout),
+            type: NotificationTypes.subscription,
+            payload: {lastSeenVideo: videos.first.videoId},
+          );
         }
       }
     }

@@ -45,8 +45,9 @@ class HistoryItemCubit extends Cubit<HistoryItemState> {
 
 @freezed
 sealed class HistoryItemState with _$HistoryItemState {
-  const factory HistoryItemState(
-      {required String videoId,
-      @Default(true) bool loading,
-      HistoryVideoCache? cachedVid}) = _HistoryItemState;
+  const factory HistoryItemState({
+    required String videoId,
+    @Default(true) bool loading,
+    HistoryVideoCache? cachedVid,
+  }) = _HistoryItemState;
 }

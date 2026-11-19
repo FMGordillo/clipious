@@ -26,8 +26,11 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
       if (scrollController.hasClients) {
         if (scrollController.position.maxScrollExtent * 0.9 ==
             scrollController.offset) {
-          EasyDebounce.debounce('get-more-playlists',
-              const Duration(milliseconds: 500), getMorePlaylists);
+          EasyDebounce.debounce(
+            'get-more-playlists',
+            const Duration(milliseconds: 500),
+            getMorePlaylists,
+          );
         }
       }
     }
@@ -58,8 +61,13 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
       var playlists = await refreshFunction();
       emit(state.copyWith(playlists: playlists, loading: false));
     } catch (err) {
-      emit(state.copyWith(
-          error: couldNotGetPlaylits, playlists: [], loading: false));
+      emit(
+        state.copyWith(
+          error: couldNotGetPlaylits,
+          playlists: [],
+          loading: false,
+        ),
+      );
       rethrow;
     }
   }
@@ -73,9 +81,10 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
 
 @freezed
 sealed class PlaylistListState with _$PlaylistListState {
-  const factory PlaylistListState(
-      {required PaginatedList<Playlist> paginatedList,
-      @Default([]) List<Playlist> playlists,
-      @Default(true) bool loading,
-      @Default('') String error}) = _PlaylistListState;
+  const factory PlaylistListState({
+    required PaginatedList<Playlist> paginatedList,
+    @Default([]) List<Playlist> playlists,
+    @Default(true) bool loading,
+    @Default('') String error,
+  }) = _PlaylistListState;
 }

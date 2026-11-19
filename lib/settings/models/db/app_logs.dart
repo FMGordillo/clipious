@@ -16,12 +16,13 @@ class AppLog {
   String? stacktrace;
   String? message;
 
-  AppLog(
-      {required this.level,
-      required this.logger,
-      required this.time,
-      this.message,
-      this.stacktrace});
+  AppLog({
+    required this.level,
+    required this.logger,
+    required this.time,
+    this.message,
+    this.stacktrace,
+  });
 
   factory AppLog.fromJson(Map<String, dynamic> json) => _$AppLogFromJson(json);
 

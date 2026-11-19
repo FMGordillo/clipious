@@ -20,44 +20,46 @@ class ManagerServersView extends StatelessWidget {
   const ManagerServersView({super.key, this.fromWizard = false});
 
   showPublicServerActions(
-      BuildContext context, ServerListSettingsState controller, Server server) {
+    BuildContext context,
+    ServerListSettingsState controller,
+    Server server,
+  ) {
     var locals = AppLocalizations.of(context)!;
     ServerListSettingsCubit cubit = context.read<ServerListSettingsCubit>();
 
     showSafeModalBottomSheet<void>(
-        showDragHandle: true,
-        context: context,
-        builder: (BuildContext context) {
-          return SizedBox(
-            height: 100,
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        IconButton.filledTonal(
-                          onPressed: () {
-                            cubit.upsertServer(server);
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.add),
-                        ),
-                        Text(
-                          locals.addServer,
-                        )
-                      ],
-                    ),
+      showDragHandle: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 100,
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton.filledTonal(
+                        onPressed: () {
+                          cubit.upsertServer(server);
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(Icons.add),
+                      ),
+                      Text(locals.addServer),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   saveServer(BuildContext context) async {
@@ -66,7 +68,9 @@ class ManagerServersView extends StatelessWidget {
   }
 
   _serverServerHandling(
-      BuildContext context, ServerListSettingsCubit cubit) async {
+    BuildContext context,
+    ServerListSettingsCubit cubit,
+  ) async {
     var locals = AppLocalizations.of(context)!;
     try {
       // await cubit.saveServer();
@@ -77,25 +81,23 @@ class ManagerServersView extends StatelessWidget {
       if (context.mounted) {
         if (err is CannotAddServerError) {
           showAlertDialog(
-              context,
-              switch (err.runtimeType) {
-                (MissingSoftwareKeyError _) => locals.malformedStatsEndpoint,
-                (UnreachableServerError _) => locals.serverIsNotReachable,
-                (_) => locals.error
-              },
-              [
-                SelectableText(
-                  '${err is MissingSoftwareKeyError ? "${locals.malformedStatsEndpointDescription}\n" : ""}${err.error}',
-                  minLines: 1,
-                  maxLines: 100,
-                )
-              ]);
+            context,
+            switch (err.runtimeType) {
+              (MissingSoftwareKeyError _) => locals.malformedStatsEndpoint,
+              (UnreachableServerError _) => locals.serverIsNotReachable,
+              (_) => locals.error,
+            },
+            [
+              SelectableText(
+                '${err is MissingSoftwareKeyError ? "${locals.malformedStatsEndpointDescription}\n" : ""}${err.error}',
+                minLines: 1,
+                maxLines: 100,
+              ),
+            ],
+          );
         } else {
           showAlertDialog(context, locals.error, [
-            SelectableText(
-              err.toString(),
-              maxLines: 100,
-            )
+            SelectableText(err.toString(), maxLines: 100),
           ]);
         }
       }
@@ -140,42 +142,43 @@ class ManagerServersView extends StatelessWidget {
                       description: Text(locals.skipSslVerificationDescription),
                       initialValue: settings.state.skipSslVerification,
                       onToggle: settings.toggleSslVerification,
-                    )
+                    ),
                   ],
                 ),
                 SettingsSection(
-                    title: Text(locals.yourServers),
-                    tiles: state.dbServers.isNotEmpty
-                        ? state.dbServers
-                            .map((s) => SettingsTile(
-                                  leading: InkWell(
-                                    onTap: () => cubit.switchServer(s),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.done,
-                                        color: s.inUse
-                                            ? colorScheme.primary
-                                            : colorScheme.secondaryContainer,
-                                      ),
+                  title: Text(locals.yourServers),
+                  tiles: state.dbServers.isNotEmpty
+                      ? state.dbServers
+                            .map(
+                              (s) => SettingsTile(
+                                leading: InkWell(
+                                  onTap: () => cubit.switchServer(s),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.done,
+                                      color: s.inUse
+                                          ? colorScheme.primary
+                                          : colorScheme.secondaryContainer,
                                     ),
                                   ),
-                                  title: Text(s.url),
-                                  value: Text(
-                                      '${cubit.isLoggedInToServer(s.url) ? '${locals.loggedIn}, ' : ''} ${locals.tapToManage}'),
-                                  onPressed: (context) =>
-                                      openServer(context, s),
-                                ))
-                            .toList()
-                        : [
-                            SettingsTile(
-                              title: Text(
-                                locals.addServerHelpText,
+                                ),
+                                title: Text(s.url),
+                                value: Text(
+                                  '${cubit.isLoggedInToServer(s.url) ? '${locals.loggedIn}, ' : ''} ${locals.tapToManage}',
+                                ),
+                                onPressed: (context) => openServer(context, s),
                               ),
-                              enabled: false,
                             )
-                          ]),
-/*
+                            .toList()
+                      : [
+                          SettingsTile(
+                            title: Text(locals.addServerHelpText),
+                            enabled: false,
+                          ),
+                        ],
+                ),
+                /*
                 SettingsSection(
                     title: Text(locals.publicServers),
                     tiles: state.publicServersError != PublicServerErrors.none
@@ -264,7 +267,7 @@ class ManagerServersView extends StatelessWidget {
                 backgroundColor: colorScheme.primaryContainer,
                 child: const Icon(Icons.add),
               ),
-            )
+            ),
           ],
         );
       },

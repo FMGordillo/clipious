@@ -126,10 +126,7 @@ class AppRouter extends RootStackRouter {
   List<AutoRoute> get routes {
     return isTv
         ? [
-            AutoRoute(
-              page: TvHomeRoute.page,
-              initial: hasServer,
-            ),
+            AutoRoute(page: TvHomeRoute.page, initial: hasServer),
             AutoRoute(page: TvWelcomeWizardRoute.page, initial: !hasServer),
             AutoRoute(page: TvChannelRoute.page),
             AutoRoute(page: TvGridRoute.page),
@@ -151,7 +148,7 @@ class AppRouter extends RootStackRouter {
             AutoRoute(page: TvFilterListSettingsRoute.page),
             AutoRoute(page: TvTimePickerRoute.page),
             AutoRoute(page: TvPlainTextRoute.page),
-            AutoRoute(page: TvAddServerRoute.page)
+            AutoRoute(page: TvAddServerRoute.page),
           ]
         : [
             AutoRoute(
@@ -160,53 +157,72 @@ class AppRouter extends RootStackRouter {
               path: mainPath,
               children: [
                 AutoRoute(
-                    page: MainContentRoute.page,
-                    initial: true,
-                    children: [
-                      AutoRoute(page: HomeRoute.page, path: homePath),
-                      AutoRoute(
-                          page: SubscriptionRoute.page, path: subscriptionPath),
-                      AutoRoute(page: HistoryRoute.page, path: historyPath),
-                      AutoRoute(page: PlaylistsRoute.page, path: playlistsPath),
-                      AutoRoute(page: PopularRoute.page, path: popularPath),
-                      AutoRoute(page: TrendingRoute.page, path: trendingPath),
-                      AutoRoute(page: DownloadsRoute.page, path: downloadsPath),
-                      AutoRoute(
-                          page: SearchHistoryRoute.page,
-                          path: searchHistoryPath),
-                    ]),
-                AutoRoute(page: VideoRoute.page, path: videoPath, children: [
-                  AutoRoute(page: VideoInfoRoute.page, path: infoPath),
-                  AutoRoute(
-                      page: RecommendedRoute.page, path: recommendedVideoPath),
-                  AutoRoute(page: CommentsRoute.page, path: commentsPath)
-                ]),
+                  page: MainContentRoute.page,
+                  initial: true,
+                  children: [
+                    AutoRoute(page: HomeRoute.page, path: homePath),
+                    AutoRoute(
+                      page: SubscriptionRoute.page,
+                      path: subscriptionPath,
+                    ),
+                    AutoRoute(page: HistoryRoute.page, path: historyPath),
+                    AutoRoute(page: PlaylistsRoute.page, path: playlistsPath),
+                    AutoRoute(page: PopularRoute.page, path: popularPath),
+                    AutoRoute(page: TrendingRoute.page, path: trendingPath),
+                    AutoRoute(page: DownloadsRoute.page, path: downloadsPath),
+                    AutoRoute(
+                      page: SearchHistoryRoute.page,
+                      path: searchHistoryPath,
+                    ),
+                  ],
+                ),
                 AutoRoute(
-                    page: ChannelRoute.page,
-                    path: channelPath,
-                    children: [
-                      AutoRoute(page: ChannelInfoRoute.page, path: infoPath),
-                      AutoRoute(page: ChannelVideoRoute.page, path: videosPath),
-                      AutoRoute(
-                          page: ChannelShortsRoute.page, path: shortsPath),
-                      AutoRoute(
-                          page: ChannelStreamRoute.page, path: streamsPath),
-                      AutoRoute(
-                          page: ChannelPlaylistsRoute.page, path: playlistsPath)
-                    ]),
+                  page: VideoRoute.page,
+                  path: videoPath,
+                  children: [
+                    AutoRoute(page: VideoInfoRoute.page, path: infoPath),
+                    AutoRoute(
+                      page: RecommendedRoute.page,
+                      path: recommendedVideoPath,
+                    ),
+                    AutoRoute(page: CommentsRoute.page, path: commentsPath),
+                  ],
+                ),
+                AutoRoute(
+                  page: ChannelRoute.page,
+                  path: channelPath,
+                  children: [
+                    AutoRoute(page: ChannelInfoRoute.page, path: infoPath),
+                    AutoRoute(page: ChannelVideoRoute.page, path: videosPath),
+                    AutoRoute(page: ChannelShortsRoute.page, path: shortsPath),
+                    AutoRoute(page: ChannelStreamRoute.page, path: streamsPath),
+                    AutoRoute(
+                      page: ChannelPlaylistsRoute.page,
+                      path: playlistsPath,
+                    ),
+                  ],
+                ),
                 AutoRoute(page: DownloadManagerRoute.page),
-                AutoRoute(page: SearchRoute.page, path: searchPath, children: [
-                  AutoRoute(page: SearchVideoRoute.page, path: videosPath),
-                  AutoRoute(page: SearchChannelRoute.page, path: channelPath),
-                  AutoRoute(page: SearchPlaylistRoute.page, path: playlistsPath)
-                ]),
+                AutoRoute(
+                  page: SearchRoute.page,
+                  path: searchPath,
+                  children: [
+                    AutoRoute(page: SearchVideoRoute.page, path: videosPath),
+                    AutoRoute(page: SearchChannelRoute.page, path: channelPath),
+                    AutoRoute(
+                      page: SearchPlaylistRoute.page,
+                      path: playlistsPath,
+                    ),
+                  ],
+                ),
                 AutoRoute(page: EditHomeLayoutRoute.page),
                 AutoRoute(page: SettingsRoute.page),
                 AutoRoute(page: BrowsingSettingsRoute.page),
                 AutoRoute(page: ManageServersRoute.page),
                 AutoRoute(
-                    page: ManageSingleServerRoute.page,
-                    path: pathManageSingleServerFromSettings),
+                  page: ManageSingleServerRoute.page,
+                  path: pathManageSingleServerFromSettings,
+                ),
                 AutoRoute(page: VideoPlayerSettingsRoute.page),
                 AutoRoute(page: AppearanceSettingsRoute.page),
                 AutoRoute(page: SearchHistorySettingsRoute.page),
@@ -222,22 +238,23 @@ class AppRouter extends RootStackRouter {
               ],
             ),
             AutoRoute(
-                page: ManageSingleServerRoute.page,
-                path: pathManageSingleServerFromWizard),
+              page: ManageSingleServerRoute.page,
+              path: pathManageSingleServerFromWizard,
+            ),
             AutoRoute(page: WelcomeWizardRoute.page, initial: !hasServer),
-            AutoRoute(
-              page: AddServerRoute.page,
-            )
+            AutoRoute(page: AddServerRoute.page),
           ];
   }
 
   @override
   late final List<AutoRouteGuard> guards = [
-    AutoRouteGuard.simple(onNavigation)
+    AutoRouteGuard.simple(onNavigation),
   ];
 
   Future<void> onNavigation(
-      NavigationResolver resolver, StackRouter router) async {
+    NavigationResolver resolver,
+    StackRouter router,
+  ) async {
     try {
       var routeName = resolver.route.name;
       if (routeName == TvWelcomeWizardRoute.name ||
@@ -265,7 +282,8 @@ class MyRouteObserver extends AutoRouterObserver {
   @override
   void didPush(Route route, Route? previousRoute) {
     log.fine(
-        'New route pushed: ${route.settings.name}, ${route.runtimeType}, previous route: ${previousRoute?.settings.name}, ${previousRoute.runtimeType}');
+      'New route pushed: ${route.settings.name}, ${route.runtimeType}, previous route: ${previousRoute?.settings.name}, ${previousRoute.runtimeType}',
+    );
     log.fine('current route: ${appRouter.current.name}');
     if (route.settings.name != null) {
       route.navigator?.context.read<PlayerCubit>().showMiniPlayer();
@@ -276,12 +294,13 @@ class MyRouteObserver extends AutoRouterObserver {
   @override
   void didPop(Route route, Route? previousRoute) {
     log.fine(
-        'New route popped: ${route.settings.name}, ${route.runtimeType}, previous route: ${previousRoute?.settings.name}, ${previousRoute.runtimeType}');
+      'New route popped: ${route.settings.name}, ${route.runtimeType}, previous route: ${previousRoute?.settings.name}, ${previousRoute.runtimeType}',
+    );
     log.fine('current route: ${appRouter.current.name}');
     super.didPop(route, previousRoute);
   }
 
-/*
+  /*
   // only override to observer tab routes
   @override
   void didInitTabRoute(TabPageRoute route, TabPageRoute? previousRoute) {

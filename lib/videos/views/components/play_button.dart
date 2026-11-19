@@ -6,8 +6,12 @@ class PlayButton extends StatelessWidget {
   final Function(bool isAudio) onPressed;
   final IconData? icon;
 
-  const PlayButton(
-      {super.key, required this.onPressed, this.icon, this.hasAudio = true});
+  const PlayButton({
+    super.key,
+    required this.onPressed,
+    this.icon,
+    this.hasAudio = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +28,11 @@ class PlayButton extends StatelessWidget {
                 AutoRouter.of(context).maybePop();
               },
               style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) => colorScheme.primary.withValues(alpha: 1))),
-              icon: const Icon(
-                Icons.music_note,
-                size: 35,
+                backgroundColor: WidgetStateProperty.resolveWith(
+                  (states) => colorScheme.primary.withValues(alpha: 1),
+                ),
               ),
+              icon: const Icon(Icons.music_note, size: 35),
               color: colorScheme.primaryContainer,
             ),
           ),
@@ -39,12 +42,11 @@ class PlayButton extends StatelessWidget {
             AutoRouter.of(context).maybePop();
           },
           style: ButtonStyle(
-              backgroundColor: WidgetStateColor.resolveWith((states) =>
-                  colorScheme.primaryContainer.withValues(alpha: 1))),
-          icon: Icon(
-            icon ?? Icons.play_arrow,
-            size: 75,
+            backgroundColor: WidgetStateColor.resolveWith(
+              (states) => colorScheme.primaryContainer.withValues(alpha: 1),
+            ),
           ),
+          icon: Icon(icon ?? Icons.play_arrow, size: 75),
           color: colorScheme.primary,
         ),
       ],

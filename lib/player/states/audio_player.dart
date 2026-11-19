@@ -43,10 +43,12 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   initPlayer() {
     if (audioPlayer == null) {
       audioPlayer = AudioPlayer();
-      audioPlayer?.playerStateStream.listen(onStateStreamChange,
-          onError: (e, st) {
-        return player.setEvent(const MediaEvent(state: MediaState.error));
-      });
+      audioPlayer?.playerStateStream.listen(
+        onStateStreamChange,
+        onError: (e, st) {
+          return player.setEvent(const MediaEvent(state: MediaState.error));
+        },
+      );
       audioPlayer?.positionStream.listen(onPositionChanged);
       audioPlayer?.durationStream.listen(onDurationChanged);
       audioPlayer?.bufferedPositionStream.listen(onBufferChanged);
@@ -78,19 +80,25 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   onDurationChanged(Duration? duration) async {
     emit(state.copyWith(loading: false));
     if (!isClosed) emit(state);
-    player.setEvent(MediaEvent(
+    player.setEvent(
+      MediaEvent(
         state: MediaState.playing,
         type: MediaEventType.durationChanged,
-        value: duration ?? const Duration(seconds: 1)));
+        value: duration ?? const Duration(seconds: 1),
+      ),
+    );
   }
 
   onPositionChanged(Duration position) {
     EasyThrottle.throttle('audio-progress', const Duration(seconds: 1), () {
       emit(state.copyWith(audioPosition: position));
-      player.setEvent(MediaEvent(
+      player.setEvent(
+        MediaEvent(
           state: MediaState.playing,
           type: MediaEventType.progress,
-          value: position));
+          value: position,
+        ),
+      );
     });
   }
 
@@ -103,13 +111,17 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
       // disposeControllers();
       initPlayer();
       var audioLength = Duration(
-          seconds: offline
-              ? state.offlineVideo!.lengthSeconds
-              : (state.video!.lengthSeconds ?? 0));
-      emit(state.copyWith(
+        seconds: offline
+            ? state.offlineVideo!.lengthSeconds
+            : (state.video!.lengthSeconds ?? 0),
+      );
+      emit(
+        state.copyWith(
           audioPosition: Duration.zero,
           audioLength: audioLength,
-          loading: true));
+          loading: true,
+        ),
+      );
       player.setEvent(const MediaEvent(state: MediaState.loading));
       try {
         AudioSource? source;
@@ -120,9 +132,12 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
           if (service.useProxy()) {
             // audio only streams don't seem to work when using proxy mode, using formatted streams when proxy is enabled
             var formatStream = state
-                .video!.formatStreams![state.video!.formatStreams!.length - 1];
-            source = AudioSource.uri(Uri.parse(formatStream.url),
-                headers: server.headersForUrl(formatStream.url));
+                .video!
+                .formatStreams![state.video!.formatStreams!.length - 1];
+            source = AudioSource.uri(
+              Uri.parse(formatStream.url),
+              headers: server.headersForUrl(formatStream.url),
+            );
           } else {
             AdaptiveFormat? audio = state.video?.adaptiveFormats!
                 .where((element) => element.type.contains("audio"))
@@ -133,14 +148,17 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
                 double progress = db.getVideoProgress(state.video!.videoId);
                 if (progress > 0 && progress < 0.90) {
                   startAt = Duration(
-                      seconds: ((state.video!.lengthSeconds ?? 0) * progress)
-                          .floor());
+                    seconds: ((state.video!.lengthSeconds ?? 0) * progress)
+                        .floor(),
+                  );
                 }
               }
               emit(state);
 
-              source = AudioSource.uri(Uri.parse(audio.url),
-                  headers: server.headersForUrl(audio.url));
+              source = AudioSource.uri(
+                Uri.parse(audio.url),
+                headers: server.headersForUrl(audio.url),
+              );
             }
           }
         } else {
@@ -223,25 +241,31 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   void play() {
     audioPlayer?.play();
     player.setEvent(
-        const MediaEvent(state: MediaState.playing, type: MediaEventType.play));
+      const MediaEvent(state: MediaState.playing, type: MediaEventType.play),
+    );
   }
 
   @override
   void seek(Duration position) {
     audioPlayer?.seek(position);
     player.setEvent(
-        const MediaEvent(state: MediaState.playing, type: MediaEventType.seek));
-    player.setEvent(MediaEvent(
+      const MediaEvent(state: MediaState.playing, type: MediaEventType.seek),
+    );
+    player.setEvent(
+      MediaEvent(
         state: MediaState.playing,
         type: MediaEventType.progress,
-        value: position));
+        value: position,
+      ),
+    );
   }
 
   @override
   void pause() {
     audioPlayer?.pause();
-    player.setEvent(const MediaEvent(
-        state: MediaState.playing, type: MediaEventType.pause));
+    player.setEvent(
+      const MediaEvent(state: MediaState.playing, type: MediaEventType.pause),
+    );
   }
 
   @override
@@ -350,10 +374,13 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
 
   void onBufferChanged(Duration event) {
     EasyThrottle.throttle('audio-buffering', const Duration(seconds: 1), () {
-      player.setEvent(MediaEvent(
+      player.setEvent(
+        MediaEvent(
           state: MediaState.playing,
           type: MediaEventType.bufferChanged,
-          value: event));
+          value: event,
+        ),
+      );
     });
   }
 

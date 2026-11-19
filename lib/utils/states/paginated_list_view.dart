@@ -37,14 +37,16 @@ class PaginatedListCubit<T> extends Cubit<PaginatedListViewController<T>> {
         if (scrollController.position.maxScrollExtent * 0.9 <
             scrollController.offset) {
           EasyDebounce.debounce(
-              'get-more-playlists', const Duration(milliseconds: 250),
-              () async {
-            emit(state.copyWith(loading: true));
+            'get-more-playlists',
+            const Duration(milliseconds: 250),
+            () async {
+              emit(state.copyWith(loading: true));
 
-            List<T> i = await state.paginatedList.getMoreItems();
-            var items = List<T>.from(state.items)..addAll(i);
-            emit(state.copyWith(items: items, loading: false));
-          });
+              List<T> i = await state.paginatedList.getMoreItems();
+              var items = List<T>.from(state.items)..addAll(i);
+              emit(state.copyWith(items: items, loading: false));
+            },
+          );
         }
       }
     }
@@ -54,14 +56,19 @@ class PaginatedListCubit<T> extends Cubit<PaginatedListViewController<T>> {
 @freezed
 sealed class PaginatedListViewController<T>
     with _$PaginatedListViewController<T> {
-  const factory PaginatedListViewController(
-      {required PaginatedList<T> paginatedList,
-      @Default([]) List<T> items,
-      @Default(false) bool loading}) = _PaginatedListViewController<T>;
+  const factory PaginatedListViewController({
+    required PaginatedList<T> paginatedList,
+    @Default([]) List<T> items,
+    @Default(false) bool loading,
+  }) = _PaginatedListViewController<T>;
 
-  static PaginatedListViewController<V> init<V>(
-      {required PaginatedList<V> paginatedList, List<V>? startItems}) {
+  static PaginatedListViewController<V> init<V>({
+    required PaginatedList<V> paginatedList,
+    List<V>? startItems,
+  }) {
     return PaginatedListViewController<V>(
-        paginatedList: paginatedList, items: startItems ?? []);
+      paginatedList: paginatedList,
+      items: startItems ?? [],
+    );
   }
 }

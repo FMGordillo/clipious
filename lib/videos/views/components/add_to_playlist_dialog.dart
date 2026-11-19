@@ -18,27 +18,31 @@ class AddToPlaylistDialog extends StatelessWidget {
   final List<Playlist> playlists;
   final Function(String selectedPlaylistId) onAdd;
 
-  const AddToPlaylistDialog(
-      {super.key,
-      required this.videoId,
-      required this.playlists,
-      required this.onAdd});
+  const AddToPlaylistDialog({
+    super.key,
+    required this.videoId,
+    required this.playlists,
+    required this.onAdd,
+  });
 
-  static showAddToPlaylistDialog(BuildContext context,
-      {required String videoId,
-      required List<Playlist> playlists,
-      required Function(String selectedPlaylistId) onAdd}) {
+  static showAddToPlaylistDialog(
+    BuildContext context, {
+    required String videoId,
+    required List<Playlist> playlists,
+    required Function(String selectedPlaylistId) onAdd,
+  }) {
     showSafeModalBottomSheet<void>(
-        showDragHandle: true,
-        isScrollControlled: true,
-        context: context,
-        builder: (BuildContext context) {
-          return AddToPlaylistDialog(
-            videoId: videoId,
-            playlists: playlists,
-            onAdd: onAdd,
-          );
-        });
+      showDragHandle: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return AddToPlaylistDialog(
+          videoId: videoId,
+          playlists: playlists,
+          onAdd: onAdd,
+        );
+      },
+    );
   }
 
   addToPlaylist(BuildContext context, String playlistId) async {
@@ -46,100 +50,120 @@ class AddToPlaylistDialog extends StatelessWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     try {
       onAdd(playlistId);
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text(locals.videoAddedToPlaylist),
-        duration: const Duration(seconds: 3),
-      ));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(locals.videoAddedToPlaylist),
+          duration: const Duration(seconds: 3),
+        ),
+      );
 
       if (context.mounted) {
         Navigator.pop(context);
       }
     } catch (err) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text(locals.errorAddingVideoToPlaylist),
-        duration: const Duration(seconds: 3),
-      ));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(locals.errorAddingVideoToPlaylist),
+          duration: const Duration(seconds: 3),
+        ),
+      );
       rethrow;
     }
   }
 
   newPlaylistAndAdd(BuildContext context) {
     showDialog<String>(
-        context: context,
-        useRootNavigator: false,
-        builder: (BuildContext ctx) => Dialog(
-              child: AddPlayListForm(
-                  afterAdd: (playlistId) => addToPlaylist(context, playlistId)),
-            ));
+      context: context,
+      useRootNavigator: false,
+      builder: (BuildContext ctx) => Dialog(
+        child: AddPlayListForm(
+          afterAdd: (playlistId) => addToPlaylist(context, playlistId),
+        ),
+      ),
+    );
   }
 
   openServerSettings(BuildContext context) async {
     AutoRouter.of(context).push(
-        ManageSingleServerRoute(server: await db.getCurrentlySelectedServer()));
+      ManageSingleServerRoute(server: await db.getCurrentlySelectedServer()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var locals = AppLocalizations.of(context)!;
-    return BlocBuilder<AppCubit, AppState>(builder: (context, state) {
-      var app = context.read<AppCubit>();
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(locals.selectPlaylist),
-          !app.isLoggedIn
-              ? Expanded(
-                  child: Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(locals.notLoggedIn),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: FilledButton(
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        var app = context.read<AppCubit>();
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(locals.selectPlaylist),
+              !app.isLoggedIn
+                  ? Expanded(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(locals.notLoggedIn),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: FilledButton(
                                 onPressed: () => openServerSettings(context),
-                                child: Text(locals.logIn)),
-                          )
-                        ],
-                      )))
-              : Expanded(
-                  child: ListView(
-                    children: playlists.map((p) {
-                      bool inPlaylist =
-                          p.videos.any((element) => element.videoId == videoId);
-                      return FilledButton.tonal(
-                          onPressed: inPlaylist
-                              ? null
-                              : () => addToPlaylist(context, p.playlistId),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
+                                child: Text(locals.logIn),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView(
+                        children: playlists.map((p) {
+                          bool inPlaylist = p.videos.any(
+                            (element) => element.videoId == videoId,
+                          );
+                          return FilledButton.tonal(
+                            onPressed: inPlaylist
+                                ? null
+                                : () => addToPlaylist(context, p.playlistId),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
                                     width: 20,
                                     child: inPlaylist
-                                        ? const Icon(
-                                            Icons.check,
-                                            size: 15,
-                                          )
-                                        : const SizedBox.shrink()),
-                              ),
-                              Expanded(child: Text(p.title)),
-                            ],
-                          ));
-                    }).toList(),
-                  ),
+                                        ? const Icon(Icons.check, size: 15)
+                                        : const SizedBox.shrink(),
+                                  ),
+                                ),
+                                Expanded(child: Text(p.title)),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+              FilledButton.tonal(
+                onPressed: app.isLoggedIn
+                    ? () => newPlaylistAndAdd(context)
+                    : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.add),
+                    Text(locals.createNewPlaylist),
+                  ],
                 ),
-          FilledButton.tonal(
-            onPressed: app.isLoggedIn ? () => newPlaylistAndAdd(context) : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [const Icon(Icons.add), Text(locals.createNewPlaylist)],
-            ),
-          )
-        ]),
-      );
-    });
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

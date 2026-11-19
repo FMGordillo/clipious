@@ -18,50 +18,53 @@ class DeArrowSettingsScreen extends StatelessWidget {
     SettingsThemeData theme = settingsTheme(colorScheme);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locals.browsing),
-      ),
-      body: SafeArea(child:
-          BlocBuilder<SettingsCubit, SettingsState>(builder: (context, state) {
-        var cubit = context.read<SettingsCubit>();
-        return DefaultTabController(
-          length: 2,
-          child: SettingsList(
-            lightTheme: theme,
-            darkTheme: theme,
-            sections: [
-              SettingsSection(
-                tiles: [
-                  SettingsTile.switchTile(
-                    title: const Text("DeArrow"),
-                    description: Text(locals.deArrowSettingDescription),
-                    initialValue: state.dearrow,
-                    onToggle: (value) {
-                      if (value) {
-                        okCancelDialog(
-                            context,
-                            "DeArrow",
-                            locals.deArrowWarning,
-                            () => cubit.setDearrow(value));
-                      } else {
-                        return cubit.setDearrow(value);
-                      }
-                    },
-                  ),
-                  SettingsTile.switchTile(
-                    title: Text(locals.deArrowReplaceThumbnails),
-                    description:
-                        Text(locals.deArrowReplaceThumbnailsDescription),
-                    initialValue: state.dearrowThumbnails,
-                    onToggle: cubit.setDearrowThumbnails,
-                    enabled: state.dearrow,
+      appBar: AppBar(title: Text(locals.browsing)),
+      body: SafeArea(
+        child: BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, state) {
+            var cubit = context.read<SettingsCubit>();
+            return DefaultTabController(
+              length: 2,
+              child: SettingsList(
+                lightTheme: theme,
+                darkTheme: theme,
+                sections: [
+                  SettingsSection(
+                    tiles: [
+                      SettingsTile.switchTile(
+                        title: const Text("DeArrow"),
+                        description: Text(locals.deArrowSettingDescription),
+                        initialValue: state.dearrow,
+                        onToggle: (value) {
+                          if (value) {
+                            okCancelDialog(
+                              context,
+                              "DeArrow",
+                              locals.deArrowWarning,
+                              () => cubit.setDearrow(value),
+                            );
+                          } else {
+                            return cubit.setDearrow(value);
+                          }
+                        },
+                      ),
+                      SettingsTile.switchTile(
+                        title: Text(locals.deArrowReplaceThumbnails),
+                        description: Text(
+                          locals.deArrowReplaceThumbnailsDescription,
+                        ),
+                        initialValue: state.dearrowThumbnails,
+                        onToggle: cubit.setDearrowThumbnails,
+                        enabled: state.dearrow,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        );
-      })),
+            );
+          },
+        ),
+      ),
     );
   }
 }

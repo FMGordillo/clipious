@@ -12,9 +12,6 @@ class ChannelPlaylistsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return channelId == null
         ? const SizedBox.shrink()
-        : ChannelPlayListsView(
-            channelId: channelId!,
-            canDeleteVideos: false,
-          );
+        : ChannelPlayListsView(channelId: channelId!, canDeleteVideos: false);
   }
 }

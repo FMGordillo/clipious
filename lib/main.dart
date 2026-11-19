@@ -37,19 +37,24 @@ late MediaHandler mediaHandler;
 final Logger log = Logger('main');
 
 Future<void> main() async {
-  Logger.root.level =
-      kDebugMode ? Level.FINEST : Level.INFO; // defaults to Level.INFO
+  Logger.root.level = kDebugMode
+      ? Level.FINEST
+      : Level.INFO; // defaults to Level.INFO
   Logger.root.onRecord.listen((record) async {
     debugPrint(
-        '[${record.level.name}] [${record.loggerName}] ${record.message}');
+      '[${record.level.name}] [${record.loggerName}] ${record.message}',
+    );
     // we don't want debug
     if (record.level == Level.INFO || record.level == Level.SEVERE) {
-      await db.insertLogs(AppLog(
+      await db.insertLogs(
+        AppLog(
           logger: record.loggerName,
           level: record.level.name,
           time: record.time,
           message: record.message,
-          stacktrace: record.stackTrace?.toString()));
+          stacktrace: record.stackTrace?.toString(),
+        ),
+      );
     }
   });
 
@@ -82,31 +87,42 @@ Future<void> main() async {
   }
 
   isTv = await isDeviceTv();
-  runApp(BetterFeedback(
-    child: MultiBlocProvider(providers: [
-      BlocProvider(
-        create: (context) {
-          return AppCubit(AppState(0, null, HomeLayout()));
-        },
+  runApp(
+    BetterFeedback(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) {
+              return AppCubit(AppState(0, null, HomeLayout()));
+            },
+          ),
+          BlocProvider(
+            create: (context) {
+              var settingsCubit = SettingsCubit(
+                SettingsState.init(),
+                context.read<AppCubit>(),
+              );
+              configureBackgroundService(settingsCubit);
+              return settingsCubit;
+            },
+          ),
+          BlocProvider(
+            create: (context) => PlayerCubit(
+              PlayerState.init(null),
+              context.read<SettingsCubit>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => DownloadManagerCubit(
+              const DownloadManagerState(),
+              context.read<PlayerCubit>(),
+            ),
+          ),
+        ],
+        child: const MyApp(),
       ),
-      BlocProvider(
-        create: (context) {
-          var settingsCubit =
-              SettingsCubit(SettingsState.init(), context.read<AppCubit>());
-          configureBackgroundService(settingsCubit);
-          return settingsCubit;
-        },
-      ),
-      BlocProvider(
-        create: (context) =>
-            PlayerCubit(PlayerState.init(null), context.read<SettingsCubit>()),
-      ),
-      BlocProvider(
-        create: (context) => DownloadManagerCubit(
-            const DownloadManagerState(), context.read<PlayerCubit>()),
-      )
-    ], child: const MyApp()),
-  ));
+    ),
+  );
 }
 
 late ColorScheme darkColorScheme;
@@ -117,23 +133,28 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubit, AppState>(
-        buildWhen: (previous, current) => previous.server != current.server,
-        // we want to rebuild only when anything other than the navigation index is changed
-        builder: (context, state) {
-          bool useDynamicTheme = context
-              .select((SettingsCubit value) => value.state.useDynamicTheme);
-          bool useBlackBackground = context
-              .select((SettingsCubit value) => value.state.blackBackground);
-          String? locale =
-              context.select((SettingsCubit value) => value.state.locale);
-          ThemeMode themeMode =
-              context.select((SettingsCubit value) => value.state.themeMode);
+      buildWhen: (previous, current) => previous.server != current.server,
+      // we want to rebuild only when anything other than the navigation index is changed
+      builder: (context, state) {
+        bool useDynamicTheme = context.select(
+          (SettingsCubit value) => value.state.useDynamicTheme,
+        );
+        bool useBlackBackground = context.select(
+          (SettingsCubit value) => value.state.blackBackground,
+        );
+        String? locale = context.select(
+          (SettingsCubit value) => value.state.locale,
+        );
+        ThemeMode themeMode = context.select(
+          (SettingsCubit value) => value.state.themeMode,
+        );
 
-          var navigationBarBehavior = context
-              .select((SettingsCubit s) => s.state.navigationBarLabelBehavior);
+        var navigationBarBehavior = context.select(
+          (SettingsCubit s) => s.state.navigationBarLabelBehavior,
+        );
 
-          return DynamicColorBuilder(
-              builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+        return DynamicColorBuilder(
+          builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
             ColorScheme lightColorScheme;
 
             if (useDynamicTheme &&
@@ -156,9 +177,7 @@ class MyApp extends StatelessWidget {
               // _isDemoUsingDynamicColors = true; // ignore, only for demo purposes
             } else {
               // Otherwise, use fallback schemes.
-              lightColorScheme = ColorScheme.fromSeed(
-                seedColor: brandColor,
-              );
+              lightColorScheme = ColorScheme.fromSeed(seedColor: brandColor);
               darkColorScheme = ColorScheme.fromSeed(
                 seedColor: brandColor,
                 brightness: Brightness.dark,
@@ -176,16 +195,22 @@ class MyApp extends StatelessWidget {
             }
 
             log.fine(
-                'locale from db ${db.getSettings(localeSettingName)?.value} from cubit: $dbLocale, $localeString');
+              'locale from db ${db.getSettings(localeSettingName)?.value} from cubit: $dbLocale, $localeString',
+            );
             Locale? savedLocale = localeString != null
                 ? Locale.fromSubtags(
                     languageCode: localeString[0],
-                    scriptCode:
-                        localeString.length >= 2 ? localeString[1] : null)
+                    scriptCode: localeString.length >= 2
+                        ? localeString[1]
+                        : null,
+                  )
                 : null;
 
-            var colors = getColorSchemeOutsideOfMaterial(context,
-                dark: darkColorScheme, light: lightColorScheme);
+            var colors = getColorSchemeOutsideOfMaterial(
+              context,
+              dark: darkColorScheme,
+              light: lightColorScheme,
+            );
 
             var navigationBarTheme = NavigationBarThemeData(
               elevation: 0,
@@ -199,24 +224,31 @@ class MyApp extends StatelessWidget {
             );
 
             var appBarTheme = AppBarTheme(
-                backgroundColor: colors.surface,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                systemOverlayStyle: getUiOverlayStyle(context,
-                    dark: darkColorScheme, light: lightColorScheme));
+              backgroundColor: colors.surface,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              systemOverlayStyle: getUiOverlayStyle(
+                context,
+                dark: darkColorScheme,
+                light: lightColorScheme,
+              ),
+            );
 
-            var sliderTheme =
-                const SliderThemeData(inactiveTrackColor: Colors.blue);
+            var sliderTheme = const SliderThemeData(
+              inactiveTrackColor: Colors.blue,
+            );
 
             return MaterialApp.router(
               routerConfig: appRouter.config(
-                  navigatorObservers: () => [MyRouteObserver()],
-                  includePrefixMatches: true),
+                navigatorObservers: () => [MyRouteObserver()],
+                includePrefixMatches: true,
+              ),
               locale: savedLocale,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               localeListResolutionCallback: (locales, supportedLocales) {
                 log.info(
-                    'device locales=$locales supported locales=$supportedLocales, saved: $savedLocale');
+                  'device locales=$locales supported locales=$supportedLocales, saved: $savedLocale',
+                );
                 if (savedLocale != null) {
                   log.info("using saved locale, $savedLocale");
                   return savedLocale;
@@ -230,8 +262,10 @@ class MyApp extends StatelessWidget {
                       return locale;
                     } else {
                       Locale? match = supportedLocales
-                          .where((element) =>
-                              element.languageCode == locale.languageCode)
+                          .where(
+                            (element) =>
+                                element.languageCode == locale.languageCode,
+                          )
                           .firstOrNull;
                       if (match != null) {
                         log.info("found partial match $locale with $match");
@@ -249,33 +283,42 @@ class MyApp extends StatelessWidget {
               scaffoldMessengerKey: scaffoldKey,
               debugShowCheckedModeBanner: false,
               themeMode: ThemeMode.values.firstWhere(
-                  (element) => element.name == themeMode.name,
-                  orElse: () => ThemeMode.system),
+                (element) => element.name == themeMode.name,
+                orElse: () => ThemeMode.system,
+              ),
               title: 'Clipious',
               theme: ThemeData(
-                  useMaterial3: true,
-                  colorScheme: lightColorScheme,
-                  navigationBarTheme: navigationBarTheme,
-                  navigationRailTheme: navigationRailTheme,
-                  appBarTheme: appBarTheme,
-                  sliderTheme: sliderTheme.copyWith(
-                      inactiveTrackColor: lightColorScheme.secondaryContainer),
-                  progressIndicatorTheme: ProgressIndicatorThemeData(
-                      circularTrackColor: lightColorScheme.secondaryContainer
-                          .withValues(alpha: 0.8))),
+                useMaterial3: true,
+                colorScheme: lightColorScheme,
+                navigationBarTheme: navigationBarTheme,
+                navigationRailTheme: navigationRailTheme,
+                appBarTheme: appBarTheme,
+                sliderTheme: sliderTheme.copyWith(
+                  inactiveTrackColor: lightColorScheme.secondaryContainer,
+                ),
+                progressIndicatorTheme: ProgressIndicatorThemeData(
+                  circularTrackColor: lightColorScheme.secondaryContainer
+                      .withValues(alpha: 0.8),
+                ),
+              ),
               darkTheme: ThemeData(
-                  useMaterial3: true,
-                  colorScheme: darkColorScheme,
-                  appBarTheme: appBarTheme,
-                  navigationBarTheme: navigationBarTheme,
-                  navigationRailTheme: navigationRailTheme,
-                  sliderTheme: sliderTheme.copyWith(
-                      inactiveTrackColor: darkColorScheme.secondaryContainer),
-                  progressIndicatorTheme: ProgressIndicatorThemeData(
-                      circularTrackColor: darkColorScheme.secondaryContainer
-                          .withValues(alpha: 0.8))),
+                useMaterial3: true,
+                colorScheme: darkColorScheme,
+                appBarTheme: appBarTheme,
+                navigationBarTheme: navigationBarTheme,
+                navigationRailTheme: navigationRailTheme,
+                sliderTheme: sliderTheme.copyWith(
+                  inactiveTrackColor: darkColorScheme.secondaryContainer,
+                ),
+                progressIndicatorTheme: ProgressIndicatorThemeData(
+                  circularTrackColor: darkColorScheme.secondaryContainer
+                      .withValues(alpha: 0.8),
+                ),
+              ),
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 }

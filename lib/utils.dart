@@ -26,8 +26,9 @@ var log = Logger('Utils');
 
 enum DeviceType { phone, tablet, tv }
 
-double tabletMaxVideoWidth =
-    getDeviceType() == DeviceType.phone ? double.infinity : 500;
+double tabletMaxVideoWidth = getDeviceType() == DeviceType.phone
+    ? double.infinity
+    : 500;
 
 bool isPhoneLandscape(BuildContext context) {
   var size = MediaQuery.sizeOf(context);
@@ -39,16 +40,18 @@ const List<LogicalKeyboardKey> selectKeys = [
   LogicalKeyboardKey.enter,
   LogicalKeyboardKey.numpadEnter,
   LogicalKeyboardKey.select,
-  LogicalKeyboardKey.open
+  LogicalKeyboardKey.open,
 ];
 const List<int> selectPhysicalKeys = [];
 
 bool isOk(LogicalKeyboardKey key, {PhysicalKeyboardKey? physicalKeyboardKey}) {
   log.fine(
-      'Received key event, Logical: ${key.debugName}, Physical ${physicalKeyboardKey?.debugName}');
+    'Received key event, Logical: ${key.debugName}, Physical ${physicalKeyboardKey?.debugName}',
+  );
   return selectKeys.any((element) => element == key) ||
-      selectPhysicalKeys
-          .any((element) => element == physicalKeyboardKey?.usbHidUsage);
+      selectPhysicalKeys.any(
+        (element) => element == physicalKeyboardKey?.usbHidUsage,
+      );
 }
 
 String prettyDurationCustom(Duration duration) {
@@ -73,8 +76,11 @@ NumberFormat compactCurrency = NumberFormat.compactCurrency(
 );
 
 Future<void> showAlertDialog(
-    BuildContext context, String title, List<Widget> body,
-    {List<Widget>? actions}) async {
+  BuildContext context,
+  String title,
+  List<Widget> body, {
+  List<Widget>? actions,
+}) async {
   var locals = AppLocalizations.of(context)!;
   return showDialog<void>(
     context: context,
@@ -82,12 +88,9 @@ Future<void> showAlertDialog(
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(title),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: body,
-          ),
-        ),
-        actions: actions ??
+        content: SingleChildScrollView(child: ListBody(children: body)),
+        actions:
+            actions ??
             <Widget>[
               TextButton(
                 child: Text(locals.ok),
@@ -101,8 +104,11 @@ Future<void> showAlertDialog(
   );
 }
 
-void showSharingSheet(BuildContext context, ShareLinks links,
-    {bool showTimestampOption = false}) {
+void showSharingSheet(
+  BuildContext context,
+  ShareLinks links, {
+  bool showTimestampOption = false,
+}) {
   var locals = AppLocalizations.of(context)!;
 
   bool shareWithTimestamp = false;
@@ -138,10 +144,14 @@ void showSharingSheet(BuildContext context, ShareLinks links,
                   onPressed: () async {
                     final timestamp = await getTimestamp();
 
-                    SharePlus.instance.share(ShareParams(
+                    SharePlus.instance.share(
+                      ShareParams(
                         uri: links.getInvidiousLink(
-                            await db.getCurrentlySelectedServer(),
-                            timestamp?.inSeconds)));
+                          await db.getCurrentlySelectedServer(),
+                          timestamp?.inSeconds,
+                        ),
+                      ),
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -152,8 +162,11 @@ void showSharingSheet(BuildContext context, ShareLinks links,
                   onPressed: () async {
                     final timestamp = await getTimestamp();
 
-                    SharePlus.instance.share(ShareParams(
-                        uri: links.getRedirectLink(timestamp?.inSeconds)));
+                    SharePlus.instance.share(
+                      ShareParams(
+                        uri: links.getRedirectLink(timestamp?.inSeconds),
+                      ),
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -164,8 +177,11 @@ void showSharingSheet(BuildContext context, ShareLinks links,
                   onPressed: () async {
                     final timestamp = await getTimestamp();
 
-                    SharePlus.instance.share(ShareParams(
-                        uri: links.getYoutubeLink(timestamp?.inSeconds)));
+                    SharePlus.instance.share(
+                      ShareParams(
+                        uri: links.getYoutubeLink(timestamp?.inSeconds),
+                      ),
+                    );
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -184,7 +200,7 @@ void showSharingSheet(BuildContext context, ShareLinks links,
                         Text(locals.shareLinkWithTimestamp),
                       ],
                     ),
-                  )
+                  ),
               ],
             ),
           );
@@ -196,13 +212,15 @@ void showSharingSheet(BuildContext context, ShareLinks links,
 
 double getScreenWidth() {
   final data = MediaQueryData.fromView(
-      WidgetsBinding.instance.platformDispatcher.implicitView!);
+    WidgetsBinding.instance.platformDispatcher.implicitView!,
+  );
   return data.size.width;
 }
 
 DeviceType getDeviceType() {
   final data = MediaQueryData.fromView(
-      WidgetsBinding.instance.platformDispatcher.implicitView!);
+    WidgetsBinding.instance.platformDispatcher.implicitView!,
+  );
   return data.size.shortestSide < 600 ? DeviceType.phone : DeviceType.tablet;
 }
 
@@ -228,7 +246,11 @@ double getGridAspectRatio(BuildContext context) {
 }
 
 okCancelDialog(
-    BuildContext context, String title, String message, Function() onOk) {
+  BuildContext context,
+  String title,
+  String message,
+  Function() onOk,
+) {
   var locals = AppLocalizations.of(context)!;
   showDialog(
     useRootNavigator: false,
@@ -260,64 +282,80 @@ okCancelDialog(
 
 showTvAlertdialog(BuildContext context, String title, List<Widget> body) {
   var locals = AppLocalizations.of(context)!;
-  showTvDialog(context: context, builder: (context) => body, actions: [
-    TvButton(
-      autofocus: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-        child: Text(locals.ok),
+  showTvDialog(
+    context: context,
+    builder: (context) => body,
+    actions: [
+      TvButton(
+        autofocus: true,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+          child: Text(locals.ok),
+        ),
+        onPressed: (context) {
+          Navigator.of(context).pop();
+        },
       ),
-      onPressed: (context) {
-        Navigator.of(context).pop();
-      },
-    )
-  ]);
+    ],
+  );
 }
 
-showTvDialog(
-    {required BuildContext context,
-    String? title,
-    required List<Widget> Function(BuildContext context) builder,
-    required List<Widget> actions}) {
+showTvDialog({
+  required BuildContext context,
+  String? title,
+  required List<Widget> Function(BuildContext context) builder,
+  required List<Widget> actions,
+}) {
   var textTheme = Theme.of(context).textTheme;
 
-  Navigator.of(context).push(MaterialPageRoute(
-    builder: (context) {
-      ColorScheme colors = Theme.of(context).colorScheme;
-      return Scaffold(
-        body: TvOverscan(
-          child: Column(children: [
-            if (title != null)
-              Text(title,
-                  style: textTheme.titleLarge?.copyWith(color: colors.primary)),
-            Expanded(
-              child: ListView(
-                children: builder(context),
-              ),
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) {
+        ColorScheme colors = Theme.of(context).colorScheme;
+        return Scaffold(
+          body: TvOverscan(
+            child: Column(
+              children: [
+                if (title != null)
+                  Text(
+                    title,
+                    style: textTheme.titleLarge?.copyWith(
+                      color: colors.primary,
+                    ),
+                  ),
+                Expanded(child: ListView(children: builder(context))),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: actions
+                      .map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: e,
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: actions
-                  .map((e) => Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: e,
-                      ))
-                  .toList(),
-            )
-          ]),
-        ),
-      );
-    },
-  ));
+          ),
+        );
+      },
+    ),
+  );
 }
 
 Country getCountryFromCode(String code) {
-  return countryCodes.firstWhere((element) => element.code == code,
-      orElse: () => Country('US', 'United States of America'));
+  return countryCodes.firstWhere(
+    (element) => element.code == code,
+    orElse: () => Country('US', 'United States of America'),
+  );
 }
 
 KeyEventResult onTvSelect(
-    KeyEvent event, BuildContext context, Function(BuildContext context) func) {
+  KeyEvent event,
+  BuildContext context,
+  Function(BuildContext context) func,
+) {
   if (event is KeyUpEvent) {
     log.fine('onTvSelect, ${event.logicalKey}, $event');
     if (isOk(event.logicalKey, physicalKeyboardKey: event.physicalKey)) {
@@ -329,34 +367,43 @@ KeyEventResult onTvSelect(
   return KeyEventResult.ignored;
 }
 
-ColorScheme getColorSchemeOutsideOfMaterial(BuildContext context,
-    {required ColorScheme dark, required ColorScheme light}) {
+ColorScheme getColorSchemeOutsideOfMaterial(
+  BuildContext context, {
+  required ColorScheme dark,
+  required ColorScheme light,
+}) {
   var colors = switch (context.read<SettingsCubit>().state.themeMode) {
     (ThemeMode.dark) => dark,
     (ThemeMode.light) => light,
     (ThemeMode.system) =>
       MediaQuery.platformBrightnessOf(context) == Brightness.light
           ? light
-          : dark
+          : dark,
   };
   return colors;
 }
 
-SystemUiOverlayStyle getUiOverlayStyle(BuildContext context,
-    {required ColorScheme dark, required ColorScheme light}) {
-  var colorScheme =
-      getColorSchemeOutsideOfMaterial(context, dark: dark, light: light);
+SystemUiOverlayStyle getUiOverlayStyle(
+  BuildContext context, {
+  required ColorScheme dark,
+  required ColorScheme light,
+}) {
+  var colorScheme = getColorSchemeOutsideOfMaterial(
+    context,
+    dark: dark,
+    light: light,
+  );
 
   return SystemUiOverlayStyle(
-      systemNavigationBarColor: colorScheme.surface,
-      systemNavigationBarIconBrightness:
-          colorScheme.brightness == Brightness.dark
-              ? Brightness.light
-              : Brightness.dark,
-      statusBarColor: colorScheme.surface,
-      statusBarIconBrightness: colorScheme.brightness == Brightness.dark
-          ? Brightness.light
-          : Brightness.dark);
+    systemNavigationBarColor: colorScheme.surface,
+    systemNavigationBarIconBrightness: colorScheme.brightness == Brightness.dark
+        ? Brightness.light
+        : Brightness.dark,
+    statusBarColor: colorScheme.surface,
+    statusBarIconBrightness: colorScheme.brightness == Brightness.dark
+        ? Brightness.light
+        : Brightness.dark,
+  );
 }
 
 List<Video> filteredVideos(List<Video> videos) =>
@@ -383,7 +430,11 @@ TimeOfDay timeStringToTimeOfDay(String time) {
 }
 
 Orientation getOrientation() {
-  return (WidgetsBinding.instance.platformDispatcher.implicitView?.physicalSize
+  return (WidgetsBinding
+                  .instance
+                  .platformDispatcher
+                  .implicitView
+                  ?.physicalSize
                   .aspectRatio ??
               1) >
           1

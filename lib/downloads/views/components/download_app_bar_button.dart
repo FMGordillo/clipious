@@ -23,46 +23,53 @@ class AppBarDownloadButton extends StatelessWidget {
               onPressed: () => openDownloadManager(context),
               icon: Icon(
                 Icons.download,
-                color:
-                    state.downloadProgresses.isNotEmpty ? colors.surface : null,
+                color: state.downloadProgresses.isNotEmpty
+                    ? colors.surface
+                    : null,
               ),
             ),
             state.downloadProgresses.isNotEmpty
                 ? InkWell(
                     onTap: () => openDownloadManager(context),
                     child: SizedBox(
-                        width: 15,
-                        height: 15,
-                        child: TweenAnimationBuilder(
-                          builder: (context, value, child) {
-                            return CircularProgressIndicator(
-                              value: state.totalProgress == 0 ? null : value,
-                              strokeWidth: 2,
-                            );
-                          },
-                          duration: animationDuration,
-                          tween:
-                              Tween<double>(begin: 0, end: state.totalProgress),
-                        )),
+                      width: 15,
+                      height: 15,
+                      child: TweenAnimationBuilder(
+                        builder: (context, value, child) {
+                          return CircularProgressIndicator(
+                            value: state.totalProgress == 0 ? null : value,
+                            strokeWidth: 2,
+                          );
+                        },
+                        duration: animationDuration,
+                        tween: Tween<double>(
+                          begin: 0,
+                          end: state.totalProgress,
+                        ),
+                      ),
+                    ),
                   )
                 : const SizedBox.shrink(),
             Positioned(
-                top: 1,
-                right: 1,
-                child: state.videos.isNotEmpty
-                    ? GestureDetector(
-                        onTap: () => openDownloadManager(context),
-                        child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                                color: colors.secondaryContainer,
-                                shape: BoxShape.circle),
-                            child: Text(
-                              state.videos.length.toString(),
-                              style: textTheme.labelSmall,
-                            )),
-                      )
-                    : const SizedBox.shrink())
+              top: 1,
+              right: 1,
+              child: state.videos.isNotEmpty
+                  ? GestureDetector(
+                      onTap: () => openDownloadManager(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: colors.secondaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          state.videos.length.toString(),
+                          style: textTheme.labelSmall,
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
           ],
         );
       },

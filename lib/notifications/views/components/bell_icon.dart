@@ -7,10 +7,7 @@ import 'package:clipious/settings/states/settings.dart';
 
 import '../../../utils.dart';
 
-enum BellIconType {
-  playlist,
-  channel;
-}
+enum BellIconType { playlist, channel }
 
 class BellIcon<T> extends StatelessWidget {
   final BellIconType type;
@@ -25,14 +22,18 @@ class BellIcon<T> extends StatelessWidget {
       case TurnOnStatus.needToEnableBackGroundServices:
         if (context.mounted) {
           var locals = AppLocalizations.of(context)!;
-          okCancelDialog(context, locals.askToEnableBackgroundServiceTitle,
-              locals.askToEnableBackgroundServiceContent, () async {
-            var settings = context.read<SettingsCubit>();
-            await settings.setBackgroundNotifications(true);
-            if (context.mounted) {
-              cubit.toggle();
-            }
-          });
+          okCancelDialog(
+            context,
+            locals.askToEnableBackgroundServiceTitle,
+            locals.askToEnableBackgroundServiceContent,
+            () async {
+              var settings = context.read<SettingsCubit>();
+              await settings.setBackgroundNotifications(true);
+              if (context.mounted) {
+                cubit.toggle();
+              }
+            },
+          );
         }
         break;
       default:
@@ -50,12 +51,14 @@ class BellIcon<T> extends StatelessWidget {
         builder: (context, state) {
           return IconButton(
             onPressed: () => toggleNotifications(context),
-            icon:
-                Icon(state ? Icons.notifications_active : Icons.notifications),
+            icon: Icon(
+              state ? Icons.notifications_active : Icons.notifications,
+            ),
             color: state ? colors.primary : null,
           ).animate(
-              target: state ? 1 : 0,
-              effects: state ? [const ShakeEffect()] : []);
+            target: state ? 1 : 0,
+            effects: state ? [const ShakeEffect()] : [],
+          );
         },
       ),
     );

@@ -25,27 +25,32 @@ class TabletExpandedPlayer extends StatelessWidget {
     return !isFullScreen &&
             !controller.isMini &&
             (video != null || offlineVid != null)
-        ? Column(children: [
-            MiniPlayerControls(
-              videoId: video?.videoId ?? offlineVid?.videoId ?? '',
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: innerHorizontalPadding),
-                child: Builder(builder: (context) {
-                  return video != null
-                      ? SingleChildScrollView(
-                          child: VideoInfo(
-                            video: video,
-                            descriptionAndTags: false,
-                          ),
-                        )
-                      : const SizedBox.shrink();
-                }),
+        ? Column(
+            children: [
+              MiniPlayerControls(
+                videoId: video?.videoId ?? offlineVid?.videoId ?? '',
               ),
-            )
-          ])
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: innerHorizontalPadding,
+                  ),
+                  child: Builder(
+                    builder: (context) {
+                      return video != null
+                          ? SingleChildScrollView(
+                              child: VideoInfo(
+                                video: video,
+                                descriptionAndTags: false,
+                              ),
+                            )
+                          : const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          )
         : const SizedBox.shrink();
   }
 }

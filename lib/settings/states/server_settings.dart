@@ -64,8 +64,12 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
 
   Future<void> logInWithCookie(String username, String password) async {
     var s = state.server.copyWith();
-    String cookie = await service.loginWithCookies(s.url, username, password,
-        headers: s.customHeaders);
+    String cookie = await service.loginWithCookies(
+      s.url,
+      username,
+      password,
+      headers: s.customHeaders,
+    );
     s = s.copyWith(sidCookie: cookie);
     await db.upsertServer(s);
     if (s.inUse) {
@@ -94,9 +98,10 @@ class ServerSettingsCubit extends Cubit<ServerSettingsState> {
 
 @freezed
 sealed class ServerSettingsState with _$ServerSettingsState {
-  const factory ServerSettingsState(
-      {required Server server,
-      @Default(false) bool canDelete}) = _ServerSettingsState;
+  const factory ServerSettingsState({
+    required Server server,
+    @Default(false) bool canDelete,
+  }) = _ServerSettingsState;
 
   const ServerSettingsState._();
 

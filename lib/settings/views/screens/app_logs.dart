@@ -27,8 +27,9 @@ class AppLogsScreen extends StatelessWidget {
               title: Text(locals.appLogs),
               actions: [
                 IconButton(
-                    onPressed: cubit.selectAll,
-                    icon: const Icon(Icons.checklist))
+                  onPressed: cubit.selectAll,
+                  icon: const Icon(Icons.checklist),
+                ),
               ],
             ),
             body: SafeArea(
@@ -49,11 +50,13 @@ class AppLogsScreen extends StatelessWidget {
                           key: ValueKey(log.uuid),
                           title: Text(
                             '${log.level} - ${log.logger} - ${log.time}',
-                            style: textTheme.labelSmall
-                                ?.copyWith(color: colors.secondary),
+                            style: textTheme.labelSmall?.copyWith(
+                              color: colors.secondary,
+                            ),
                           ),
                           subtitle: Text(
-                              '${log.message}${log.stacktrace != null ? '\n\n${log.stacktrace}' : ''}'),
+                            '${log.message}${log.stacktrace != null ? '\n\n${log.stacktrace}' : ''}',
+                          ),
                           dense: true,
                           visualDensity: VisualDensity.compact,
                           value: state.selected.contains(log.uuid),
@@ -67,32 +70,31 @@ class AppLogsScreen extends StatelessWidget {
                     ),
                   ),
                   AnimatedPositioned(
-                      left: 0,
-                      right: 0,
-                      bottom: state.selected.isNotEmpty ? 0 : -50,
-                      duration: animationDuration,
-                      child: InkWell(
-                        onTap: cubit.copySelectedLogsToClipboard,
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 50,
-                          color: colors.secondaryContainer,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(right: 8.0),
-                                child: Icon(
-                                  Icons.copy,
-                                  size: 15,
-                                ),
-                              ),
-                              Text(
-                                  '${locals.copyToClipBoard} (${state.selected.length})'),
-                            ],
-                          ),
+                    left: 0,
+                    right: 0,
+                    bottom: state.selected.isNotEmpty ? 0 : -50,
+                    duration: animationDuration,
+                    child: InkWell(
+                      onTap: cubit.copySelectedLogsToClipboard,
+                      child: Container(
+                        alignment: Alignment.center,
+                        height: 50,
+                        color: colors.secondaryContainer,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(Icons.copy, size: 15),
+                            ),
+                            Text(
+                              '${locals.copyToClipBoard} (${state.selected.length})',
+                            ),
+                          ],
                         ),
-                      ))
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

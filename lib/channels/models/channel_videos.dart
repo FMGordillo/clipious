@@ -10,7 +10,7 @@ class VideosWithContinuation extends ItemtWithContinuation<Video> {
   List<Video> videos;
 
   VideosWithContinuation(this.videos, String? continuation)
-      : super(continuation);
+    : super(continuation);
 
   factory VideosWithContinuation.fromJson(Map<String, dynamic> json) =>
       _$VideosWithContinuationFromJson(json);

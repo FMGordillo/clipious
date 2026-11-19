@@ -15,10 +15,15 @@ class AudioPlayer extends StatelessWidget {
   final DownloadedVideo? offlineVideo;
   final bool miniPlayer;
 
-  const AudioPlayer(
-      {super.key, this.video, required this.miniPlayer, this.offlineVideo})
-      : assert(video == null || offlineVideo == null,
-            'cannot provide both video and offline video\n');
+  const AudioPlayer({
+    super.key,
+    this.video,
+    required this.miniPlayer,
+    this.offlineVideo,
+  }) : assert(
+         video == null || offlineVideo == null,
+         'cannot provide both video and offline video\n',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -27,42 +32,46 @@ class AudioPlayer extends StatelessWidget {
 
     return BlocProvider(
       create: (context) => AudioPlayerCubit(
-          AudioPlayerState(offlineVideo: offlineVideo, video: video),
-          player,
-          settings),
+        AudioPlayerState(offlineVideo: offlineVideo, video: video),
+        player,
+        settings,
+      ),
       child: BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
         builder: (context, playerState) =>
             BlocListener<PlayerCubit, PlayerState>(
-          listenWhen: (previous, current) =>
-              previous.mediaCommand != current.mediaCommand &&
-              current.mediaCommand != null,
-          listener: (context, state) => context
-              .read<AudioPlayerCubit>()
-              .handleCommand(state.mediaCommand!),
-          child: Padding(
-            padding: EdgeInsets.all(miniPlayer ? 8 : 0.0),
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                playerState.video != null
-                    ? VideoThumbnailView(
-                        decoration: const BoxDecoration(),
-                        videoId: playerState.video!.videoId,
-                        thumbnails: playerState.video?.thumbnails ?? [],
-                      )
-                    : playerState.offlineVideo != null
+              listenWhen: (previous, current) =>
+                  previous.mediaCommand != current.mediaCommand &&
+                  current.mediaCommand != null,
+              listener: (context, state) => context
+                  .read<AudioPlayerCubit>()
+                  .handleCommand(state.mediaCommand!),
+              child: Padding(
+                padding: EdgeInsets.all(miniPlayer ? 8 : 0.0),
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    playerState.video != null
+                        ? VideoThumbnailView(
+                            decoration: const BoxDecoration(),
+                            videoId: playerState.video!.videoId,
+                            thumbnails: playerState.video?.thumbnails ?? [],
+                          )
+                        : playerState.offlineVideo != null
                         ? OfflineVideoThumbnail(
                             borderRadius: 0,
                             key: ValueKey(
-                                playerState.offlineVideo?.videoId ?? ''),
-                            video: playerState.offlineVideo!)
+                              playerState.offlineVideo?.videoId ?? '',
+                            ),
+                            video: playerState.offlineVideo!,
+                          )
                         : const SizedBox.shrink(),
-                PlayerControls(
-                    mediaPlayerCubit: context.read<AudioPlayerCubit>())
-              ],
+                    PlayerControls(
+                      mediaPlayerCubit: context.read<AudioPlayerCubit>(),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }

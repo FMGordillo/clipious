@@ -48,8 +48,11 @@ class DownloadedVideoCubit extends Cubit<DownloadedVideoState> {
   }
 
   void refreshVideo() async {
-    emit(state.copyWith(
-        video: db.getDownloadByVideoId(state.video?.videoId ?? '')!));
+    emit(
+      state.copyWith(
+        video: db.getDownloadByVideoId(state.video?.videoId ?? '')!,
+      ),
+    );
 
     setThumbnail();
   }
@@ -86,10 +89,11 @@ class DownloadedVideoCubit extends Cubit<DownloadedVideoState> {
 
 @freezed
 sealed class DownloadedVideoState with _$DownloadedVideoState {
-  const factory DownloadedVideoState(
-      {DownloadedVideo? video,
-      String? thumbnailPath,
-      @Default(0) double progress}) = _DownloadedVideoState;
+  const factory DownloadedVideoState({
+    DownloadedVideo? video,
+    String? thumbnailPath,
+    @Default(0) double progress,
+  }) = _DownloadedVideoState;
 
   static DownloadedVideoState init(String videoId) {
     DownloadedVideo? video;

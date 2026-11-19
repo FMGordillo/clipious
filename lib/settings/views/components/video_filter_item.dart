@@ -16,13 +16,15 @@ class VideoFilterItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
       child: Container(
-          decoration: BoxDecoration(
-              color: colors.secondaryContainer,
-              borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(filter.localizedLabel(locals, context)),
-          )),
+        decoration: BoxDecoration(
+          color: colors.secondaryContainer,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(filter.localizedLabel(locals, context)),
+        ),
+      ),
     );
   }
 }

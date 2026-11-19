@@ -21,32 +21,39 @@ class ChannelVideoTab extends StatelessWidget {
 
     return channel == null
         ? const SizedBox.shrink()
-        : Builder(builder: (context) {
-            final sortBy = context.select((ChannelCubit c) => c.state.sortBy);
+        : Builder(
+            builder: (context) {
+              final sortBy = context.select((ChannelCubit c) => c.state.sortBy);
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: innerHorizontalPadding),
-                  child: SortDropdownButton(
-                    selectedSortingOption: sortBy,
-                    onChanged: (ChannelSortBy newValue) =>
-                        cubit.onSortByChanged(newValue),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: innerHorizontalPadding,
+                    ),
+                    child: SortDropdownButton(
+                      selectedSortingOption: sortBy,
+                      onChanged: (ChannelSortBy newValue) =>
+                          cubit.onSortByChanged(newValue),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: ChannelVideosView(
-                    key: ValueKey(sortBy),
-                    channel: channel!,
-                    getVideos: (String channelId, String? continuation) {
-                      return service.getChannelVideos(channelId, continuation,
-                          sortBy: sortBy);
-                    },
+                  Expanded(
+                    child: ChannelVideosView(
+                      key: ValueKey(sortBy),
+                      channel: channel!,
+                      getVideos: (String channelId, String? continuation) {
+                        return service.getChannelVideos(
+                          channelId,
+                          continuation,
+                          sortBy: sortBy,
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
-          });
+                ],
+              );
+            },
+          );
   }
 }

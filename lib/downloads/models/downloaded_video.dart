@@ -15,16 +15,17 @@ const String _downloadFolder = 'downloads';
 @freezed
 sealed class DownloadedVideo with _$DownloadedVideo implements IdedVideo {
   @Implements<IdedVideo>()
-  const factory DownloadedVideo(
-      {required String videoId,
-      required String title,
-      String? author,
-      String? authorUrl,
-      @Default(false) bool downloadComplete,
-      @Default(false) bool downloadFailed,
-      @Default(false) bool audioOnly,
-      required int lengthSeconds,
-      required String quality}) = _DownloadedVideo;
+  const factory DownloadedVideo({
+    required String videoId,
+    required String title,
+    String? author,
+    String? authorUrl,
+    @Default(false) bool downloadComplete,
+    @Default(false) bool downloadFailed,
+    @Default(false) bool audioOnly,
+    required int lengthSeconds,
+    required String quality,
+  }) = _DownloadedVideo;
 
   const DownloadedVideo._();
 

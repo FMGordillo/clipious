@@ -15,28 +15,36 @@ class SearchVideoTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final query =
-          context.select((SearchCubit s) => s.state.queryController.value.text);
-      final sortBy = context.select((SearchCubit s) => s.state.filters.sortBy);
-      final date = context.select((SearchCubit s) => s.state.filters.date);
-      final duration =
-          context.select((SearchCubit s) => s.state.filters.duration);
+    return Builder(
+      builder: (context) {
+        final query = context.select(
+          (SearchCubit s) => s.state.queryController.value.text,
+        );
+        final sortBy = context.select(
+          (SearchCubit s) => s.state.filters.sortBy,
+        );
+        final date = context.select((SearchCubit s) => s.state.filters.date);
+        final duration = context.select(
+          (SearchCubit s) => s.state.filters.duration,
+        );
 
-      return VideoList(
-        key: UniqueKey(),
-        paginatedVideoList: PageBasedPaginatedList<Video>(
-          getItemsFunc: (page, maxResults) => service
-              .search(query,
+        return VideoList(
+          key: UniqueKey(),
+          paginatedVideoList: PageBasedPaginatedList<Video>(
+            getItemsFunc: (page, maxResults) => service
+                .search(
+                  query,
                   page: page,
                   sortBy: sortBy,
                   type: SearchType.video,
                   date: date,
-                  duration: duration)
-              .then((value) => value.videos),
-          maxResults: searchPageSize,
-        ),
-      );
-    });
+                  duration: duration,
+                )
+                .then((value) => value.videos),
+            maxResults: searchPageSize,
+          ),
+        );
+      },
+    );
   }
 }

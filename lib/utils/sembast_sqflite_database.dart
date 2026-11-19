@@ -31,23 +31,30 @@ class SembastSqfDb extends IDbClient {
   final log = Logger('SembastSqfLDB');
   final Database db;
   final downloadedVideosStore = stringMapStoreFactory.store('downloadedVideo');
-  final homeLayoutStore =
-      intMapStoreFactory.store('homeLayout'); // always use id = 1
-  final searchHistoryStore =
-      stringMapStoreFactory.store('searchHistory'); // use term as key
+  final homeLayoutStore = intMapStoreFactory.store(
+    'homeLayout',
+  ); // always use id = 1
+  final searchHistoryStore = stringMapStoreFactory.store(
+    'searchHistory',
+  ); // use term as key
   final appLogsStore = stringMapStoreFactory.store('appLogs');
-  final serversStore =
-      stringMapStoreFactory.store('serviers'); // use server url as key
+  final serversStore = stringMapStoreFactory.store(
+    'serviers',
+  ); // use server url as key
   final videoFiltersStore = stringMapStoreFactory.store('videoFilters');
-  final settingsStore =
-      stringMapStoreFactory.store('settings'); // settings name as key;
-  final deArrowCacheStore =
-      stringMapStoreFactory.store('dearrow'); // use video id as key
-  final historyVideoCacheStore =
-      stringMapStoreFactory.store('historyVideoCache'); // use historyVideoCache
+  final settingsStore = stringMapStoreFactory.store(
+    'settings',
+  ); // settings name as key;
+  final deArrowCacheStore = stringMapStoreFactory.store(
+    'dearrow',
+  ); // use video id as key
+  final historyVideoCacheStore = stringMapStoreFactory.store(
+    'historyVideoCache',
+  ); // use historyVideoCache
   final progressStore = stringMapStoreFactory.store('progress');
-  final offlineSubscriptions =
-      stringMapStoreFactory.store('offline_subscriptions');
+  final offlineSubscriptions = stringMapStoreFactory.store(
+    'offline_subscriptions',
+  );
 
   SembastSqfDb(this.db);
 
@@ -61,8 +68,9 @@ class SembastSqfDb extends IDbClient {
 
     var dbPath = p.join(docsDir.path, "clipious.db");
 
-    final databaseFactorySqflite =
-        getDatabaseFactorySqflite(sqflite.databaseFactory);
+    final databaseFactorySqflite = getDatabaseFactorySqflite(
+      sqflite.databaseFactory,
+    );
     var db = await databaseFactorySqflite.openDatabase(
       dbPath.toString(),
       version: 1,
@@ -96,27 +104,37 @@ class SembastSqfDb extends IDbClient {
     // TODO: implement cleanOldLogs
     var all = getAppLogs();
     List<String> ids = all.reversed.skip(maxLogs).map((e) => e.uuid).toList();
-    await appLogsStore.delete(db,
-        finder: Finder(
-            sortOrders: [SortOrder("time")], offset: 0, limit: ids.length));
+    await appLogsStore.delete(
+      db,
+      finder: Finder(
+        sortOrders: [SortOrder("time")],
+        offset: 0,
+        limit: ids.length,
+      ),
+    );
     log.fine("clearing ${ids.length} logs out of ${all.length}");
   }
 
   @override
   Future<void> clearExcessSearchHistory() async {
-    final limit = int.parse(getSettings(searchHistoryLimitSettingName)?.value ??
-        searchHistoryDefaultLength);
+    final limit = int.parse(
+      getSettings(searchHistoryLimitSettingName)?.value ??
+          searchHistoryDefaultLength,
+    );
 
     log.fine('History limit ? $limit');
 
     var count = searchHistoryStore.countSync(db);
     log.fine('search history clear $count/$limit');
     if (count > limit) {
-      await searchHistoryStore.delete(db,
-          finder: Finder(
-              sortOrders: [SortOrder("time")],
-              offset: 0,
-              limit: count - limit));
+      await searchHistoryStore.delete(
+        db,
+        finder: Finder(
+          sortOrders: [SortOrder("time")],
+          offset: 0,
+          limit: count - limit,
+        ),
+      );
       log.fine('clearing ${count - limit} history itens');
     }
   }
@@ -233,9 +251,9 @@ class SembastSqfDb extends IDbClient {
 
   @override
   Future<List<Server>> getServers() async {
-    return (await serversStore.find(db))
-        .map((e) => Server.fromJson(e.value))
-        .toList();
+    return (await serversStore.find(
+      db,
+    )).map((e) => Server.fromJson(e.value)).toList();
   }
 
   @override
@@ -327,8 +345,12 @@ class SembastSqfDb extends IDbClient {
 
   @override
   Future<List<OfflineSubscription>> getOfflineSubscriptions() {
-    return offlineSubscriptions.find(db).then((values) =>
-        values.map((e) => OfflineSubscription.fromJson(e.value)).toList());
+    return offlineSubscriptions
+        .find(db)
+        .then(
+          (values) =>
+              values.map((e) => OfflineSubscription.fromJson(e.value)).toList(),
+        );
   }
 
   @override

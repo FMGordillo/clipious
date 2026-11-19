@@ -10,17 +10,16 @@ import '../models/db/server.dart';
 part 'add_server.freezed.dart';
 
 class AddServerCubit extends Cubit<AddServerState> {
-  final TextEditingController urlController =
-      TextEditingController(text: 'https://');
+  final TextEditingController urlController = TextEditingController(
+    text: 'https://',
+  );
   final TextEditingController headerNameController = TextEditingController();
   final TextEditingController headerValueController = TextEditingController();
 
   AddServerCubit(super.initialState) {
-    urlController.addListener(
-      () {
-        emit(state.copyWith(valid: validUrl));
-      },
-    );
+    urlController.addListener(() {
+      emit(state.copyWith(valid: validUrl));
+    });
   }
 
   @override
@@ -50,13 +49,13 @@ class AddServerCubit extends Cubit<AddServerState> {
 
       if (state.advancedTest) {
         Server server = Server(url: serverUrl, customHeaders: state.headers);
-        final video =
-            await service.getVideo('dQw4w9WgXcQ', serverOverride: server);
+        final video = await service.getVideo(
+          'dQw4w9WgXcQ',
+          serverOverride: server,
+        );
 
         final invalidThumbnailUrls = video.videoThumbnails
-            .map(
-              (e) => e.url,
-            )
+            .map((e) => e.url)
             .any((u) => u.startsWith("/"));
 
         if (invalidThumbnailUrls) {
@@ -108,10 +107,11 @@ class AddServerCubit extends Cubit<AddServerState> {
 
 @freezed
 sealed class AddServerState with _$AddServerState {
-  const factory AddServerState(
-      {@Default(false) bool loading,
-      @Default(false) bool valid,
-      @Default(false) bool showAdvanced,
-      @Default(true) bool advancedTest,
-      @Default({}) Map<String, String> headers}) = _AddServerState;
+  const factory AddServerState({
+    @Default(false) bool loading,
+    @Default(false) bool valid,
+    @Default(false) bool showAdvanced,
+    @Default(true) bool advancedTest,
+    @Default({}) Map<String, String> headers,
+  }) = _AddServerState;
 }

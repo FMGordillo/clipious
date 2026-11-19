@@ -11,12 +11,13 @@ class TvSubscribeButton extends StatelessWidget {
   final bool? autoFocus;
   final Function(bool focus)? onFocusChanged;
 
-  const TvSubscribeButton(
-      {super.key,
-      required this.channelId,
-      required this.subCount,
-      this.autoFocus,
-      this.onFocusChanged});
+  const TvSubscribeButton({
+    super.key,
+    required this.channelId,
+    required this.subCount,
+    this.autoFocus,
+    this.onFocusChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,49 +28,55 @@ class TvSubscribeButton extends StatelessWidget {
       create: (context) =>
           SubscribeButtonCubit(SubscribeButtonState.init(channelId)),
       child: BlocBuilder<SubscribeButtonCubit, SubscribeButtonState>(
-          builder: (context, state) {
-        var cubit = context.read<SubscribeButtonCubit>();
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: TvButton(
-            autofocus: autoFocus,
-            onFocusChanged: onFocusChanged,
-            unfocusedColor: colors.surface.withValues(alpha: 0.0),
-            onPressed: (context) {
-              if (state.isSubscribed) {
-                cubit.unsubscribe();
-              } else {
-                SubscribeButton.showSubscriptionSheet(context);
-              }
-            },
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: !state.loading
-                    ? [
-                        Icon(state.isSubscribed ? Icons.done : Icons.add),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            '${(state.isSubscribed ? locals.subscribed : locals.subscribe)} | $subCount',
+        builder: (context, state) {
+          var cubit = context.read<SubscribeButtonCubit>();
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: TvButton(
+              autofocus: autoFocus,
+              onFocusChanged: onFocusChanged,
+              unfocusedColor: colors.surface.withValues(alpha: 0.0),
+              onPressed: (context) {
+                if (state.isSubscribed) {
+                  cubit.unsubscribe();
+                } else {
+                  SubscribeButton.showSubscriptionSheet(context);
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: !state.loading
+                      ? [
+                          Icon(state.isSubscribed ? Icons.done : Icons.add),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '${(state.isSubscribed ? locals.subscribed : locals.subscribe)} | $subCount',
+                            ),
                           ),
-                        ),
-                      ]
-                    : [
-                        const Icon(Icons.people),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(locals.nSubscribers(
-                              subCount.replaceAll(RegExp(r'^0.00$'), "no"))),
-                        ),
-                      ],
+                        ]
+                      : [
+                          const Icon(Icons.people),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              locals.nSubscribers(
+                                subCount.replaceAll(RegExp(r'^0.00$'), "no"),
+                              ),
+                            ),
+                          ),
+                        ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

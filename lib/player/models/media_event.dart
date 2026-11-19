@@ -31,5 +31,5 @@ enum MediaState {
   pause,
   ready,
   error,
-  completed;
+  completed,
 }

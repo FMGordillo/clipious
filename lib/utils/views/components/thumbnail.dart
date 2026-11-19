@@ -13,34 +13,39 @@ class Thumbnail extends StatelessWidget {
   final List<String>? thumbnails;
   final BoxDecoration decoration;
 
-  const Thumbnail(
-      {super.key,
-      this.child,
-      this.thumbnails,
-      required this.decoration,
-      this.width,
-      this.height});
+  const Thumbnail({
+    super.key,
+    this.child,
+    this.thumbnails,
+    required this.decoration,
+    this.width,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
     ColorScheme colors = Theme.of(context).colorScheme;
     return FutureBuilder<Server?>(
-        future: db.getCurrentlySelectedServer(),
-        builder: (context, server) {
-          return !server.hasData || server.data == null
-              ? Container(
-                  decoration: decoration,
-                  width: width,
-                  height: height,
-                  child: child)
-              : BlocProvider(
-                  create: (context) =>
-                      ThumbnailCubit(ThumbnailState(urls: thumbnails ?? [])),
-                  child: BlocBuilder<ThumbnailCubit, ThumbnailState>(
-                      builder: (context, state) {
+      future: db.getCurrentlySelectedServer(),
+      builder: (context, server) {
+        return !server.hasData || server.data == null
+            ? Container(
+                decoration: decoration,
+                width: width,
+                height: height,
+                child: child,
+              )
+            : BlocProvider(
+                create: (context) =>
+                    ThumbnailCubit(ThumbnailState(urls: thumbnails ?? [])),
+                child: BlocBuilder<ThumbnailCubit, ThumbnailState>(
+                  builder: (context, state) {
                     if (state.selected == null) {
                       return _ErrorWidget(
-                          decoration: decoration, width: width, height: height);
+                        decoration: decoration,
+                        width: width,
+                        height: height,
+                      );
                     } else {
                       final cubit = context.read<ThumbnailCubit>();
 
@@ -55,16 +60,19 @@ class Thumbnail extends StatelessWidget {
                         errorListener: (value) => cubit.onThumbnailFailed(),
                         imageBuilder: (context, imageProvider) =>
                             AnimatedContainer(
-                          height: height,
-                          width: width,
-                          decoration: decoration.copyWith(
-                              image: DecorationImage(
-                                  image: imageProvider, fit: BoxFit.cover)),
-                          // duration: animationDuration,
-                          duration: animationDuration ~/ 2,
-                          curve: Curves.easeInOutQuad,
-                          child: child,
-                        ),
+                              height: height,
+                              width: width,
+                              decoration: decoration.copyWith(
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              // duration: animationDuration,
+                              duration: animationDuration ~/ 2,
+                              curve: Curves.easeInOutQuad,
+                              child: child,
+                            ),
                         imageUrl: url,
                         placeholderFadeInDuration: animationDuration,
                         fadeInDuration: animationDuration,
@@ -76,24 +84,28 @@ class Thumbnail extends StatelessWidget {
                         ),
                         progressIndicatorBuilder: (context, url, progress) =>
                             Container(
-                          height: height,
-                          width: width,
-                          alignment: Alignment.center,
-                          decoration: decoration.copyWith(
-                              color: colors.secondaryContainer),
-                          // duration: animationDuration,
-                          child: const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1,
-                              )),
-                        ),
+                              height: height,
+                              width: width,
+                              alignment: Alignment.center,
+                              decoration: decoration.copyWith(
+                                color: colors.secondaryContainer,
+                              ),
+                              // duration: animationDuration,
+                              child: const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                ),
+                              ),
+                            ),
                       );
                     }
-                  }),
-                );
-        });
+                  },
+                ),
+              );
+      },
+    );
   }
 }
 
@@ -114,12 +126,13 @@ class _ErrorWidget extends StatelessWidget {
       decoration: decoration.copyWith(color: colors.secondaryContainer),
       // duration: animationDuration,
       child: SizedBox(
-          height: 20,
-          width: 20,
-          child: Icon(
-            Icons.error_outline,
-            color: colors.onSecondaryContainer.withValues(alpha: 0.5),
-          )),
+        height: 20,
+        width: 20,
+        child: Icon(
+          Icons.error_outline,
+          color: colors.onSecondaryContainer.withValues(alpha: 0.5),
+        ),
+      ),
     );
   }
 }

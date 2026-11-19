@@ -28,17 +28,17 @@ class ChannelInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Thumbnail(
-              width: 50,
-              height: 50,
-              thumbnails: ImageObject.getThumbnailUrlsByPreferredOrder(
-                  channel.authorThumbnails),
-              decoration: BoxDecoration(
-                color: colors.secondaryContainer,
-                shape: BoxShape.circle,
-              )),
-          const SizedBox(
-            width: 8,
+            width: 50,
+            height: 50,
+            thumbnails: ImageObject.getThumbnailUrlsByPreferredOrder(
+              channel.authorThumbnails,
+            ),
+            decoration: BoxDecoration(
+              color: colors.secondaryContainer,
+              shape: BoxShape.circle,
+            ),
           ),
+          const SizedBox(width: 8),
           Text(
             channel.author,
             style: textTheme.titleLarge?.copyWith(color: colors.primary),
@@ -50,20 +50,26 @@ class ChannelInfo extends StatelessWidget {
         child: Row(
           children: [
             SubscribeButton(
-                channelId: channel.authorId,
-                subCount: compactCurrency.format(channel.subCount)),
+              channelId: channel.authorId,
+              subCount: compactCurrency.format(channel.subCount),
+            ),
           ],
         ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: SelectableLinkify(
-            text: channel.description,
-            linkStyle: TextStyle(
-                color: colors.primary, decoration: TextDecoration.none),
-            onOpen: (link) => launchUrl(Uri.parse(link.url),
-                mode: LaunchMode.externalApplication),
-            options: const LinkifyOptions(humanize: true, removeWww: true)),
+          text: channel.description,
+          linkStyle: TextStyle(
+            color: colors.primary,
+            decoration: TextDecoration.none,
+          ),
+          onOpen: (link) => launchUrl(
+            Uri.parse(link.url),
+            mode: LaunchMode.externalApplication,
+          ),
+          options: const LinkifyOptions(humanize: true, removeWww: true),
+        ),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -74,7 +80,8 @@ class ChannelInfo extends StatelessWidget {
       ),
     ];
 
-    widgets.add(GridView.count(
+    widgets.add(
+      GridView.count(
         crossAxisCount: getGridCount(context),
         padding: const EdgeInsets.all(4),
         crossAxisSpacing: 5,
@@ -82,12 +89,13 @@ class ChannelInfo extends StatelessWidget {
         shrinkWrap: true,
         mainAxisSpacing: 5,
         childAspectRatio: getGridAspectRatio(context),
-        children: channel.latestVideos?.map((e) {
-              return VideoListItem(
-                video: e,
-              );
+        children:
+            channel.latestVideos?.map((e) {
+              return VideoListItem(video: e);
             }).toList() ??
-            []));
+            [],
+      ),
+    );
 
     final bannerUrl = ImageObject.getBestThumbnail(channel.authorBanners)?.url;
 
@@ -98,28 +106,30 @@ class ChannelInfo extends StatelessWidget {
           if (bannerUrl != null)
             Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: innerHorizontalPadding),
+                horizontal: innerHorizontalPadding,
+              ),
               child: SizedBox(
                 height: deviceType == DeviceType.phone ? 100 : 230,
                 child: Thumbnail(
-                    width: double.infinity,
-                    thumbnails: [bannerUrl],
-                    decoration: BoxDecoration(
-                        color: colors.secondaryContainer,
-                        borderRadius: BorderRadius.circular(10))),
+                  width: double.infinity,
+                  thumbnails: [bannerUrl],
+                  decoration: BoxDecoration(
+                    color: colors.secondaryContainer,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: innerHorizontalPadding),
+            padding: const EdgeInsets.symmetric(
+              horizontal: innerHorizontalPadding,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widgets,
             ),
-          )
+          ),
         ],
       ),
     );

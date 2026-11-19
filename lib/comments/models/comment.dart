@@ -22,18 +22,19 @@ class Comment {
   CommentReplies? replies;
 
   Comment(
-      this.author,
-      this.authorThumbnails,
-      this.authorId,
-      this.authorUrl,
-      this.isEdited,
-      this.content,
-      this.publishedText,
-      this.likeCount,
-      this.commentId,
-      this.authorIsChannelOwner,
-      this.creatorHeart,
-      this.replies);
+    this.author,
+    this.authorThumbnails,
+    this.authorId,
+    this.authorUrl,
+    this.isEdited,
+    this.content,
+    this.publishedText,
+    this.likeCount,
+    this.commentId,
+    this.authorIsChannelOwner,
+    this.creatorHeart,
+    this.replies,
+  );
 
   factory Comment.fromJson(Map<String, dynamic> json) =>
       _$CommentFromJson(json);

@@ -17,8 +17,8 @@ class DeArrow {
 
   String? get thumbnailUrl => thumbnails.isNotEmpty
       ? 'https://dearrow-thumb.ajay.app/api/v1/getThumbnail?videoID=:id&time=:time'
-          .replaceAll(':id', videoId)
-          .replaceAll(":time", thumbnails.first.timestamp.toString())
+            .replaceAll(':id', videoId)
+            .replaceAll(":time", thumbnails.first.timestamp.toString())
       : null;
 
   DeArrow({required this.titles, required this.thumbnails});
@@ -33,8 +33,9 @@ class DeArrow {
     if (videos != null && process) {
       bool doThumbnails =
           db.getSettings(dearrowThumbnailsSettingName)?.value == "true";
-      var futureTasks =
-          videos.map((e) => _deArrowVideo(e, doThumbnails)).toList();
+      var futureTasks = videos
+          .map((e) => _deArrowVideo(e, doThumbnails))
+          .toList();
 
       return await Future.wait(futureTasks);
     } else {
@@ -98,12 +99,13 @@ class DeArrowTitle {
   @JsonKey(name: 'UUID')
   final String? uuid;
 
-  DeArrowTitle(
-      {this.title,
-      this.original = false,
-      this.votes = 0,
-      this.locked = false,
-      this.uuid});
+  DeArrowTitle({
+    this.title,
+    this.original = false,
+    this.votes = 0,
+    this.locked = false,
+    this.uuid,
+  });
 
   factory DeArrowTitle.fromJson(Map<String, dynamic> json) =>
       _$DeArrowTitleFromJson(json);
@@ -120,12 +122,13 @@ class DeArrowThumbnail {
   @JsonKey(name: 'UUID')
   final String? uuid;
 
-  DeArrowThumbnail(
-      {this.timestamp,
-      this.original = false,
-      this.votes = 0,
-      this.locked = false,
-      this.uuid});
+  DeArrowThumbnail({
+    this.timestamp,
+    this.original = false,
+    this.votes = 0,
+    this.locked = false,
+    this.uuid,
+  });
 
   factory DeArrowThumbnail.fromJson(Map<String, dynamic> json) =>
       _$DeArrowThumbnailFromJson(json);

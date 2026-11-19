@@ -19,10 +19,9 @@ class TvSleepTimer extends StatelessWidget {
     var locals = AppLocalizations.of(context)!;
 
     return BlocProvider(
-        create: (context) =>
-            SleepTimerCubit(const SleepTimer(stopVideo: false)),
-        child:
-            BlocBuilder<SleepTimerCubit, SleepTimer>(builder: (context, state) {
+      create: (context) => SleepTimerCubit(const SleepTimer(stopVideo: false)),
+      child: BlocBuilder<SleepTimerCubit, SleepTimer>(
+        builder: (context, state) {
           final cubit = context.read<SleepTimerCubit>();
 
           var textTheme = Theme.of(context).textTheme;
@@ -35,7 +34,8 @@ class TvSleepTimer extends StatelessWidget {
                   TvButton(
                     unfocusedColor: Colors.transparent,
                     onPressed: (context) => cubit.setDuration(
-                        state.duration - const Duration(minutes: 1)),
+                      state.duration - const Duration(minutes: 1),
+                    ),
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Icon(Icons.remove),
@@ -50,12 +50,13 @@ class TvSleepTimer extends StatelessWidget {
                   TvButton(
                     unfocusedColor: Colors.transparent,
                     onPressed: (context) => cubit.setDuration(
-                        state.duration + const Duration(minutes: 1)),
+                      state.duration + const Duration(minutes: 1),
+                    ),
                     child: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Icon(Icons.add),
                     ),
-                  )
+                  ),
                 ],
               ),
               TvSettingButton(
@@ -63,9 +64,11 @@ class TvSleepTimer extends StatelessWidget {
                 onPressed: (selected) {
                   onSet(state);
                 },
-              )
+              ),
             ],
           );
-        }));
+        },
+      ),
+    );
   }
 }

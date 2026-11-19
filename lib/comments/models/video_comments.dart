@@ -12,7 +12,11 @@ class VideoComments {
   List<Comment> comments = [];
 
   VideoComments(
-      this.commentCount, this.videoId, this.continuation, this.comments);
+    this.commentCount,
+    this.videoId,
+    this.continuation,
+    this.comments,
+  );
 
   factory VideoComments.fromJson(Map<String, dynamic> json) =>
       _$VideoCommentsFromJson(json);

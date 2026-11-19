@@ -19,11 +19,12 @@ class PlaylistList extends StatelessWidget {
   final bool canDeleteVideos;
   final bool small;
 
-  const PlaylistList(
-      {super.key,
-      required this.paginatedList,
-      required this.canDeleteVideos,
-      this.small = false});
+  const PlaylistList({
+    super.key,
+    required this.paginatedList,
+    required this.canDeleteVideos,
+    this.small = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +44,16 @@ class PlaylistList extends StatelessWidget {
                       alignment: Alignment.center,
                       color: colorScheme.surface,
                       child: Visibility(
-                          visible: state.error.isNotEmpty,
-                          child: InkWell(
-                              onTap: () => cubit.getPlaylists(),
-                              child: Text(state.error == couldNotGetPlaylits
-                                  ? locals.couldntFetchVideos
-                                  : state.error))),
+                        visible: state.error.isNotEmpty,
+                        child: InkWell(
+                          onTap: () => cubit.getPlaylists(),
+                          child: Text(
+                            state.error == couldNotGetPlaylits
+                                ? locals.couldntFetchVideos
+                                : state.error,
+                          ),
+                        ),
+                      ),
                     )
                   : Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -58,56 +63,68 @@ class PlaylistList extends StatelessWidget {
                         child: RefreshIndicator(
                           onRefresh: () =>
                               !small && state.paginatedList.hasRefresh()
-                                  ? cubit.refreshPlaylists()
-                                  : null,
+                              ? cubit.refreshPlaylists()
+                              : null,
                           child: DeviceWidget(
                             forcedTyped: small ? DeviceType.phone : null,
                             phone: ListView.builder(
-                                scrollDirection:
-                                    small ? Axis.horizontal : Axis.vertical,
-                                controller: cubit.scrollController,
-                                itemBuilder: (context, index) => index >=
-                                        state.playlists.length
-                                    ? PlaylistPlaceHolder(small: small)
-                                    : PlaylistInList(
-                                        key: ValueKey(
-                                            state.playlists[index].playlistId),
-                                        playlist: state.playlists[index],
-                                        canDeleteVideos: canDeleteVideos,
-                                        small: small),
-                                // separatorBuilder: (context, index) => const Divider(),
-                                itemCount: state.playlists.length +
-                                    (state.loading ? 7 : 0)),
+                              scrollDirection: small
+                                  ? Axis.horizontal
+                                  : Axis.vertical,
+                              controller: cubit.scrollController,
+                              itemBuilder: (context, index) =>
+                                  index >= state.playlists.length
+                                  ? PlaylistPlaceHolder(small: small)
+                                  : PlaylistInList(
+                                      key: ValueKey(
+                                        state.playlists[index].playlistId,
+                                      ),
+                                      playlist: state.playlists[index],
+                                      canDeleteVideos: canDeleteVideos,
+                                      small: small,
+                                    ),
+                              // separatorBuilder: (context, index) => const Divider(),
+                              itemCount:
+                                  state.playlists.length +
+                                  (state.loading ? 7 : 0),
+                            ),
                             tablet: GridView.builder(
-                                itemCount: state.playlists.length,
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  childAspectRatio: 16 / 12,
-                                  crossAxisCount: getGridCount(context),
-                                ),
-                                itemBuilder: (context, index) => index >=
-                                        state.playlists.length
-                                    ? const TvPlaylistPlaceHolder()
-                                    : PlaylistInList(
-                                        isTablet:
-                                            deviceType == DeviceType.tablet,
-                                        thumbnailsHeight: 160,
-                                        key: ValueKey(
-                                            state.playlists[index].playlistId),
-                                        playlist: state.playlists[index],
-                                        canDeleteVideos: canDeleteVideos,
-                                        small: false)),
+                              itemCount: state.playlists.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    childAspectRatio: 16 / 12,
+                                    crossAxisCount: getGridCount(context),
+                                  ),
+                              itemBuilder: (context, index) =>
+                                  index >= state.playlists.length
+                                  ? const TvPlaylistPlaceHolder()
+                                  : PlaylistInList(
+                                      isTablet: deviceType == DeviceType.tablet,
+                                      thumbnailsHeight: 160,
+                                      key: ValueKey(
+                                        state.playlists[index].playlistId,
+                                      ),
+                                      playlist: state.playlists[index],
+                                      canDeleteVideos: canDeleteVideos,
+                                      small: false,
+                                    ),
+                            ),
                           ),
                         ),
                       ),
                     ),
               Visibility(
-                  visible: state.loading && !small,
-                  child: const TopListLoading()),
+                visible: state.loading && !small,
+                child: const TopListLoading(),
+              ),
               Visibility(
-                  visible: !small && canDeleteVideos,
-                  child: const Positioned(
-                      bottom: 15, right: 15, child: AddPlayListButton()))
+                visible: !small && canDeleteVideos,
+                child: const Positioned(
+                  bottom: 15,
+                  right: 15,
+                  child: AddPlayListButton(),
+                ),
+              ),
             ],
           );
         },

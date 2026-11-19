@@ -21,30 +21,31 @@ class VideoTabletInnerView extends StatelessWidget {
   final VideoState videoController;
   final TabController tabController;
 
-  const VideoTabletInnerView(
-      {super.key,
-      required this.video,
-      this.playNow,
-      required this.child,
-      required this.videoController,
-      required this.tabController});
+  const VideoTabletInnerView({
+    super.key,
+    required this.video,
+    this.playNow,
+    required this.child,
+    required this.videoController,
+    required this.tabController,
+  });
 
-  List<Widget> getView(BuildContext context,
-      {required Orientation orientation}) {
+  List<Widget> getView(
+    BuildContext context, {
+    required Orientation orientation,
+  }) {
     AppLocalizations locals = AppLocalizations.of(context)!;
     var textTheme = Theme.of(context).textTheme;
     var cubit = context.read<VideoCubit>();
     var settings = context.read<SettingsCubit>();
-    String? currentlyPlayingVideoId = context
-        .select((PlayerCubit player) => player.state.currentlyPlaying?.videoId);
+    String? currentlyPlayingVideoId = context.select(
+      (PlayerCubit player) => player.state.currentlyPlaying?.videoId,
+    );
     final bool restart = currentlyPlayingVideoId == video.videoId;
     var distractionFreeMode = settings.state.distractionFreeMode;
     return [
       ConditionalWrap(
-        wrapper: (Widget child) => Expanded(
-          flex: 2,
-          child: child,
-        ),
+        wrapper: (Widget child) => Expanded(flex: 2, child: child),
         wrapIf: orientation == Orientation.landscape,
         child: Padding(
           padding: const EdgeInsets.only(right: 8.0),
@@ -59,22 +60,23 @@ class VideoTabletInnerView extends StatelessWidget {
                   thumbnails: video.deArrowThumbnailUrl != null
                       ? [video.deArrowThumbnailUrl!]
                       : ImageObject.getThumbnailUrlsByPreferredOrder(
-                          video.videoThumbnails),
+                          video.videoThumbnails,
+                        ),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       PlayButton(
                         icon: restart ? Icons.refresh : null,
                         hasAudio: !(video.liveNow ?? false),
-                        onPressed:
-                            restart ? cubit.restartVideo : cubit.playVideo,
+                        onPressed: restart
+                            ? cubit.restartVideo
+                            : cubit.playVideo,
                       ),
                       Positioned(
-                          right: 5,
-                          bottom: 3,
-                          child: AddToQueueButton(
-                            videos: [video],
-                          ))
+                        right: 5,
+                        bottom: 3,
+                        child: AddToQueueButton(videos: [video]),
+                      ),
                     ],
                   ),
                 ),
@@ -84,38 +86,43 @@ class VideoTabletInnerView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
-                        height: 25,
-                        child: Checkbox(
-                            value: settings.state.playRecommendedNext,
-                            onChanged: cubit.togglePlayRecommendedNext,
-                            visualDensity: VisualDensity.compact)),
+                      height: 25,
+                      child: Checkbox(
+                        value: settings.state.playRecommendedNext,
+                        onChanged: cubit.togglePlayRecommendedNext,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
                     InkWell(
-                        onTap: () => cubit.togglePlayRecommendedNext(
-                            !settings.state.playRecommendedNext),
-                        child: Text(
-                          locals.addRecommendedToQueue,
-                          style: textTheme.bodySmall,
-                        ))
+                      onTap: () => cubit.togglePlayRecommendedNext(
+                        !settings.state.playRecommendedNext,
+                      ),
+                      child: Text(
+                        locals.addRecommendedToQueue,
+                        style: textTheme.bodySmall,
+                      ),
+                    ),
                   ],
                 ),
               Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  // constraints: const BoxConstraints(maxWidth: 500),
-                  child: ListView(
-                    children: [
-                      VideoInfo(
-                        video: video,
-                        dislikes: videoController.dislikes,
-                        descriptionAndTags: false,
-                      )
-                    ],
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    // constraints: const BoxConstraints(maxWidth: 500),
+                    child: ListView(
+                      children: [
+                        VideoInfo(
+                          video: video,
+                          dislikes: videoController.dislikes,
+                          descriptionAndTags: false,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )),
+              ),
             ],
           ),
         ),
@@ -126,41 +133,35 @@ class VideoTabletInnerView extends StatelessWidget {
           children: [
             TabBar(
               tabs: [
-                Tab(
-                  icon: const Icon(Icons.info),
-                  text: locals.info,
-                ),
+                Tab(icon: const Icon(Icons.info), text: locals.info),
                 if (!distractionFreeMode)
                   Tab(
                     icon: const Icon(Icons.chat_bubble),
                     text: locals.comments,
                   ),
                 if (!distractionFreeMode)
-                  Tab(
-                    icon: const Icon(Icons.schema),
-                    text: locals.recommended,
-                  )
+                  Tab(icon: const Icon(Icons.schema), text: locals.recommended),
               ],
               controller: tabController,
             ),
-            Expanded(child: child)
+            Expanded(child: child),
           ],
         ),
-      )
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return OrientationBuilder(builder: (context, orientation) {
-      var deviceOrientation = getOrientation();
-      return deviceOrientation == Orientation.landscape
-          ? Row(
-              children: getView(context, orientation: deviceOrientation),
-            )
-          : Column(
-              children: getView(context, orientation: deviceOrientation),
-            );
-    });
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        var deviceOrientation = getOrientation();
+        return deviceOrientation == Orientation.landscape
+            ? Row(children: getView(context, orientation: deviceOrientation))
+            : Column(
+                children: getView(context, orientation: deviceOrientation),
+              );
+      },
+    );
   }
 }

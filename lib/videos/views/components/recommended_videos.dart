@@ -21,13 +21,11 @@ class RecommendedVideos extends StatelessWidget {
       ),
     ];
 
-    widgets.addAll(video.recommendedVideos
-        .where((element) => !element.filterHide)
-        .map((e) {
-      return VideoListItem(
-        video: e,
-      );
-    }).toList());
+    widgets.addAll(
+      video.recommendedVideos.where((element) => !element.filterHide).map((e) {
+        return VideoListItem(video: e);
+      }).toList(),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

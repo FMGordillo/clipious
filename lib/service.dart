@@ -87,7 +87,8 @@ class Service {
   handleResponse(Response response) {
     var body = utf8.decode(response.bodyBytes);
     log.info(
-        "Response from ${response.request?.method} ${urlFormatForLog(response.request?.url)}, status: ${response.statusCode}");
+      "Response from ${response.request?.method} ${urlFormatForLog(response.request?.url)}, status: ${response.statusCode}",
+    );
 
     if (body.isNotEmpty) {
       var decoded = jsonDecode(body);
@@ -107,9 +108,11 @@ class Service {
       return decoded;
     } else if (response.statusCode < 200 || response.statusCode >= 400) {
       log.severe(
-          'Error making request to ${response.request?.url}, \n status: ${response.statusCode}, \n Body: ${response.body}');
+        'Error making request to ${response.request?.url}, \n status: ${response.statusCode}, \n Body: ${response.body}',
+      );
       throw InvidiousServiceError(
-          'Couldn\'t make request, response code: ${response.statusCode}');
+        'Couldn\'t make request, response code: ${response.statusCode}',
+      );
     }
   }
 
@@ -117,13 +120,15 @@ class Service {
     return db.getSettings(useProxySettingName)?.value == 'true';
   }
 
-  Future<ServerRequest> buildRequest(String baseUrl,
-      {Map<String, String>? pathParams,
-      Map<String, String?>? query,
-      bool authenticated = false,
-      bool utf16 = false,
-      bool forceJson = false,
-      Server? serverOverride}) async {
+  Future<ServerRequest> buildRequest(
+    String baseUrl, {
+    Map<String, String>? pathParams,
+    Map<String, String?>? query,
+    bool authenticated = false,
+    bool utf16 = false,
+    bool forceJson = false,
+    Server? serverOverride,
+  }) async {
     try {
       final server = serverOverride ?? (await db.getCurrentlySelectedServer());
       String url = '${(server).url}$baseUrl';
@@ -175,29 +180,39 @@ class Service {
   handleErrors(Response response) {}
 
   Future<Video> getVideo(String videoId, {Server? serverOverride}) async {
-    var req = await buildRequest(urlGetVideo,
-        pathParams: {':id': videoId},
-        utf16: true,
-        serverOverride: serverOverride);
+    var req = await buildRequest(
+      urlGetVideo,
+      pathParams: {':id': videoId},
+      utf16: true,
+      serverOverride: serverOverride,
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
 
     var video = Video.fromJson(handleResponse(response));
     video = (await DeArrow.processVideos([video]))[0];
     video = video.copyWith(
-        recommendedVideos:
-            (await postProcessVideos(video.recommendedVideos)).cast());
+      recommendedVideos: (await postProcessVideos(
+        video.recommendedVideos,
+      )).cast(),
+    );
     return video;
   }
 
   Future<String> loginWithCookies(
-      String serverUrl, String username, String password,
-      {Map<String, String>? headers}) async {
+    String serverUrl,
+    String username,
+    String password, {
+    Map<String, String>? headers,
+  }) async {
     try {
       String url = '$serverUrl/login?type=invidious';
       var map = {'email': username, 'password': password};
 
-      final response =
-          await httpClient.post(Uri.parse(url), body: map, headers: headers);
+      final response = await httpClient.post(
+        Uri.parse(url),
+        body: map,
+        headers: headers,
+      );
       if (response.statusCode == 302 &&
           response.headers.containsKey('set-cookie')) {
         // we have a cookie to parse
@@ -206,12 +221,16 @@ class Service {
             .firstWhere((element) => element.startsWith('SID='));
       } else {
         throw InvidiousServiceError(
-            'wrong error code (${response.statusCode}) or no cookie headers: ${response.headers['set-cookie']}');
+          'wrong error code (${response.statusCode}) or no cookie headers: ${response.headers['set-cookie']}',
+        );
       }
     } catch (err, stacktrace) {
       if (err is InvidiousServiceError) {
-        log.severe('Failed to log in with cookies: \n ${err.message}', err,
-            stacktrace);
+        log.severe(
+          'Failed to log in with cookies: \n ${err.message}',
+          err,
+          stacktrace,
+        );
       }
       throw InvidiousServiceError('Wrong username or password');
     }
@@ -221,7 +240,9 @@ class Service {
     String url =
         '$serverUrl/authorize_token?scopes=:feed,:subscriptions*,:playlists*,:history*&callback_url=clipious-auth://';
     final result = await FlutterWebAuth2.authenticate(
-        url: url, callbackUrlScheme: 'clipious-auth');
+      url: url,
+      callbackUrlScheme: 'clipious-auth',
+    );
 
     final token = Uri.parse(result).queryParameters['token'];
 
@@ -250,7 +271,8 @@ class Service {
       return {'Cookie': s.sidCookie!};
     } else {
       throw InvidiousServiceError(
-          'No authentication method provided to access authenticated endpoint');
+        'No authentication method provided to access authenticated endpoint',
+      );
     }
   }
 
@@ -281,22 +303,27 @@ class Service {
     return list;
   }
 
-  Future<SearchResults> search(String query,
-      {SearchType? type,
-      int? page,
-      SearchSortBy? sortBy,
-      SearchDate date = SearchDate.any,
-      SearchDuration duration = SearchDuration.any}) async {
+  Future<SearchResults> search(
+    String query, {
+    SearchType? type,
+    int? page,
+    SearchSortBy? sortBy,
+    SearchDate date = SearchDate.any,
+    SearchDuration duration = SearchDuration.any,
+  }) async {
     String countryCode = db.getSettings(browsingCountry)?.value ?? 'US';
-    final req = await buildRequest(urlSearch, query: {
-      'q': Uri.encodeQueryComponent(query),
-      'type': type?.name,
-      'page': page?.toString() ?? '1',
-      'sort': sortBy?.name,
-      'region': countryCode,
-      'date': date != SearchDate.any ? date.name : null,
-      'duration': duration != SearchDuration.any ? duration.name : null,
-    });
+    final req = await buildRequest(
+      urlSearch,
+      query: {
+        'q': Uri.encodeQueryComponent(query),
+        'type': type?.name,
+        'page': page?.toString() ?? '1',
+        'sort': sortBy?.name,
+        'region': countryCode,
+        'date': date != SearchDate.any ? date.name : null,
+        'duration': duration != SearchDuration.any ? duration.name : null,
+      },
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
     Iterable i = handleResponse(response);
     // only getting videos for now
@@ -324,21 +351,24 @@ class Service {
     return results;
   }
 
-  Future<UserFeed> getUserFeed(
-      {int? maxResults, int? page, bool saveLastSeen = true}) async {
+  Future<UserFeed> getUserFeed({
+    int? maxResults,
+    int? page,
+    bool saveLastSeen = true,
+  }) async {
     // for background service to be able to use
-    final req = await buildRequest(urlGetUserFeed,
-        query: {
-          'max_results': maxResults?.toString(),
-          'page': page?.toString()
-        },
-        authenticated: true);
+    final req = await buildRequest(
+      urlGetUserFeed,
+      query: {'max_results': maxResults?.toString(), 'page': page?.toString()},
+      authenticated: true,
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     var feed = UserFeed.fromJson(handleResponse(response));
     feed.videos = (await postProcessVideos(feed.videos ?? [])).cast();
-    feed.notifications =
-        (await postProcessVideos(feed.notifications ?? [])).cast();
+    feed.notifications = (await postProcessVideos(
+      feed.notifications ?? [],
+    )).cast();
 
     // we only save the last video seen if we're on the first page otherwise it does not make sense
     if (saveLastSeen && (page ?? 1) == 1) {
@@ -346,7 +376,9 @@ class Service {
       videos.addAll(feed.videos ?? []);
       if (videos.isNotEmpty) {
         var toSave = SubscriptionNotification(
-            videos.first.videoId, DateTime.now().millisecondsSinceEpoch);
+          videos.first.videoId,
+          DateTime.now().millisecondsSinceEpoch,
+        );
         await fileDb.setLastSubscriptionNotification(toSave);
       }
     }
@@ -355,7 +387,9 @@ class Service {
   }
 
   Future<List<SponsorSegment>> getSponsorSegments(
-      String videoId, List<SponsorSegmentType> categories) async {
+    String videoId,
+    List<SponsorSegmentType> categories,
+  ) async {
     try {
       String url = urlGetSponsorSegments.replaceAll(":id", videoId);
 
@@ -368,7 +402,8 @@ class Service {
       final response = await httpClient.get(Uri.parse(url));
       Iterable i = handleResponse(response);
       return List<SponsorSegment>.from(
-          i.map((e) => SponsorSegment.fromJson(e)));
+        i.map((e) => SponsorSegment.fromJson(e)),
+      );
     } catch (err) {
       return [];
     }
@@ -401,18 +436,29 @@ class Service {
 
   Future<SearchSuggestion> getSearchSuggestion(String query) async {
     if (query.isEmpty) return SearchSuggestion(query, []);
-    var request = await buildRequest(urlSearchSuggestions,
-        query: {"q": Uri.encodeQueryComponent(query)});
-    final response =
-        await httpClient.get(request.uri, headers: request.headers);
-    SearchSuggestion search =
-        SearchSuggestion.fromJson(handleResponse(response));
+    var request = await buildRequest(
+      urlSearchSuggestions,
+      query: {"q": Uri.encodeQueryComponent(query)},
+    );
+    final response = await httpClient.get(
+      request.uri,
+      headers: request.headers,
+    );
+    SearchSuggestion search = SearchSuggestion.fromJson(
+      handleResponse(response),
+    );
     if (search.suggestions.any((element) => element.contains(";"))) {
       search.suggestions = search.suggestions
-          .map((s) => s.replaceAll(" ", "&#32;").replaceAllMapped(
-              RegExp(r"&#\w*;"),
-              (m) => String.fromCharCode(
-                  int.parse(m[0]!.replaceAll(RegExp(r"&#|;"), "")))))
+          .map(
+            (s) => s
+                .replaceAll(" ", "&#32;")
+                .replaceAllMapped(
+                  RegExp(r"&#\w*;"),
+                  (m) => String.fromCharCode(
+                    int.parse(m[0]!.replaceAll(RegExp(r"&#|;"), "")),
+                  ),
+                ),
+          )
           .toList();
     }
 
@@ -420,7 +466,9 @@ class Service {
   }
 
   Future<void> validateServer(
-      String serverUrl, Map<String, String>? headers) async {
+    String serverUrl,
+    Map<String, String>? headers,
+  ) async {
     try {
       String url = serverUrl + urlStats;
       log.info('Calling $url');
@@ -450,8 +498,11 @@ class Service {
 
   Future<bool> subscribe(String channelId) async {
     if (!await isLoggedIn()) return false;
-    final req = await buildRequest(urlAddDeleteSubscriptions,
-        pathParams: {":ucid": channelId}, authenticated: true);
+    final req = await buildRequest(
+      urlAddDeleteSubscriptions,
+      pathParams: {":ucid": channelId},
+      authenticated: true,
+    );
 
     final response = await httpClient.post(req.uri, headers: req.headers);
     log.info('${response.statusCode} - ${response.body}');
@@ -466,8 +517,11 @@ class Service {
   Future<bool> unSubscribe(String channelId) async {
     if (!await isLoggedIn()) return false;
 
-    final req = await buildRequest(urlAddDeleteSubscriptions,
-        pathParams: {":ucid": channelId}, authenticated: true);
+    final req = await buildRequest(
+      urlAddDeleteSubscriptions,
+      pathParams: {":ucid": channelId},
+      authenticated: true,
+    );
 
     final response = await httpClient.delete(req.uri, headers: req.headers);
     log.info('${response.statusCode} - ${response.body}');
@@ -482,8 +536,9 @@ class Service {
   Future<bool> isSubscribedToChannel(String channelId) async {
     if (!await isLoggedIn()) return false;
 
-    return (await getSubscriptions())
-            .indexWhere((element) => element.authorId == channelId) >
+    return (await getSubscriptions()).indexWhere(
+          (element) => element.authorId == channelId,
+        ) >
         -1;
   }
 
@@ -498,8 +553,12 @@ class Service {
     return List<Subscription>.from(i.map((e) => Subscription.fromJson(e)));
   }
 
-  Future<VideoComments> getComments(String videoId,
-      {String? continuation, String? sortBy, String? source}) async {
+  Future<VideoComments> getComments(
+    String videoId, {
+    String? continuation,
+    String? sortBy,
+    String? source,
+  }) async {
     Map<String, String> queryStr = {};
     if (continuation != null) {
       queryStr.putIfAbsent('continuation', () => continuation);
@@ -507,8 +566,11 @@ class Service {
     if (sortBy != null) queryStr.putIfAbsent('sort_by', () => sortBy);
     if (source != null) queryStr.putIfAbsent('source', () => source);
 
-    var req = await buildRequest(urlGetComments,
-        pathParams: {':id': videoId}, query: queryStr);
+    var req = await buildRequest(
+      urlGetComments,
+      pathParams: {':id': videoId},
+      query: queryStr,
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
     return VideoComments.fromJson(handleResponse(response));
   }
@@ -516,74 +578,97 @@ class Service {
   Future<Channel> getChannel(String channelId) async {
     // sometimes the api gives the channel with /channel/<channelid> format
     channelId = channelId.replaceAll("/channel/", '');
-    var req = await buildRequest(urlGetChannel,
-        pathParams: {':id': channelId}, utf16: true);
+    var req = await buildRequest(
+      urlGetChannel,
+      pathParams: {':id': channelId},
+      utf16: true,
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
 
     var channel = Channel.fromJson(handleResponse(response));
-    channel.latestVideos =
-        (await postProcessVideos(channel.latestVideos ?? [])).cast();
+    channel.latestVideos = (await postProcessVideos(
+      channel.latestVideos ?? [],
+    )).cast();
 
     if (channel.latestVideos != null && channel.latestVideos!.isNotEmpty) {
       await fileDb.setChannelNotificationLastViewedVideo(
-          channel.authorUrl, channel.latestVideos![0].videoId);
+        channel.authorUrl,
+        channel.latestVideos![0].videoId,
+      );
     }
     return channel;
   }
 
   Future<VideosWithContinuation> getChannelVideos(
-      String channelId, String? continuation,
-      {bool saveLastSeen = true,
-      ChannelSortBy sortBy = ChannelSortBy.newest}) async {
-    final req = await buildRequest(urlGetChannelVideos,
-        pathParams: {':id': channelId},
-        query: {
-          'continuation': continuation,
-          'sort_by': sortBy.name,
-        },
-        utf16: true);
+    String channelId,
+    String? continuation, {
+    bool saveLastSeen = true,
+    ChannelSortBy sortBy = ChannelSortBy.newest,
+  }) async {
+    final req = await buildRequest(
+      urlGetChannelVideos,
+      pathParams: {':id': channelId},
+      query: {'continuation': continuation, 'sort_by': sortBy.name},
+      utf16: true,
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
 
-    var videosWithContinuation =
-        VideosWithContinuation.fromJson(handleResponse(response));
-    videosWithContinuation.videos =
-        (await postProcessVideos(videosWithContinuation.videos)).cast();
+    var videosWithContinuation = VideosWithContinuation.fromJson(
+      handleResponse(response),
+    );
+    videosWithContinuation.videos = (await postProcessVideos(
+      videosWithContinuation.videos,
+    )).cast();
 
     if (saveLastSeen && videosWithContinuation.videos.isNotEmpty) {
       await fileDb.setChannelNotificationLastViewedVideo(
-          channelId, videosWithContinuation.videos.first.videoId);
+        channelId,
+        videosWithContinuation.videos.first.videoId,
+      );
     }
     return videosWithContinuation;
   }
 
   Future<VideosWithContinuation> getChannelStreams(
-      String channelId, String? continuation) async {
-    final req = await buildRequest(urlGetChannelStreams,
-        pathParams: {':id': channelId},
-        query: {'continuation': continuation},
-        utf16: true);
+    String channelId,
+    String? continuation,
+  ) async {
+    final req = await buildRequest(
+      urlGetChannelStreams,
+      pathParams: {':id': channelId},
+      query: {'continuation': continuation},
+      utf16: true,
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
 
-    var videosWithContinuation =
-        VideosWithContinuation.fromJson(handleResponse(response));
-    videosWithContinuation.videos =
-        (await postProcessVideos(videosWithContinuation.videos)).cast();
+    var videosWithContinuation = VideosWithContinuation.fromJson(
+      handleResponse(response),
+    );
+    videosWithContinuation.videos = (await postProcessVideos(
+      videosWithContinuation.videos,
+    )).cast();
     return videosWithContinuation;
   }
 
   Future<VideosWithContinuation> getChannelShorts(
-      String channelId, String? continuation) async {
-    final req = await buildRequest(urlGetChannelShorts,
-        pathParams: {':id': channelId},
-        query: {'continuation': continuation},
-        utf16: true);
+    String channelId,
+    String? continuation,
+  ) async {
+    final req = await buildRequest(
+      urlGetChannelShorts,
+      pathParams: {':id': channelId},
+      query: {'continuation': continuation},
+      utf16: true,
+    );
     final response = await httpClient.get(req.uri, headers: req.headers);
 
-    var videosWithContinuation =
-        VideosWithContinuation.fromJson(handleResponse(response));
-    videosWithContinuation.videos =
-        (await postProcessVideos(videosWithContinuation.videos)).cast();
+    var videosWithContinuation = VideosWithContinuation.fromJson(
+      handleResponse(response),
+    );
+    videosWithContinuation.videos = (await postProcessVideos(
+      videosWithContinuation.videos,
+    )).cast();
     return videosWithContinuation;
   }
 
@@ -607,10 +692,15 @@ class Service {
     }
   }
 
-  Future<ChannelPlaylists> getChannelPlaylists(String channelId,
-      {String? continuation}) async {
-    final req = await buildRequest(urlGetChannelPlaylists,
-        pathParams: {':id': channelId}, query: {'continuation': continuation});
+  Future<ChannelPlaylists> getChannelPlaylists(
+    String channelId, {
+    String? continuation,
+  }) async {
+    final req = await buildRequest(
+      urlGetChannelPlaylists,
+      pathParams: {':id': channelId},
+      query: {'continuation': continuation},
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     var channelPlaylists = ChannelPlaylists.fromJson(handleResponse(response));
@@ -623,59 +713,77 @@ class Service {
   }
 
   Future<String?> createPlayList(String name, String type) async {
-    var req = await buildRequest(urlPostUserPlaylists,
-        authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlPostUserPlaylists,
+      authenticated: true,
+      forceJson: true,
+    );
 
-    Map<String, String> body = {
-      'title': name,
-      'privacy': type,
-    };
+    Map<String, String> body = {'title': name, 'privacy': type};
 
     log.info(jsonEncode(body));
 
-    final response = await httpClient.post(req.uri,
-        headers: req.headers, body: jsonEncode(body));
+    final response = await httpClient.post(
+      req.uri,
+      headers: req.headers,
+      body: jsonEncode(body),
+    );
     Map<String, dynamic> playlist = handleResponse(response);
     return playlist['playlistId'] as String;
   }
 
   Future<void> addVideoToPlaylist(String playListId, String videoId) async {
-    var req = await buildRequest(urlPostUserPlaylistVideo,
-        pathParams: {":id": playListId}, authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlPostUserPlaylistVideo,
+      pathParams: {":id": playListId},
+      authenticated: true,
+      forceJson: true,
+    );
 
-    Map<String, String> body = {
-      'videoId': videoId,
-    };
+    Map<String, String> body = {'videoId': videoId};
 
-    final response = await httpClient.post(req.uri,
-        headers: req.headers, body: jsonEncode(body));
+    final response = await httpClient.post(
+      req.uri,
+      headers: req.headers,
+      body: jsonEncode(body),
+    );
     handleResponse(response);
   }
 
   Future<void> deleteUserPlaylist(String playListId) async {
-    var req = await buildRequest(urlDeleteUserPlaylist,
-        pathParams: {":id": playListId}, authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlDeleteUserPlaylist,
+      pathParams: {":id": playListId},
+      authenticated: true,
+      forceJson: true,
+    );
 
     final response = await httpClient.delete(req.uri, headers: req.headers);
     handleResponse(response);
   }
 
   Future<void> deleteUserPlaylistVideo(
-      String playListId, String indexId) async {
-    final req = await buildRequest(urlDeleteUserPlaylistVideo,
-        pathParams: {':id': playListId, ':index': indexId},
-        authenticated: true,
-        forceJson: true);
+    String playListId,
+    String indexId,
+  ) async {
+    final req = await buildRequest(
+      urlDeleteUserPlaylistVideo,
+      pathParams: {':id': playListId, ':index': indexId},
+      authenticated: true,
+      forceJson: true,
+    );
 
     final response = await httpClient.delete(req.uri, headers: req.headers);
     handleResponse(response);
   }
 
   Future<List<String>> getUserHistory(int page, int maxResults) async {
-    final req = await buildRequest(urlGetClearHistory,
-        query: {'page': page.toString(), 'max_results': maxResults.toString()},
-        authenticated: true,
-        forceJson: true);
+    final req = await buildRequest(
+      urlGetClearHistory,
+      query: {'page': page.toString(), 'max_results': maxResults.toString()},
+      authenticated: true,
+      forceJson: true,
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     Iterable i = handleResponse(response);
@@ -686,9 +794,12 @@ class Service {
   void syncHistory() async {
     try {
       if (await db.isLoggedInToCurrentServer()) {
-        (await getUserHistory(1, 200))
-            .where((element) => db.getVideoProgress(element) == 0)
-            .forEach((element) async {
+        (await getUserHistory(
+          1,
+          200,
+        )).where((element) => db.getVideoProgress(element) == 0).forEach((
+          element,
+        ) async {
           await db.saveProgress(Progress.named(progress: 1, videoId: element));
           log.fine('updated watch status of $element');
         });
@@ -699,23 +810,34 @@ class Service {
   }
 
   Future<void> clearUserHistory() async {
-    var req = await buildRequest(urlGetClearHistory,
-        authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlGetClearHistory,
+      authenticated: true,
+      forceJson: true,
+    );
 
     final response = await httpClient.delete(req.uri, headers: req.headers);
     handleResponse(response);
   }
 
   Future<void> deleteFromUserHistory(String videoId) async {
-    var req = await buildRequest(urlAddDeleteHistory,
-        pathParams: {':id': videoId}, authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlAddDeleteHistory,
+      pathParams: {':id': videoId},
+      authenticated: true,
+      forceJson: true,
+    );
     final response = await httpClient.delete(req.uri, headers: req.headers);
     handleResponse(response);
   }
 
   Future<void> addToUserHistory(String videoId) async {
-    var req = await buildRequest(urlAddDeleteHistory,
-        pathParams: {':id': videoId}, authenticated: true, forceJson: true);
+    var req = await buildRequest(
+      urlAddDeleteHistory,
+      pathParams: {':id': videoId},
+      authenticated: true,
+      forceJson: true,
+    );
 
     final response = await httpClient.post(req.uri, headers: req.headers);
     handleResponse(response);
@@ -725,8 +847,10 @@ class Service {
     int start = DateTime.now().millisecondsSinceEpoch;
     String fullUri = '$url$urlStats';
     log.fine('ping $fullUri');
-    final response = await httpClient.get(Uri.parse(fullUri),
-        headers: {'Content-Type': 'application/json; charset=utf-16'});
+    final response = await httpClient.get(
+      Uri.parse(fullUri),
+      headers: {'Content-Type': 'application/json; charset=utf-16'},
+    );
 
     try {
       handleResponse(response);
@@ -739,16 +863,18 @@ class Service {
   }
 
   Future<List<InvidiousPublicServer>> getPublicServers() async {
-    final response =
-        await httpClient.get(Uri.parse(urlGetInvidiousPublicServers));
+    final response = await httpClient.get(
+      Uri.parse(urlGetInvidiousPublicServers),
+    );
     List<InvidiousPublicServer> servers = [];
     Iterable i = handleResponse(response);
 
     for (var element in i) {
       Iterable s = element as Iterable;
       if (s.length == 2) {
-        servers.add(InvidiousPublicServer.fromJson(
-            s.toList()[1] as Map<String, dynamic>));
+        servers.add(
+          InvidiousPublicServer.fromJson(s.toList()[1] as Map<String, dynamic>),
+        );
       }
     }
 
@@ -757,36 +883,49 @@ class Service {
         .toList();
   }
 
-  Future<Playlist> getPublicPlaylists(String playlistId,
-      {int? page, bool saveLastSeen = true}) async {
-    final req = await buildRequest(urlGetPublicPlaylist,
-        pathParams: {':id': playlistId}, query: {'page': page?.toString()});
+  Future<Playlist> getPublicPlaylists(
+    String playlistId, {
+    int? page,
+    bool saveLastSeen = true,
+  }) async {
+    final req = await buildRequest(
+      urlGetPublicPlaylist,
+      pathParams: {':id': playlistId},
+      query: {'page': page?.toString()},
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     var playlist = Playlist.fromJson(handleResponse(response));
     var oldLength = playlist.videos.length;
     playlist = playlist.copyWith(
-        videos: await postProcessVideos(playlist.videos),
-        removedByFilter: oldLength - playlist.videos.length);
+      videos: await postProcessVideos(playlist.videos),
+      removedByFilter: oldLength - playlist.videos.length,
+    );
 
     if (saveLastSeen) {
       await fileDb.setPlaylistNotificationLastViewedVideo(
-          playlist.playlistId, playlist.videoCount);
+        playlist.playlistId,
+        playlist.videoCount,
+      );
     }
 
     return playlist;
   }
 
   Future<Playlist> getUserPlaylist(String playlistId) async {
-    final req = await buildRequest(urlGetUserPlaylist,
-        pathParams: {':id': playlistId}, authenticated: true);
+    final req = await buildRequest(
+      urlGetUserPlaylist,
+      pathParams: {':id': playlistId},
+      authenticated: true,
+    );
 
     final response = await httpClient.get(req.uri, headers: req.headers);
     var playlist = Playlist.fromJson(handleResponse(response));
     var oldLength = playlist.videos.length;
     playlist = playlist.copyWith(
-        videos: await postProcessVideos(playlist.videos),
-        removedByFilter: oldLength - playlist.videos.length);
+      videos: await postProcessVideos(playlist.videos),
+      removedByFilter: oldLength - playlist.videos.length,
+    );
 
     return playlist;
   }
@@ -795,10 +934,12 @@ class Service {
     final customUrl =
         db.getSettings(returnYoutubeDislikeUrlSettingName)?.value ?? '';
 
-    Uri uri = Uri.parse((customUrl.trim().isNotEmpty
-            ? '${customUrl}votes?videoId='
-            : urlGetDislikes) +
-        videoId);
+    Uri uri = Uri.parse(
+      (customUrl.trim().isNotEmpty
+              ? '${customUrl}votes?videoId='
+              : urlGetDislikes) +
+          videoId,
+    );
 
     final response = await httpClient.get(uri);
     return Dislike.fromJson(handleResponse(response));

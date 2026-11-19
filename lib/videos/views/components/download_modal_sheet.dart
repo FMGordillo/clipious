@@ -20,43 +20,55 @@ class DownloadModalSheet extends StatelessWidget {
   // called when we know whether we can start downloading stuff
   final Function(bool isDownloadStarted)? onDownloadStarted;
 
-  const DownloadModalSheet(
-      {super.key,
-      required this.video,
-      this.onDownloadStarted,
-      this.onDownload});
+  const DownloadModalSheet({
+    super.key,
+    required this.video,
+    this.onDownloadStarted,
+    this.onDownload,
+  });
 
-  static void showVideoModalSheet(BuildContext context, Video video,
-      {Function(bool isDownloadStarted)? onDownloadStarted,
-      Function()? onDownload}) {
+  static void showVideoModalSheet(
+    BuildContext context,
+    Video video, {
+    Function(bool isDownloadStarted)? onDownloadStarted,
+    Function()? onDownload,
+  }) {
     showSafeModalBottomSheet<void>(
-        enableDrag: true,
-        showDragHandle: true,
-        context: context,
-        builder: (BuildContext context) {
-          return DownloadModalSheet(
-            video: video,
-            onDownload: onDownload,
-            onDownloadStarted: onDownloadStarted,
-          );
-        });
+      enableDrag: true,
+      showDragHandle: true,
+      context: context,
+      builder: (BuildContext context) {
+        return DownloadModalSheet(
+          video: video,
+          onDownload: onDownload,
+          onDownloadStarted: onDownloadStarted,
+        );
+      },
+    );
   }
 
   void downloadVideo(
-      BuildContext context, DownloadModalSheetState state) async {
+    BuildContext context,
+    DownloadModalSheetState state,
+  ) async {
     var downloadManager = context.read<DownloadManagerCubit>();
     if (onDownload != null) {
       onDownload!();
     }
     var locals = AppLocalizations.of(context)!;
     Navigator.of(context).pop();
-    scaffoldKey.currentState
-        ?.showSnackBar(SnackBar(content: Text(locals.videoDownloadStarted)));
-    bool canDownload = await downloadManager.addDownload(video.videoId,
-        audioOnly: state.audioOnly, quality: state.quality);
+    scaffoldKey.currentState?.showSnackBar(
+      SnackBar(content: Text(locals.videoDownloadStarted)),
+    );
+    bool canDownload = await downloadManager.addDownload(
+      video.videoId,
+      audioOnly: state.audioOnly,
+      quality: state.quality,
+    );
     if (!canDownload) {
       scaffoldKey.currentState?.showSnackBar(
-          SnackBar(content: Text(locals.videoAlreadyDownloaded)));
+        SnackBar(content: Text(locals.videoAlreadyDownloaded)),
+      );
     }
     if (onDownloadStarted != null) {
       onDownloadStarted!(canDownload);
@@ -70,78 +82,83 @@ class DownloadModalSheet extends StatelessWidget {
       create: (BuildContext context) =>
           DownloadModalSheetCubit(const DownloadModalSheetState(), video),
       child: BlocBuilder<DownloadModalSheetCubit, DownloadModalSheetState>(
-          builder: (context, state) {
-        var cubit = context.read<DownloadModalSheetCubit>();
-        return AnimatedSwitcher(
-          duration: animationDuration,
-          switchInCurve: animationCurve,
-          switchOutCurve: animationCurve,
-          child: state.loading
-              ? const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  ],
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
+        builder: (context, state) {
+          var cubit = context.read<DownloadModalSheetCubit>();
+          return AnimatedSwitcher(
+            duration: animationDuration,
+            switchInCurve: animationCurve,
+            switchOutCurve: animationCurve,
+            child: state.loading
+                ? const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Row(
-                              children: [
-                                Text(locals.quality),
-                                const Gap(10),
-                                DropdownButton<String>(
-                                  value: state.availableQualities
-                                      .map((e) => e.qualityLabel)
-                                      .where((e) => e == state.quality)
-                                      .firstOrNull,
-                                  onChanged: state.audioOnly
-                                      ? null
-                                      : (value) => cubit.setQuality(value),
-                                  items: state.availableQualities
-                                      .map((e) => DropdownMenuItem<String>(
-                                          value: e.qualityLabel,
-                                          child: Text(
-                                              '${e.qualityLabel ?? ''} (~${prettyBytes(double.parse(e.clen))})')))
-                                      .toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () => cubit.setAudioOnly(!state.audioOnly),
-                            child: Row(
-                              children: [
-                                Text(locals.videoDownloadAudioOnly),
-                                const Gap(10),
-                                Switch(
-                                  value: state.audioOnly,
-                                  onChanged: cubit.setAudioOnly,
-                                )
-                              ],
-                            ),
-                          ),
-                          IconButton.filledTonal(
-                            onPressed: () => downloadVideo(context, state),
-                            icon: const Icon(Icons.download),
-                          )
-                        ],
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: CircularProgressIndicator(),
                       ),
                     ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Text(locals.quality),
+                                  const Gap(10),
+                                  DropdownButton<String>(
+                                    value: state.availableQualities
+                                        .map((e) => e.qualityLabel)
+                                        .where((e) => e == state.quality)
+                                        .firstOrNull,
+                                    onChanged: state.audioOnly
+                                        ? null
+                                        : (value) => cubit.setQuality(value),
+                                    items: state.availableQualities
+                                        .map(
+                                          (e) => DropdownMenuItem<String>(
+                                            value: e.qualityLabel,
+                                            child: Text(
+                                              '${e.qualityLabel ?? ''} (~${prettyBytes(double.parse(e.clen))})',
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => cubit.setAudioOnly(!state.audioOnly),
+                              child: Row(
+                                children: [
+                                  Text(locals.videoDownloadAudioOnly),
+                                  const Gap(10),
+                                  Switch(
+                                    value: state.audioOnly,
+                                    onChanged: cubit.setAudioOnly,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton.filledTonal(
+                              onPressed: () => downloadVideo(context, state),
+                              icon: const Icon(Icons.download),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

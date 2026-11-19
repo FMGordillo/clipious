@@ -76,16 +76,17 @@ class VideoFilter {
   bool hideFromFeed = false;
 
   VideoFilter._(
-      this.uuid,
-      this.channelId,
-      this.operation,
-      this.type,
-      this.value,
-      this.filterAll,
-      this.hideFromFeed,
-      this.daysOfWeek,
-      this.startTime,
-      this.endTime);
+    this.uuid,
+    this.channelId,
+    this.operation,
+    this.type,
+    this.value,
+    this.filterAll,
+    this.hideFromFeed,
+    this.daysOfWeek,
+    this.startTime,
+    this.endTime,
+  );
 
   VideoFilter({required this.value, this.channelId});
 
@@ -103,8 +104,9 @@ class VideoFilter {
   Map<String, dynamic> toJson() => _$VideoFilterToJson(this);
 
   set dbType(String? value) {
-    type =
-        FilterType.values.where((element) => element.name == value).firstOrNull;
+    type = FilterType.values
+        .where((element) => element.name == value)
+        .firstOrNull;
   }
 
   String? get dbOperation {
@@ -123,9 +125,10 @@ class VideoFilter {
     final filterHide = matches.any((element) => element.hideFromFeed);
 
     return v.copyWith(
-        matchedFilters: matches,
-        filtered: matches.isNotEmpty,
-        filterHide: filterHide);
+      matchedFilters: matches,
+      filtered: matches.isNotEmpty,
+      filterHide: filterHide,
+    );
   }
 
   /// Returns the number of videos removed
@@ -134,7 +137,7 @@ class VideoFilter {
 
     log.fine('filtering videos, we have ${filters.length} filters');
 
-/*
+    /*
     videos = await Future.wait(videos?.map((v) {
           return compute((message) => _innerFilterVideo(message.first, message.last), Couple(v, filters));
         }).toList() ??
@@ -160,7 +163,8 @@ class VideoFilter {
     // Channel hide all
     if (channelId != null && filterAll == true && videoChannel == channelId) {
       log.fine(
-          'Video filtered because hide all == $filterAll, video channel id: $videoChannel, channel id $channelId');
+        'Video filtered because hide all == $filterAll, video channel id: $videoChannel, channel id $channelId',
+      );
       return !isTimeAllowed();
     }
 
@@ -201,30 +205,34 @@ class VideoFilter {
 
     if (isDayAllowed) {
       log.fine(
-          "Filter daysOfWeek $daysOfWeek, now day of week: ${now.weekday}");
+        "Filter daysOfWeek $daysOfWeek, now day of week: ${now.weekday}",
+      );
       return true;
     }
 
     List<String> safeStartTime =
         (startTime.isEmpty ? defaultStartTime : startTime).split(":");
-    List<String> safeEndTime =
-        (endTime.isEmpty ? defaultEndTime : endTime).split(":");
+    List<String> safeEndTime = (endTime.isEmpty ? defaultEndTime : endTime)
+        .split(":");
 
     DateTime startDateTime = DateTime.now().copyWith(
-        hour: int.parse(safeStartTime[0]),
-        minute: int.parse(safeStartTime[1]),
-        second: int.parse(safeStartTime[2]));
+      hour: int.parse(safeStartTime[0]),
+      minute: int.parse(safeStartTime[1]),
+      second: int.parse(safeStartTime[2]),
+    );
     DateTime endDateTime = DateTime.now().copyWith(
-        hour: int.parse(safeEndTime[0]),
-        minute: int.parse(safeEndTime[1]),
-        second: int.parse(safeEndTime[2]));
+      hour: int.parse(safeEndTime[0]),
+      minute: int.parse(safeEndTime[1]),
+      second: int.parse(safeEndTime[2]),
+    );
 
     // we only allow the video if current time is outside current time range
     bool isTimeAllowed =
         now.isBefore(startDateTime) || now.isAfter(endDateTime);
 
     log.fine(
-        "Filter daysOfWeek $daysOfWeek, now day of week: ${now.weekday}, Filter from $startDateTime to $endDateTime current time $now ");
+      "Filter daysOfWeek $daysOfWeek, now day of week: ${now.weekday}, Filter from $startDateTime to $endDateTime current time $now ",
+    );
 
     return isTimeAllowed;
   }
@@ -245,10 +253,12 @@ class VideoFilter {
   }
 
   bool filterVideoStringOperation(String stringToCompare) {
-    var contains =
-        stringToCompare.contains(RegExp(value ?? '', caseSensitive: false));
+    var contains = stringToCompare.contains(
+      RegExp(value ?? '', caseSensitive: false),
+    );
     log.fine(
-        'String compare: "$stringToCompare" ${operation?.name} "$value", contains ? $contains');
+      'String compare: "$stringToCompare" ${operation?.name} "$value", contains ? $contains',
+    );
     switch (operation) {
       case FilterOperation.contain:
         return contains;
@@ -262,18 +272,21 @@ class VideoFilter {
   String localizedLabel(AppLocalizations locals, BuildContext context) {
     String str = "";
     if (filterAll) {
-      str = locals.videoFilterWholeChannel(hideFromFeed
-          ? locals.videoFilterHideLabel
-          : locals.videoFilterFilterLabel);
+      str = locals.videoFilterWholeChannel(
+        hideFromFeed
+            ? locals.videoFilterHideLabel
+            : locals.videoFilterFilterLabel,
+      );
     } else if (type != null && operation != null) {
       log.fine("Filter type $hideFromFeed");
       str = locals.videoFilterDescriptionString(
-          hideFromFeed
-              ? locals.videoFilterHideLabel
-              : locals.videoFilterFilterLabel,
-          FilterType.localizedType(type!, locals).toLowerCase(),
-          FilterOperation.localizedLabel(operation!, locals).toLowerCase(),
-          value ?? '');
+        hideFromFeed
+            ? locals.videoFilterHideLabel
+            : locals.videoFilterFilterLabel,
+        FilterType.localizedType(type!, locals).toLowerCase(),
+        FilterOperation.localizedLabel(operation!, locals).toLowerCase(),
+        value ?? '',
+      );
     }
 
     String daysOfWeek = localizedDaysOfWeek(locals);
@@ -301,7 +314,8 @@ class VideoFilter {
     if (daysOfWeek.isNotEmpty && daysOfWeek.length != 7) {
       daysOfWeek.sort();
       return locals.videoFilterAppliedOn(
-          daysOfWeek.map((e) => getWeekdayName(e)).join(", "));
+        daysOfWeek.map((e) => getWeekdayName(e)).join(", "),
+      );
     } else {
       return '';
     }
@@ -313,7 +327,9 @@ class VideoFilter {
       var start = timeStringToTimeOfDay(startTime);
       var end = timeStringToTimeOfDay(endTime);
       str = locals.videoFilterTimeOfDayFromTo(
-          start.format(context), end.format(context));
+        start.format(context),
+        end.format(context),
+      );
     }
 
     return str;

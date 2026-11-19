@@ -34,32 +34,44 @@ class Player extends StatelessWidget {
       builder: (context) {
         var cubit = context.read<PlayerCubit>();
 
-        final bool showPlayer =
-            context.select((PlayerCubit value) => value.state.hasVideo);
-        final double? top =
-            context.select((PlayerCubit value) => value.state.top);
-        final bool isMini =
-            context.select((PlayerCubit value) => value.state.isMini);
-        final bool isPip =
-            context.select((PlayerCubit value) => value.state.isPip);
-        final bool isHidden =
-            context.select((PlayerCubit value) => value.state.isHidden);
-        final bool isDragging =
-            context.select((PlayerCubit value) => value.state.isDragging);
-        final bool isClosing =
-            context.select((PlayerCubit value) => value.state.isClosing);
-        final Video? currentlyPlaying =
-            context.select((PlayerCubit value) => value.state.currentlyPlaying);
-        final FullScreenState fullScreen =
-            context.select((PlayerCubit value) => value.state.fullScreenState);
+        final bool showPlayer = context.select(
+          (PlayerCubit value) => value.state.hasVideo,
+        );
+        final double? top = context.select(
+          (PlayerCubit value) => value.state.top,
+        );
+        final bool isMini = context.select(
+          (PlayerCubit value) => value.state.isMini,
+        );
+        final bool isPip = context.select(
+          (PlayerCubit value) => value.state.isPip,
+        );
+        final bool isHidden = context.select(
+          (PlayerCubit value) => value.state.isHidden,
+        );
+        final bool isDragging = context.select(
+          (PlayerCubit value) => value.state.isDragging,
+        );
+        final bool isClosing = context.select(
+          (PlayerCubit value) => value.state.isClosing,
+        );
+        final Video? currentlyPlaying = context.select(
+          (PlayerCubit value) => value.state.currentlyPlaying,
+        );
+        final FullScreenState fullScreen = context.select(
+          (PlayerCubit value) => value.state.fullScreenState,
+        );
         final bool isFullScreen = fullScreen == FullScreenState.fullScreen;
-        final double aspectRatio =
-            context.select((PlayerCubit value) => value.state.aspectRatio);
+        final double aspectRatio = context.select(
+          (PlayerCubit value) => value.state.aspectRatio,
+        );
         final deviceType = getDeviceType();
-        final orientation =
-            context.select((PlayerCubit value) => value.state.orientation);
+        final orientation = context.select(
+          (PlayerCubit value) => value.state.orientation,
+        );
 
-        final playerHorizontalPosition = orientation == Orientation.landscape &&
+        final playerHorizontalPosition =
+            orientation == Orientation.landscape &&
                 isMini &&
                 deviceType == DeviceType.tablet
             ? getFractionOfAvailableSpace(context, tabletMiniPlayerFraction)
@@ -78,8 +90,9 @@ class Player extends StatelessWidget {
                     child: state.isAudio
                         ? AudioPlayer(
                             key: const ValueKey('audio-player'),
-                            video:
-                                state.isAudio ? state.currentlyPlaying : null,
+                            video: state.isAudio
+                                ? state.currentlyPlaying
+                                : null,
                             offlineVideo: state.isAudio
                                 ? state.offlineCurrentlyPlaying
                                 : null,
@@ -87,8 +100,9 @@ class Player extends StatelessWidget {
                           )
                         : VideoPlayer(
                             key: const ValueKey('player'),
-                            video:
-                                !state.isAudio ? state.currentlyPlaying : null,
+                            video: !state.isAudio
+                                ? state.currentlyPlaying
+                                : null,
                             offlineVideo: !state.isAudio
                                 ? state.offlineCurrentlyPlaying
                                 : null,
@@ -96,7 +110,8 @@ class Player extends StatelessWidget {
                             startAt: state.startAt,
                           ),
                   );
-                })
+                },
+              )
             : const SizedBox.shrink();
 
         return AnimatedPositioned(
@@ -106,10 +121,10 @@ class Player extends StatelessWidget {
           bottom: isClosing
               ? -targetHeight
               : isFullScreen
-                  ? 0
-                  : isMini && isDragging && top != null
-                      ? maxHeight - top - targetHeight
-                      : cubit.getBottom,
+              ? 0
+              : isMini && isDragging && top != null
+              ? maxHeight - top - targetHeight
+              : cubit.getBottom,
           duration: isDragging ? Duration.zero : animationDuration,
           curve: Curves.easeInOutQuad,
           child: AnimatedOpacity(
@@ -132,7 +147,8 @@ class Player extends StatelessWidget {
                             duration: animationDuration,
                             color: colors.surface,
                             padding: EdgeInsets.symmetric(
-                                horizontal: isMini && !isDragging ? 7 : 0),
+                              horizontal: isMini && !isDragging ? 7 : 0,
+                            ),
                             child: ClipRRect(
                               borderRadius: isMini
                                   ? BorderRadius.circular(10)
@@ -143,8 +159,8 @@ class Player extends StatelessWidget {
                                   color: isFullScreen
                                       ? Colors.black
                                       : isMini
-                                          ? colors.secondaryContainer
-                                          : colors.surface,
+                                      ? colors.secondaryContainer
+                                      : colors.surface,
                                 ),
                                 child: Column(
                                   mainAxisSize: isMini
@@ -156,11 +172,13 @@ class Player extends StatelessWidget {
                                         : AppBar(
                                             title: Text(locals.videoPlayer),
                                             leading: IconButton(
-                                              icon:
-                                                  const Icon(Icons.expand_more),
+                                              icon: const Icon(
+                                                Icons.expand_more,
+                                              ),
                                               onPressed: cubit.showMiniPlayer,
                                             ),
-                                            actions: isHidden ||
+                                            actions:
+                                                isHidden ||
                                                     currentlyPlaying == null
                                                 ? []
                                                 : [
@@ -169,11 +187,12 @@ class Player extends StatelessWidget {
                                                       showTimestampOption: true,
                                                     ),
                                                     AddToPlayListButton(
-                                                        key: ValueKey(
-                                                            currentlyPlaying),
-                                                        videoId:
-                                                            currentlyPlaying
-                                                                .videoId)
+                                                      key: ValueKey(
+                                                        currentlyPlaying,
+                                                      ),
+                                                      videoId: currentlyPlaying
+                                                          .videoId,
+                                                    ),
                                                   ],
                                           ),
                                     Flexible(
@@ -184,12 +203,12 @@ class Player extends StatelessWidget {
                                         // this is just to animate the transition to mini player
                                         constraints: BoxConstraints(
                                           maxHeight: isFullScreen
-                                              ? MediaQuery.of(context)
-                                                  .size
-                                                  .height
+                                              ? MediaQuery.of(
+                                                  context,
+                                                ).size.height
                                               : isMini
-                                                  ? targetHeight
-                                                  : 500,
+                                              ? targetHeight
+                                              : 500,
                                         ),
                                         duration: animationDuration,
                                         child: Row(
@@ -198,70 +217,75 @@ class Player extends StatelessWidget {
                                               : MainAxisAlignment.center,
                                           children: [
                                             Flexible(
-                                                fit: isMini
-                                                    ? FlexFit.loose
-                                                    : FlexFit.tight,
-                                                flex: deviceType ==
-                                                        DeviceType.tablet
-                                                    ? 2
-                                                    : 1,
-                                                child: Column(
-                                                  mainAxisSize: isMini
-                                                      ? MainAxisSize.min
-                                                      : MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      isFullScreen
-                                                          ? MainAxisAlignment
-                                                              .center
-                                                          : MainAxisAlignment
-                                                              .start,
-                                                  crossAxisAlignment: isMini
-                                                      ? CrossAxisAlignment.start
-                                                      : CrossAxisAlignment
-                                                          .center,
-                                                  children: [
-                                                    Container(
-                                                        constraints: BoxConstraints(
-                                                            maxHeight: isMini
-                                                                ? targetHeight
-                                                                : MediaQuery.sizeOf(
-                                                                        context)
-                                                                    .height),
-                                                        child: videoPlayer),
-                                                    if (!isFullScreen)
-                                                      ConditionalWrap(
-                                                          wrapIf: !isMini,
-                                                          wrapper: (child) =>
-                                                              Expanded(
-                                                                  child: child),
-                                                          child: DeviceWidget(
-                                                              orientation:
-                                                                  orientation,
-                                                              portraitTabletAsPhone:
-                                                                  true,
-                                                              tablet:
-                                                                  const TabletExpandedPlayer(),
-                                                              phone:
-                                                                  const ExpandedPlayer()))
-                                                  ],
-                                                )),
+                                              fit: isMini
+                                                  ? FlexFit.loose
+                                                  : FlexFit.tight,
+                                              flex:
+                                                  deviceType ==
+                                                      DeviceType.tablet
+                                                  ? 2
+                                                  : 1,
+                                              child: Column(
+                                                mainAxisSize: isMini
+                                                    ? MainAxisSize.min
+                                                    : MainAxisSize.max,
+                                                mainAxisAlignment: isFullScreen
+                                                    ? MainAxisAlignment.center
+                                                    : MainAxisAlignment.start,
+                                                crossAxisAlignment: isMini
+                                                    ? CrossAxisAlignment.start
+                                                    : CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    constraints: BoxConstraints(
+                                                      maxHeight: isMini
+                                                          ? targetHeight
+                                                          : MediaQuery.sizeOf(
+                                                              context,
+                                                            ).height,
+                                                    ),
+                                                    child: videoPlayer,
+                                                  ),
+                                                  if (!isFullScreen)
+                                                    ConditionalWrap(
+                                                      wrapIf: !isMini,
+                                                      wrapper: (child) =>
+                                                          Expanded(
+                                                            child: child,
+                                                          ),
+                                                      child: DeviceWidget(
+                                                        orientation:
+                                                            orientation,
+                                                        portraitTabletAsPhone:
+                                                            true,
+                                                        tablet:
+                                                            const TabletExpandedPlayer(),
+                                                        phone:
+                                                            const ExpandedPlayer(),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
                                             if (!isFullScreen && !isMini)
                                               DeviceWidget(
-                                                  orientation: orientation,
-                                                  portraitTabletAsPhone: true,
-                                                  phone:
-                                                      const SizedBox.shrink(),
-                                                  tablet: const Expanded(
-                                                      flex: 1,
-                                                      child:
-                                                          ExpandedSideBar())),
+                                                orientation: orientation,
+                                                portraitTabletAsPhone: true,
+                                                phone: const SizedBox.shrink(),
+                                                tablet: const Expanded(
+                                                  flex: 1,
+                                                  child: ExpandedSideBar(),
+                                                ),
+                                              ),
                                             ConditionalWrap(
-                                                wrapper: (child) => Flexible(
-                                                    fit: FlexFit.tight,
-                                                    flex: 2,
-                                                    child: child),
-                                                wrapIf: isMini,
-                                                child: const MiniPlayer()),
+                                              wrapper: (child) => Flexible(
+                                                fit: FlexFit.tight,
+                                                flex: 2,
+                                                child: child,
+                                              ),
+                                              wrapIf: isMini,
+                                              child: const MiniPlayer(),
+                                            ),
                                             if (isMini)
                                               GestureDetector(
                                                 onTap: cubit.hide,
@@ -269,7 +293,7 @@ class Player extends StatelessWidget {
                                                   padding: EdgeInsets.all(8.0),
                                                   child: Icon(Icons.clear),
                                                 ),
-                                              )
+                                              ),
                                           ],
                                         ),
                                       ),

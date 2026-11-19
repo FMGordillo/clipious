@@ -22,7 +22,11 @@ class VideoCubit extends Cubit<VideoState> {
   final SettingsCubit settings;
 
   VideoCubit(
-      super.initialState, this.downloadManager, this.player, this.settings) {
+    super.initialState,
+    this.downloadManager,
+    this.player,
+    this.settings,
+  ) {
     onReady();
   }
 
@@ -42,11 +46,14 @@ class VideoCubit extends Cubit<VideoState> {
 
       final isLoggedIn = await service.isLoggedIn();
       if (isClosed) return;
-      emit(state.copyWith(
+      emit(
+        state.copyWith(
           loadingVideo: false,
           video: video,
           dislikes: dislikes,
-          isLoggedIn: isLoggedIn));
+          isLoggedIn: isLoggedIn,
+        ),
+      );
 
       getDownloadStatus();
     } catch (err) {
@@ -91,7 +98,8 @@ class VideoCubit extends Cubit<VideoState> {
         downloading = false;
       }
       emit(
-          state.copyWith(downloadProgress: progress, downloading: downloading));
+        state.copyWith(downloadProgress: progress, downloading: downloading),
+      );
     }
   }
 
@@ -126,17 +134,18 @@ class VideoCubit extends Cubit<VideoState> {
 
 @freezed
 sealed class VideoState with _$VideoState {
-  const factory VideoState(
-      {Video? video,
-      int? dislikes,
-      @Default(true) loadingVideo,
-      required String videoId,
-      required bool isLoggedIn,
-      @Default(false) bool downloading,
-      @Default(0) double downloadProgress,
-      DownloadedVideo? downloadedVideo,
-      @Default(1) double opacity,
-      @Default('') String error}) = _VideoState;
+  const factory VideoState({
+    Video? video,
+    int? dislikes,
+    @Default(true) loadingVideo,
+    required String videoId,
+    required bool isLoggedIn,
+    @Default(false) bool downloading,
+    @Default(0) double downloadProgress,
+    DownloadedVideo? downloadedVideo,
+    @Default(1) double opacity,
+    @Default('') String error,
+  }) = _VideoState;
 
   const VideoState._();
 

@@ -9,7 +9,7 @@ import '../views/components/bell_icon.dart';
 enum TurnOnStatus {
   ok,
   needToEnableBackGroundServices,
-  needToEnableBatteryOptimization
+  needToEnableBatteryOptimization,
 }
 
 class BellIconCubit extends Cubit<bool> {
@@ -57,19 +57,25 @@ class BellIconCubit extends Cubit<bool> {
       switch (type) {
         case BellIconType.channel:
           var channel = await service.getChannel(itemId);
-          await fileDb.upsertChannelNotification(ChannelNotification(
+          await fileDb.upsertChannelNotification(
+            ChannelNotification(
               itemId,
               channel.author,
               channel.latestVideos?.firstOrNull?.videoId ?? '',
-              DateTime.now().millisecondsSinceEpoch));
+              DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
           break;
         case BellIconType.playlist:
           var playlist = await service.getPublicPlaylists(itemId);
-          await fileDb.upsertPlaylistNotification(PlaylistNotification(
+          await fileDb.upsertPlaylistNotification(
+            PlaylistNotification(
               itemId,
               playlist.videoCount,
               DateTime.now().millisecondsSinceEpoch,
-              playlist.title));
+              playlist.title,
+            ),
+          );
 
           break;
       }

@@ -14,8 +14,12 @@ class TextLinkified extends StatelessWidget {
   final Video? video;
   final PlayerCubit player;
 
-  const TextLinkified(
-      {super.key, required this.text, this.video, required this.player});
+  const TextLinkified({
+    super.key,
+    required this.text,
+    this.video,
+    required this.player,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,9 @@ class TextLinkified extends StatelessWidget {
     return SelectableLinkify(
       text: text,
       linkStyle: TextStyle(
-          color: colorScheme.primary, decoration: TextDecoration.none),
+        color: colorScheme.primary,
+        decoration: TextDecoration.none,
+      ),
       onOpen: (link) => openLink(context, link),
       options: const LinkifyOptions(humanize: true, removeWww: true),
       linkifiers: const [UrlLinkifier(), TimestampLinkifier()],
@@ -53,10 +59,12 @@ class TextLinkified extends StatelessWidget {
       if (split.length >= 2 && split.length <= 3) {
         bool hours = split.length == 3;
         Duration position = Duration(
-            hours: hours ? int.parse(split[0]) : 0,
-            minutes: int.parse(split[hours ? 1 : 0]),
-            seconds: int.parse(split[hours ? 2 : 1]));
-        var videoPlaying = (player.state.isPlaying) &&
+          hours: hours ? int.parse(split[0]) : 0,
+          minutes: int.parse(split[hours ? 1 : 0]),
+          seconds: int.parse(split[hours ? 2 : 1]),
+        );
+        var videoPlaying =
+            (player.state.isPlaying) &&
             player.state.currentlyPlaying?.videoId == video?.videoId;
         if (videoPlaying) {
           player.seek(position);

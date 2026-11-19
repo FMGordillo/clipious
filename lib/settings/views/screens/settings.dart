@@ -13,13 +13,14 @@ import 'package:settings_ui/settings_ui.dart';
 import '../../states/settings.dart';
 
 settingsTheme(ColorScheme colorScheme) => SettingsThemeData(
-    settingsSectionBackground: colorScheme.surface,
-    settingsListBackground: colorScheme.surface,
-    titleTextColor: colorScheme.primary,
-    dividerColor: colorScheme.onSurface,
-    tileDescriptionTextColor: colorScheme.secondary,
-    leadingIconsColor: colorScheme.secondary,
-    tileHighlightColor: colorScheme.secondaryContainer);
+  settingsSectionBackground: colorScheme.surface,
+  settingsListBackground: colorScheme.surface,
+  titleTextColor: colorScheme.primary,
+  dividerColor: colorScheme.onSurface,
+  tileDescriptionTextColor: colorScheme.secondary,
+  leadingIconsColor: colorScheme.secondary,
+  tileHighlightColor: colorScheme.secondaryContainer,
+);
 
 @RoutePage()
 class SettingsScreen extends StatelessWidget {
@@ -49,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
     AutoRouter.of(context).push(const AppearanceSettingsRoute());
   }
 
-/*
+  /*
   selectOnOpen(BuildContext context, SettingsState controller) {
     var categories = getCategories(context);
     var locals = AppLocalizations.of(context)!;
@@ -78,145 +79,168 @@ class SettingsScreen extends StatelessWidget {
       builder: (ctx, state) {
         var cubit = ctx.read<SettingsCubit>();
         return Scaffold(
-            extendBody: true,
-            bottomNavigationBar: const SizedBox.shrink(),
-            appBar: AppBar(
-              title: Text(locals.settings),
-            ),
-            backgroundColor: colorScheme.surface,
-            body: SafeArea(
-                child: SettingsList(
+          extendBody: true,
+          bottomNavigationBar: const SizedBox.shrink(),
+          appBar: AppBar(title: Text(locals.settings)),
+          backgroundColor: colorScheme.surface,
+          body: SafeArea(
+            child: SettingsList(
               lightTheme: theme,
               darkTheme: theme,
               sections: [
-                SettingsSection(tiles: [
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.home_outlined),
-                    title: Text(locals.browsing),
-                    description: Text(
-                      List.of([
-                        locals.country,
-                        locals.customizeAppLayout,
-                        locals.distractionFreeMode,
-                        locals.appLanguage,
-                        "Return YouTube Dislike",
-                        locals.searchHistory,
-                        locals.videoFilters,
-                        'DeArrow'
-                      ]).join(", "),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                SettingsSection(
+                  tiles: [
+                    SettingsTile.navigation(
+                      leading: const Icon(Icons.home_outlined),
+                      title: Text(locals.browsing),
+                      description: Text(
+                        List.of([
+                          locals.country,
+                          locals.customizeAppLayout,
+                          locals.distractionFreeMode,
+                          locals.appLanguage,
+                          "Return YouTube Dislike",
+                          locals.searchHistory,
+                          locals.videoFilters,
+                          'DeArrow',
+                        ]).join(", "),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onPressed: openBrowsingSettings,
                     ),
-                    onPressed: openBrowsingSettings,
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.cloud_queue),
-                    title: Text(locals.manageServers),
-                    description: BlocBuilder<AppCubit, AppState>(
+                    SettingsTile.navigation(
+                      leading: const Icon(Icons.cloud_queue),
+                      title: Text(locals.manageServers),
+                      description: BlocBuilder<AppCubit, AppState>(
                         buildWhen: (previous, current) =>
                             previous.server != current.server,
-                        builder: (context, app) => Text(app.server != null
-                            ? locals.currentServer(app.server!.url)
-                            : "")),
-                    onPressed: manageServers,
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.video_settings),
-                    title: Text(locals.videoPlayer),
-                    description: Text(
-                      List.of([
-                        locals.useDash,
-                        locals.useProxy,
-                        locals.autoplayVideoOnLoad,
-                        locals.subtitles,
-                        "SponsorBlock",
-                        locals.lockFullScreenToLandscape,
-                        locals.fillFullscreen
-                      ]).join(", "),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                        builder: (context, app) => Text(
+                          app.server != null
+                              ? locals.currentServer(app.server!.url)
+                              : "",
+                        ),
+                      ),
+                      onPressed: manageServers,
                     ),
-                    onPressed: openVideoPlayerSettings,
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.notifications_outlined),
-                    title: Text(locals.notifications),
-                    description: Text(state.backgroundNotifications
-                        ? locals.foregroundServiceNotificationContent(
-                            state.backgroundNotificationFrequency.toString())
-                        : locals.notificationsDescription),
-                    onPressed: openNotificationSettings,
-                  ),
-                  SettingsTile.navigation(
-                    leading: const Icon(Icons.palette_outlined),
-                    title: Text(locals.appearance),
-                    description: Text(
-                      List.of([
-                        locals.useDynamicTheme,
-                        locals.themeBrightness,
-                        locals.blackBackground,
-                        locals.navigationBarStyle
-                      ]).join(", "),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                    SettingsTile.navigation(
+                      leading: const Icon(Icons.video_settings),
+                      title: Text(locals.videoPlayer),
+                      description: Text(
+                        List.of([
+                          locals.useDash,
+                          locals.useProxy,
+                          locals.autoplayVideoOnLoad,
+                          locals.subtitles,
+                          "SponsorBlock",
+                          locals.lockFullScreenToLandscape,
+                          locals.fillFullscreen,
+                        ]).join(", "),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onPressed: openVideoPlayerSettings,
                     ),
-                    onPressed: openAppearanceSettings,
-                  ),
-                ]),
-                SettingsSection(title: (Text(locals.about)), tiles: [
-                  SettingsTile(
+                    SettingsTile.navigation(
+                      leading: const Icon(Icons.notifications_outlined),
+                      title: Text(locals.notifications),
+                      description: Text(
+                        state.backgroundNotifications
+                            ? locals.foregroundServiceNotificationContent(
+                                state.backgroundNotificationFrequency
+                                    .toString(),
+                              )
+                            : locals.notificationsDescription,
+                      ),
+                      onPressed: openNotificationSettings,
+                    ),
+                    SettingsTile.navigation(
+                      leading: const Icon(Icons.palette_outlined),
+                      title: Text(locals.appearance),
+                      description: Text(
+                        List.of([
+                          locals.useDynamicTheme,
+                          locals.themeBrightness,
+                          locals.blackBackground,
+                          locals.navigationBarStyle,
+                        ]).join(", "),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onPressed: openAppearanceSettings,
+                    ),
+                  ],
+                ),
+                SettingsSection(
+                  title: (Text(locals.about)),
+                  tiles: [
+                    SettingsTile(
                       title: const Center(
-                          child: SizedBox(
-                              height: 150, width: 150, child: AppIcon()))),
-                  SettingsTile(
-                    leading: const Icon(Icons.badge_outlined),
-                    title: Text('${locals.name}: ${state.packageInfo.appName}'),
-                    description: Text(
-                        '${locals.package}: ${state.packageInfo.packageName}'),
-                  ),
-                  SettingsTile(
-                    leading: const Icon(Icons.numbers),
-                    title:
-                        Text('${locals.version}: ${state.packageInfo.version}'),
-                    description: Text(
-                        '${locals.build}: ${state.packageInfo.buildNumber}'),
-                  ),
-                  SettingsTile(
-                    leading: const Icon(Icons.toc),
-                    title: Text(locals.appLogs),
-                    description: Text(locals.appLogsDescription),
-                    onPressed: openAppLogs,
-                  ),
-                  SettingsTile(
-                    leading: const Icon(Icons.settings),
-                    title: Text(locals.copySettingsAsJson),
-                    description: Text(locals.copySettingsAsJsonDescription),
-                    onPressed: cubit.copySettingsAsJson,
-                  ),
-                  SettingsTile(
-                    leading: const Icon(Icons.feedback_outlined),
-                    title: Text(locals.submitFeedback),
-                    description: Text(locals.submitFeedbackDescription),
-                    onPressed: (context) {
-                      okCancelDialog(
+                        child: SizedBox(
+                          height: 150,
+                          width: 150,
+                          child: AppIcon(),
+                        ),
+                      ),
+                    ),
+                    SettingsTile(
+                      leading: const Icon(Icons.badge_outlined),
+                      title: Text(
+                        '${locals.name}: ${state.packageInfo.appName}',
+                      ),
+                      description: Text(
+                        '${locals.package}: ${state.packageInfo.packageName}',
+                      ),
+                    ),
+                    SettingsTile(
+                      leading: const Icon(Icons.numbers),
+                      title: Text(
+                        '${locals.version}: ${state.packageInfo.version}',
+                      ),
+                      description: Text(
+                        '${locals.build}: ${state.packageInfo.buildNumber}',
+                      ),
+                    ),
+                    SettingsTile(
+                      leading: const Icon(Icons.toc),
+                      title: Text(locals.appLogs),
+                      description: Text(locals.appLogsDescription),
+                      onPressed: openAppLogs,
+                    ),
+                    SettingsTile(
+                      leading: const Icon(Icons.settings),
+                      title: Text(locals.copySettingsAsJson),
+                      description: Text(locals.copySettingsAsJsonDescription),
+                      onPressed: cubit.copySettingsAsJson,
+                    ),
+                    SettingsTile(
+                      leading: const Icon(Icons.feedback_outlined),
+                      title: Text(locals.submitFeedback),
+                      description: Text(locals.submitFeedbackDescription),
+                      onPressed: (context) {
+                        okCancelDialog(
                           context,
                           locals.submitFeedback,
                           locals.feedbackDisclaimer,
                           () => BetterFeedback.of(context).show((feedback) {
-                                try {
-                                  cubit.sendFeedBack(feedback);
-                                } catch (err) {
-                                  showAlertDialog(context, locals.error, [
-                                    Text(locals.feedbackScreenshotError),
-                                    if (err is ImgurError) Text(err.error)
-                                  ]);
-                                }
-                              }));
-                    },
-                  )
-                ])
+                            try {
+                              cubit.sendFeedBack(feedback);
+                            } catch (err) {
+                              showAlertDialog(context, locals.error, [
+                                Text(locals.feedbackScreenshotError),
+                                if (err is ImgurError) Text(err.error),
+                              ]);
+                            }
+                          }),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ],
-            )));
+            ),
+          ),
+        );
       },
     );
   }

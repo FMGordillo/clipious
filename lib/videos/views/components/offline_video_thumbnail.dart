@@ -7,8 +7,11 @@ class OfflineVideoThumbnail extends StatelessWidget {
   final DownloadedVideo video;
   final double borderRadius;
 
-  const OfflineVideoThumbnail(
-      {super.key, required this.video, this.borderRadius = 10});
+  const OfflineVideoThumbnail({
+    super.key,
+    required this.video,
+    this.borderRadius = 10,
+  });
 
   Future<String?> getThumbnail() async {
     var tries = 0;
@@ -29,23 +32,23 @@ class OfflineVideoThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     var colors = Theme.of(context).colorScheme;
     return FutureBuilder<String?>(
-        future: getThumbnail(),
-        builder: (context, snapshot) {
-          return AspectRatio(
-            aspectRatio: 16 / 9,
-            child: snapshot.data != null
-                ? ClipRRect(
+      future: getThumbnail(),
+      builder: (context, snapshot) {
+        return AspectRatio(
+          aspectRatio: 16 / 9,
+          child: snapshot.data != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  child: Image.file(File(snapshot.data!), fit: BoxFit.contain),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    color: colors.secondaryContainer,
                     borderRadius: BorderRadius.circular(borderRadius),
-                    child: Image.file(
-                      File(snapshot.data!),
-                      fit: BoxFit.contain,
-                    ))
-                : Container(
-                    decoration: BoxDecoration(
-                        color: colors.secondaryContainer,
-                        borderRadius: BorderRadius.circular(borderRadius)),
                   ),
-          );
-        });
+                ),
+        );
+      },
+    );
   }
 }

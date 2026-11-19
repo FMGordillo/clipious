@@ -17,15 +17,12 @@ class VideoModalSheet extends StatelessWidget {
 
   static void showVideoModalSheet(BuildContext context, Video video) {
     showSafeModalBottomSheet<void>(
-        context: context,
-        showDragHandle: true,
-        builder: (BuildContext context) {
-          return SafeArea(
-            child: VideoModalSheet(
-              video: video,
-            ),
-          );
-        });
+      context: context,
+      showDragHandle: true,
+      builder: (BuildContext context) {
+        return SafeArea(child: VideoModalSheet(video: video));
+      },
+    );
   }
 
   void playNext(BuildContext context) {
@@ -35,10 +32,12 @@ class VideoModalSheet extends StatelessWidget {
     player.playVideoNext(video);
 
     final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
-    scaffold?.showSnackBar(SnackBar(
-      content: Text(locals.playNextAddedToQueue),
-      duration: const Duration(seconds: 1),
-    ));
+    scaffold?.showSnackBar(
+      SnackBar(
+        content: Text(locals.playNextAddedToQueue),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   void addToQueue(BuildContext context) {
@@ -48,10 +47,12 @@ class VideoModalSheet extends StatelessWidget {
     player.queueVideos([video]);
 
     final ScaffoldMessengerState? scaffold = scaffoldKey.currentState;
-    scaffold?.showSnackBar(SnackBar(
-      content: Text(locals.videoAddedToQueue),
-      duration: const Duration(seconds: 1),
-    ));
+    scaffold?.showSnackBar(
+      SnackBar(
+        content: Text(locals.videoAddedToQueue),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   void downloadVideo(BuildContext context) {
@@ -85,38 +86,42 @@ class VideoModalSheet extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton.filledTonal(
-                    onPressed: AddToQueueButton.canAddToQueue(context, [video])
-                        ? () => addToQueue(context)
-                        : null,
-                    icon: const Icon(Icons.playlist_play)),
-                Text(locals.addToQueueList)
+                  onPressed: AddToQueueButton.canAddToQueue(context, [video])
+                      ? () => addToQueue(context)
+                      : null,
+                  icon: const Icon(Icons.playlist_play),
+                ),
+                Text(locals.addToQueueList),
               ],
             ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton.filledTonal(
-                    onPressed: () => playNext(context),
-                    icon: const Icon(Icons.play_arrow)),
-                Text(locals.playNext)
+                  onPressed: () => playNext(context),
+                  icon: const Icon(Icons.play_arrow),
+                ),
+                Text(locals.playNext),
               ],
             ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton.filledTonal(
-                    onPressed: () => downloadVideo(context),
-                    icon: const Icon(Icons.download)),
-                Text(locals.download)
+                  onPressed: () => downloadVideo(context),
+                  icon: const Icon(Icons.download),
+                ),
+                Text(locals.download),
               ],
             ),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton.filledTonal(
-                    onPressed: () => _showSharingSheet(context),
-                    icon: const Icon(Icons.share)),
-                Text(locals.share)
+                  onPressed: () => _showSharingSheet(context),
+                  icon: const Icon(Icons.share),
+                ),
+                Text(locals.share),
               ],
             ),
           ],

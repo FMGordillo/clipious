@@ -40,59 +40,60 @@ int? _parsePublished(dynamic published) {
 sealed class Video with _$Video implements ShareLinks, IdedVideo {
   @Implements<ShareLinks>()
   @Implements<IdedVideo>()
-  const factory Video(
-      {required String videoId,
-      int? viewCount,
-      @JsonKey(fromJson: _parsePublished) int? published,
-      int? index,
-      String? indexId,
-      String? publishedText,
-      bool? isUpcoming,
-      int? premiereTimestamp,
-      String? dashUrl,
-      String? description,
-      String? descriptionHtml,
-      @Default([]) List<String> keywords,
-      int? likeCount,
-      int? dislikeCount,
-      bool? paid,
-      bool? premium,
-      bool? isFamilyFriendly,
-      @Default([]) List<String> allowedRegions,
-      String? genre,
-      String? genreUrl,
-      @Default([]) List<ImageObject> authorThumbnails,
-      String? subCountText,
-      @Default(false) bool allowRatings,
-      double? rating,
-      bool? isListed,
-      bool? liveNow,
-      String? hlsUrl,
-      List<AdaptiveFormat>? adaptiveFormats,
-      List<FormatStream>? formatStreams,
-      @Default([]) List<Caption> captions,
-      @Default([]) List<Video> recommendedVideos,
-      String? title,
-      int? lengthSeconds,
-      String? author,
-      String? authorId,
-      String? authorUrl,
-      @Default([]) List<ImageObject> videoThumbnails,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      @Default(false)
-      bool filtered,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      @Default([])
-      List<VideoFilter> matchedFilters,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      @Default(false)
-      bool filterHide,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      @Default(false)
-      bool deArrowed,
-      @JsonKey(includeFromJson: false, includeToJson: false)
-      String? deArrowThumbnailUrl,
-      String? viewCountText}) = _Video;
+  const factory Video({
+    required String videoId,
+    int? viewCount,
+    @JsonKey(fromJson: _parsePublished) int? published,
+    int? index,
+    String? indexId,
+    String? publishedText,
+    bool? isUpcoming,
+    int? premiereTimestamp,
+    String? dashUrl,
+    String? description,
+    String? descriptionHtml,
+    @Default([]) List<String> keywords,
+    int? likeCount,
+    int? dislikeCount,
+    bool? paid,
+    bool? premium,
+    bool? isFamilyFriendly,
+    @Default([]) List<String> allowedRegions,
+    String? genre,
+    String? genreUrl,
+    @Default([]) List<ImageObject> authorThumbnails,
+    String? subCountText,
+    @Default(false) bool allowRatings,
+    double? rating,
+    bool? isListed,
+    bool? liveNow,
+    String? hlsUrl,
+    List<AdaptiveFormat>? adaptiveFormats,
+    List<FormatStream>? formatStreams,
+    @Default([]) List<Caption> captions,
+    @Default([]) List<Video> recommendedVideos,
+    String? title,
+    int? lengthSeconds,
+    String? author,
+    String? authorId,
+    String? authorUrl,
+    @Default([]) List<ImageObject> videoThumbnails,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default(false)
+    bool filtered,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default([])
+    List<VideoFilter> matchedFilters,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default(false)
+    bool filterHide,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default(false)
+    bool deArrowed,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    String? deArrowThumbnailUrl,
+    String? viewCountText,
+  }) = _Video;
 
   const Video._();
 

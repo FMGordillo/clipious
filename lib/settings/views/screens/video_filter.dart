@@ -29,22 +29,21 @@ class VideoFilterSettingsScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => VideoFilterCubit(const VideoFilterState()),
       child: BlocBuilder<VideoFilterCubit, VideoFilterState>(
-          builder: (context, state) {
-        var cubit = context.read<VideoFilterCubit>();
+        builder: (context, state) {
+          var cubit = context.read<VideoFilterCubit>();
 
-        Map<String, List<VideoFilter>> mappedFilters = state.filters.groupBy(
-          (p0) => p0.channelId ?? allChannels,
-        );
-        List<String> keys = mappedFilters.keys.toList();
-        keys.sort(cubit.sortChannels);
-        return Scaffold(
-            appBar: AppBar(
-              title: Text(locals.videoFilters),
-            ),
+          Map<String, List<VideoFilter>> mappedFilters = state.filters.groupBy(
+            (p0) => p0.channelId ?? allChannels,
+          );
+          List<String> keys = mappedFilters.keys.toList();
+          keys.sort(cubit.sortChannels);
+          return Scaffold(
+            appBar: AppBar(title: Text(locals.videoFilters)),
             floatingActionButton: FloatingActionButton(
-                onPressed: () => createFilter(context),
-                backgroundColor: colors.primaryContainer,
-                child: const Icon(Icons.add)),
+              onPressed: () => createFilter(context),
+              backgroundColor: colors.primaryContainer,
+              child: const Icon(Icons.add),
+            ),
             body: SafeArea(
               bottom: false,
               child: Column(
@@ -59,8 +58,9 @@ class VideoFilterSettingsScreen extends StatelessWidget {
                             itemCount: keys.length,
                             itemBuilder: (context, index) {
                               return VideoFilterChannel(
-                                  key: UniqueKey(),
-                                  filters: mappedFilters[keys[index]] ?? []);
+                                key: UniqueKey(),
+                                filters: mappedFilters[keys[index]] ?? [],
+                              );
                             },
                           ),
                         )
@@ -70,8 +70,10 @@ class VideoFilterSettingsScreen extends StatelessWidget {
                         ),
                 ],
               ),
-            ));
-      }),
+            ),
+          );
+        },
+      ),
     );
   }
 }

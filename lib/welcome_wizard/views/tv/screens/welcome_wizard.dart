@@ -28,49 +28,49 @@ class TvWelcomeWizardScreen extends StatelessWidget {
             BlocProvider(create: (context) => WelcomeWizardCubit(null)),
             BlocProvider(
               create: (context) => ServerListSettingsCubit(
-                  const ServerListSettingsState(
-                      publicServers: [], dbServers: []),
-                  context.read<AppCubit>()),
-            )
+                const ServerListSettingsState(publicServers: [], dbServers: []),
+                context.read<AppCubit>(),
+              ),
+            ),
           ],
           child: BlocListener<ServerListSettingsCubit, ServerListSettingsState>(
             listener: (context, state) {
               context.read<WelcomeWizardCubit>().getSelectedServer();
             },
             child: BlocBuilder<WelcomeWizardCubit, Server?>(
-                builder: (context, server) {
-              return DefaultTextStyle(
-                style: textTheme.bodyLarge!,
-                child: Column(
-                  children: [
-                    Text(
-                      locals.wizardIntro,
-                      style: textTheme.titleLarge,
-                    ),
-                    const Expanded(child: TvManageServersInner()),
-                    TvButton(
-                      unfocusedColor: server == null ? colors.surface : null,
-                      onPressed: server != null
-                          ? (context) {
-                              AutoRouter.of(context)
-                                  .replace(const TvHomeRoute());
-                            }
-                          : null,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          locals.startUsingClipious,
-                          style: textTheme.titleLarge!.copyWith(
+              builder: (context, server) {
+                return DefaultTextStyle(
+                  style: textTheme.bodyLarge!,
+                  child: Column(
+                    children: [
+                      Text(locals.wizardIntro, style: textTheme.titleLarge),
+                      const Expanded(child: TvManageServersInner()),
+                      TvButton(
+                        unfocusedColor: server == null ? colors.surface : null,
+                        onPressed: server != null
+                            ? (context) {
+                                AutoRouter.of(
+                                  context,
+                                ).replace(const TvHomeRoute());
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            locals.startUsingClipious,
+                            style: textTheme.titleLarge!.copyWith(
                               color: server == null
                                   ? Colors.white.withValues(alpha: 0.5)
-                                  : Colors.white),
+                                  : Colors.white,
+                            ),
+                          ),
                         ),
                       ),
-                    )
-                  ],
-                ),
-              );
-            }),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),

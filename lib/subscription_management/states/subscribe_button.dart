@@ -32,8 +32,12 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
     emit(state.copyWith(loading: true));
     if (subscribed) {
       final channel = await service.getChannel(state.channelId);
-      await db.addOfflineSubscription(OfflineSubscription(
-          channelId: state.channelId, channelName: channel.author));
+      await db.addOfflineSubscription(
+        OfflineSubscription(
+          channelId: state.channelId,
+          channelName: channel.author,
+        ),
+      );
     } else {
       await db.deleteOfflineSubscription(state.channelId);
     }
@@ -47,11 +51,14 @@ class SubscribeButtonCubit extends Cubit<SubscribeButtonState> {
         isLoggedIn && await service.isSubscribedToChannel(state.channelId);
 
     bool isOfflineSubscribed = await db.isOfflineSubscribed(state.channelId);
-    emit(state.copyWith(
+    emit(
+      state.copyWith(
         loading: false,
         isOfflineSubscribed: isOfflineSubscribed,
         isAccountSubscribed: isAccountSubscribed,
-        isLoggedIn: isLoggedIn));
+        isLoggedIn: isLoggedIn,
+      ),
+    );
   }
 
   Future<void> unsubscribe() async {

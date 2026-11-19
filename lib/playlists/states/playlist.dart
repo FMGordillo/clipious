@@ -39,7 +39,9 @@ class PlaylistCubit extends Cubit<PlaylistState> {
   Future<bool> removeVideoFromPlayList(Video v) async {
     emit(state.copyWith(loading: true));
     await service.deleteUserPlaylistVideo(
-        state.playlist.playlistId, v.indexId ?? '');
+      state.playlist.playlistId,
+      v.indexId ?? '',
+    );
     var videos = List<Video>.from(state.playlist.videos);
     videos.remove(v);
     var playlist = state.playlist.copyWith(videos: videos);
@@ -52,8 +54,11 @@ class PlaylistCubit extends Cubit<PlaylistState> {
   }
 
   scrollToTop() {
-    scrollController.animateTo(0,
-        duration: animationDuration ~/ 2, curve: Curves.easeInOutQuad);
+    scrollController.animateTo(
+      0,
+      duration: animationDuration ~/ 2,
+      curve: Curves.easeInOutQuad,
+    );
   }
 
   getAllVideos() async {
@@ -64,14 +69,19 @@ class PlaylistCubit extends Cubit<PlaylistState> {
       // something is not right, let's get the full playlist
       Playlist pl;
       do {
-        pl = await service.getPublicPlaylists(state.playlist.playlistId,
-            page: page);
+        pl = await service.getPublicPlaylists(
+          state.playlist.playlistId,
+          page: page,
+        );
 
         var toAdd = pl.videos
-            .where((v) =>
-                state.playlist.videos
-                    .indexWhere((v2) => v2.videoId == v.videoId) ==
-                -1)
+            .where(
+              (v) =>
+                  state.playlist.videos.indexWhere(
+                    (v2) => v2.videoId == v.videoId,
+                  ) ==
+                  -1,
+            )
             .toList();
 
         var playlist = state.playlist;
@@ -81,14 +91,20 @@ class PlaylistCubit extends Cubit<PlaylistState> {
 
         totalFiltered += pl.removedByFilter;
         log.fine(
-            'filtered removed ${pl.removedByFilter} videos,adding ${pl.videos.length}');
+          'filtered removed ${pl.removedByFilter} videos,adding ${pl.videos.length}',
+        );
         page++;
 
-        var loadingProgress = (state.playlist.videos.length + totalFiltered) /
+        var loadingProgress =
+            (state.playlist.videos.length + totalFiltered) /
             state.playlist.videoCount;
         if (!isClosed) {
-          emit(state.copyWith(
-              loadingProgress: loadingProgress, playlist: playlist));
+          emit(
+            state.copyWith(
+              loadingProgress: loadingProgress,
+              playlist: playlist,
+            ),
+          );
         } else {
           return;
         }

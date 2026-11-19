@@ -16,16 +16,18 @@ class VideoPlayer extends StatefulWidget {
   final bool? disableControls;
   final Duration? startAt;
 
-  const VideoPlayer(
-      {super.key,
-      this.video,
-      required this.miniPlayer,
-      this.playNow,
-      this.disableControls,
-      this.offlineVideo,
-      this.startAt})
-      : assert(video == null || offlineVideo == null,
-            'cannot provide both video and offline video\n');
+  const VideoPlayer({
+    super.key,
+    this.video,
+    required this.miniPlayer,
+    this.playNow,
+    this.disableControls,
+    this.offlineVideo,
+    this.startAt,
+  }) : assert(
+         video == null || offlineVideo == null,
+         'cannot provide both video and offline video\n',
+       );
 
   @override
   State<VideoPlayer> createState() => _VideoPlayerState();
@@ -45,16 +47,18 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
     return BlocProvider(
       create: (context) => VideoPlayerCubit(
-          VideoPlayerState(
-              startAt: widget.startAt,
-              overFlowTextColor: overFlowTextColor,
-              colors: colorScheme,
-              key: _betterPlayerKey,
-              video: widget.video,
-              offlineVideo: widget.offlineVideo,
-              disableControls: widget.disableControls),
-          player,
-          settings),
+        VideoPlayerState(
+          startAt: widget.startAt,
+          overFlowTextColor: overFlowTextColor,
+          colors: colorScheme,
+          key: _betterPlayerKey,
+          video: widget.video,
+          offlineVideo: widget.offlineVideo,
+          disableControls: widget.disableControls,
+        ),
+        player,
+        settings,
+      ),
       child: BlocBuilder<VideoPlayerCubit, VideoPlayerState>(
         builder: (context, playerState) {
           var cubit = context.read<VideoPlayerCubit>();

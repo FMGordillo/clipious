@@ -35,6 +35,8 @@ class ThumbnailCubit extends Cubit<ThumbnailState> {
 
 @freezed
 sealed class ThumbnailState with _$ThumbnailState {
-  const factory ThumbnailState(
-      {@Default([]) List<String> urls, String? selected}) = _ThumbnailState;
+  const factory ThumbnailState({
+    @Default([]) List<String> urls,
+    String? selected,
+  }) = _ThumbnailState;
 }

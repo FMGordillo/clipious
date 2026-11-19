@@ -12,12 +12,15 @@ class MiniPlayerProgress extends StatelessWidget {
     ColorScheme colors = Theme.of(context).colorScheme;
     return Builder(
       builder: (context) {
-        Video? currentlyPlaying =
-            context.select((PlayerCubit cubit) => cubit.state.currentlyPlaying);
-        Duration duration =
-            context.select((PlayerCubit cubit) => cubit.duration);
-        Duration position =
-            context.select((PlayerCubit cubit) => cubit.state.position);
+        Video? currentlyPlaying = context.select(
+          (PlayerCubit cubit) => cubit.state.currentlyPlaying,
+        );
+        Duration duration = context.select(
+          (PlayerCubit cubit) => cubit.duration,
+        );
+        Duration position = context.select(
+          (PlayerCubit cubit) => cubit.state.position,
+        );
 
         return !(currentlyPlaying?.liveNow ?? false)
             ? Container(
@@ -29,17 +32,19 @@ class MiniPlayerProgress extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: AnimatedFractionallySizedBox(
-                    widthFactor:
-                        position.inMilliseconds / duration.inMilliseconds,
-                    heightFactor: 1,
-                    duration: const Duration(milliseconds: 750),
-                    curve: Curves.easeInOutQuad,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    )))
+                  widthFactor:
+                      position.inMilliseconds / duration.inMilliseconds,
+                  heightFactor: 1,
+                  duration: const Duration(milliseconds: 750),
+                  curve: Curves.easeInOutQuad,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+              )
             : const SizedBox.shrink();
       },
     );

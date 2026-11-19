@@ -17,12 +17,14 @@ class ImageObject {
   Map<String, dynamic> toJson() => _$ImageObjectToJson(this);
 
   static List<String> getThumbnailUrlsByPreferredOrder(
-      List<ImageObject>? images) {
+    List<ImageObject>? images,
+  ) {
     return _getThumbnailsByPreferredORder(images).map((i) => i.url).toList();
   }
 
   static List<ImageObject> _getThumbnailsByPreferredORder(
-      List<ImageObject>? images) {
+    List<ImageObject>? images,
+  ) {
     if (images != null && images.isNotEmpty) {
       List<ImageObject> imgs = List.from(images);
       imgs.sort((a, b) {

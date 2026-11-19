@@ -77,20 +77,31 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
       case BetterPlayerEventType.progress:
         EasyThrottle.throttle(
-            'video-player-progress', const Duration(seconds: 1), () {
-          player.setEvent(MediaEvent(
-              state: MediaState.playing,
-              type: MediaEventType.progress,
-              value: videoController?.videoPlayerController?.value.position ??
-                  Duration.zero));
-        });
+          'video-player-progress',
+          const Duration(seconds: 1),
+          () {
+            player.setEvent(
+              MediaEvent(
+                state: MediaState.playing,
+                type: MediaEventType.progress,
+                value:
+                    videoController?.videoPlayerController?.value.position ??
+                    Duration.zero,
+              ),
+            );
+          },
+        );
       case BetterPlayerEventType.seekTo:
         // we bypass the rest so we can send the current progress
-        player.setEvent(MediaEvent(
+        player.setEvent(
+          MediaEvent(
             state: MediaState.playing,
             type: MediaEventType.progress,
-            value: videoController?.videoPlayerController?.value.position ??
-                Duration.zero));
+            value:
+                videoController?.videoPlayerController?.value.position ??
+                Duration.zero,
+          ),
+        );
         return;
       case BetterPlayerEventType.bufferingEnd:
         mediaState = MediaState.playing;
@@ -110,10 +121,13 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
       case BetterPlayerEventType.openFullscreen:
         break;
       case BetterPlayerEventType.initialized:
-        player.setEvent(MediaEvent<double>(
+        player.setEvent(
+          MediaEvent<double>(
             state: MediaState.ready,
             type: MediaEventType.aspectRatioChanged,
-            value: getAspectRatio()));
+            value: getAspectRatio(),
+          ),
+        );
         mediaState = MediaState.ready;
         break;
       case BetterPlayerEventType.hideFullscreen:
@@ -146,17 +160,28 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
     switch (event.betterPlayerEventType) {
       case BetterPlayerEventType.bufferingUpdate:
-        EasyThrottle.throttle('video-buffering', const Duration(seconds: 1),
-            () {
-          List<DurationRange> durations = event.parameters?['buffered'] ?? [];
-          emit(state.copyWith(
-              bufferPosition:
-                  durations.sortBy((e) => e.end).map((e) => e.end).last));
-          player.setEvent(MediaEvent(
-              state: MediaState.playing,
-              type: MediaEventType.bufferChanged,
-              value: state.bufferPosition));
-        });
+        EasyThrottle.throttle(
+          'video-buffering',
+          const Duration(seconds: 1),
+          () {
+            List<DurationRange> durations = event.parameters?['buffered'] ?? [];
+            emit(
+              state.copyWith(
+                bufferPosition: durations
+                    .sortBy((e) => e.end)
+                    .map((e) => e.end)
+                    .last,
+              ),
+            );
+            player.setEvent(
+              MediaEvent(
+                state: MediaState.playing,
+                type: MediaEventType.bufferChanged,
+                value: state.bufferPosition,
+              ),
+            );
+          },
+        );
         break;
       case BetterPlayerEventType.play:
         double speed = 1.0;
@@ -167,7 +192,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         break;
       case BetterPlayerEventType.changedSubtitles:
         settings.setLastSubtitle(
-            videoController?.betterPlayerSubtitlesSource?.name ?? '');
+          videoController?.betterPlayerSubtitlesSource?.name ?? '',
+        );
         break;
       case BetterPlayerEventType.setSpeed:
         if (event.parameters?.containsKey("speed") ?? false) {
@@ -236,10 +262,12 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         double progress = db.getVideoProgress(idedVideo.videoId);
         if (progress > 0 && progress < 0.90) {
           startAt = Duration(
-              seconds: (offline
-                      ? newState.offlineVideo!.lengthSeconds
-                      : (newState.video!.lengthSeconds ?? 0) * progress)
-                  .floor());
+            seconds:
+                (offline
+                        ? newState.offlineVideo!.lengthSeconds
+                        : (newState.video!.lengthSeconds ?? 0) * progress)
+                    .floor(),
+          );
         }
       }
 
@@ -268,24 +296,26 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
         var formatStream = isHls
             ? null
-            : newState.video!
-                .formatStreams![newState.video!.formatStreams!.length - 1];
+            : newState
+                  .video!
+                  .formatStreams![newState.video!.formatStreams!.length - 1];
 
         var useProxy = service.useProxy();
 
         String videoUrl = isHls
             ? '${newState.video!.hlsUrl!}${useProxy ? '?local=true' : ''}'
             : isUsingDash()
-                ? '${newState.video!.dashUrl}${useProxy ? '?local=true' : ''}'
-                : formatStream?.url ?? '';
+            ? '${newState.video!.dashUrl}${useProxy ? '?local=true' : ''}'
+            : formatStream?.url ?? '';
 
         if (!videoUrl.startsWith('http')) {
           videoUrl = '${server.url}$videoUrl';
         }
 
         if (!isUsingDash() && formatStream != null) {
-          newState =
-              newState.copyWith(selectedNonDashTrack: formatStream.resolution);
+          newState = newState.copyWith(
+            selectedNonDashTrack: formatStream.resolution,
+          );
         }
 
         // somehow invidious is sending google url even when using local proxy when not using dash
@@ -295,13 +325,14 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         }
 
         log.info(
-            'Playing url (dash ${isUsingDash()},  hasHls ? ${newState.video!.hlsUrl != null})  $videoUrl');
+          'Playing url (dash ${isUsingDash()},  hasHls ? ${newState.video!.hlsUrl != null})  $videoUrl',
+        );
 
         BetterPlayerVideoFormat format = isHls
             ? BetterPlayerVideoFormat.hls
             : isUsingDash()
-                ? BetterPlayerVideoFormat.dash
-                : BetterPlayerVideoFormat.other;
+            ? BetterPlayerVideoFormat.dash
+            : BetterPlayerVideoFormat.other;
 
         if (format == BetterPlayerVideoFormat.other) {
           for (var value in (newState.video!.formatStreams ?? [])) {
@@ -321,11 +352,14 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
           videoFormat: format,
           liveStream: newState.video!.liveNow,
           subtitles: newState.video!.captions
-              .map((s) => BetterPlayerSubtitlesSource(
+              .map(
+                (s) => BetterPlayerSubtitlesSource(
                   type: BetterPlayerSubtitlesSourceType.network,
                   urls: ['$baseUrl${s.url}'],
                   name: s.label,
-                  selectedByDefault: s.label == lastSubtitle))
+                  selectedByDefault: s.label == lastSubtitle,
+                ),
+              )
               .toList(),
           resolutions: resolutions.isNotEmpty ? resolutions : null,
         );
@@ -337,46 +371,49 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
       if (videoController == null) {
         videoController = BetterPlayerController(
-            BetterPlayerConfiguration(
-                overlay: isTv
-                    ? const TvPlayerControls()
-                    : PlayerControls(mediaPlayerCubit: this),
-                deviceOrientationsOnFullScreen: [
-                  DeviceOrientation.landscapeLeft,
-                  DeviceOrientation.landscapeRight,
-                  DeviceOrientation.portraitDown,
-                  DeviceOrientation.portraitUp
-                ],
-                deviceOrientationsAfterFullScreen: [
-                  DeviceOrientation.landscapeLeft,
-                  DeviceOrientation.landscapeRight,
-                  DeviceOrientation.portraitDown,
-                  DeviceOrientation.portraitUp
-                ],
-                handleLifecycle: false,
-                startAt: startAt,
-                autoPlay: true,
-                allowedScreenSleep: false,
-                fit: fillVideo ? BoxFit.cover : BoxFit.contain,
-                subtitlesConfiguration: BetterPlayerSubtitlesConfiguration(
-                    backgroundColor: settings.state.subtitlesBackground
-                        ? Colors.black.withValues(alpha: 0.8)
-                        : Colors.transparent,
-                    fontSize: settings.state.subtitleSize,
-                    outlineEnabled: true,
-                    outlineColor: Colors.black,
-                    outlineSize: 1),
-                controlsConfiguration: const BetterPlayerControlsConfiguration(
-                    showControls: false
-                    // customControlsBuilder: (controller, onPlayerVisibilityChanged) => PlayerControls(mediaPlayerCubit: this),
-                    // customControlsBuilder: (controller, onPlayerVisibilityChanged) => const PlayerControls(),
-                    // enablePlayPause: false,
-                    // overflowModalColor: colors.surface,
-                    // overflowModalTextColor: overFlowTextColor,
-                    // overflowMenuIconsColor: overFlowTextColor,
-                    // overflowMenuCustomItems: [BetterPlayerOverflowMenuItem(useDash ? Icons.check_box_outlined : Icons.check_box_outline_blank, locals.useDash, toggleDash)])
-                    )),
-            betterPlayerDataSource: betterPlayerDataSource);
+          BetterPlayerConfiguration(
+            overlay: isTv
+                ? const TvPlayerControls()
+                : PlayerControls(mediaPlayerCubit: this),
+            deviceOrientationsOnFullScreen: [
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.portraitDown,
+              DeviceOrientation.portraitUp,
+            ],
+            deviceOrientationsAfterFullScreen: [
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.portraitDown,
+              DeviceOrientation.portraitUp,
+            ],
+            handleLifecycle: false,
+            startAt: startAt,
+            autoPlay: true,
+            allowedScreenSleep: false,
+            fit: fillVideo ? BoxFit.cover : BoxFit.contain,
+            subtitlesConfiguration: BetterPlayerSubtitlesConfiguration(
+              backgroundColor: settings.state.subtitlesBackground
+                  ? Colors.black.withValues(alpha: 0.8)
+                  : Colors.transparent,
+              fontSize: settings.state.subtitleSize,
+              outlineEnabled: true,
+              outlineColor: Colors.black,
+              outlineSize: 1,
+            ),
+            controlsConfiguration: const BetterPlayerControlsConfiguration(
+              showControls: false,
+              // customControlsBuilder: (controller, onPlayerVisibilityChanged) => PlayerControls(mediaPlayerCubit: this),
+              // customControlsBuilder: (controller, onPlayerVisibilityChanged) => const PlayerControls(),
+              // enablePlayPause: false,
+              // overflowModalColor: colors.surface,
+              // overflowModalTextColor: overFlowTextColor,
+              // overflowMenuIconsColor: overFlowTextColor,
+              // overflowMenuCustomItems: [BetterPlayerOverflowMenuItem(useDash ? Icons.check_box_outlined : Icons.check_box_outline_blank, locals.useDash, toggleDash)])
+            ),
+          ),
+          betterPlayerDataSource: betterPlayerDataSource,
+        );
         videoController!.addEventsListener(onVideoListener);
         videoController!.setBetterPlayerGlobalKey(newState.key);
         // isPipSupported = await videoController?.isPictureInPictureSupported() ?? false;
@@ -502,8 +539,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     if (state.video != null) {
       if (settings.state.useDash) {
         var tracks = getAudioTracks();
-        var track =
-            _audioTrackToString(videoController?.betterPlayerAsmsAudioTrack);
+        var track = _audioTrackToString(
+          videoController?.betterPlayerAsmsAudioTrack,
+        );
         log.fine("Current audio track: $track");
         return tracks.indexOf(track);
       }
@@ -516,9 +554,9 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   List<String> getSubtitles() {
     return state.video != null
         ? videoController?.betterPlayerSubtitlesSourceList
-                .map(_subtitleToString)
-                .toList() ??
-            []
+                  .map(_subtitleToString)
+                  .toList() ??
+              []
         : [];
   }
 
@@ -624,17 +662,18 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
 @freezed
 sealed class VideoPlayerState extends MediaPlayerState with _$VideoPlayerState {
-  const factory VideoPlayerState(
-      {required ColorScheme colors,
-      required Color overFlowTextColor,
-      required GlobalKey key,
-      Duration? startAt,
-      @Default("") String selectedNonDashTrack,
-      @Default(Duration.zero) Duration? bufferPosition,
-      Video? video,
-      DownloadedVideo? offlineVideo,
-      bool? playNow,
-      bool? disableControls}) = _VideoPlayerState;
+  const factory VideoPlayerState({
+    required ColorScheme colors,
+    required Color overFlowTextColor,
+    required GlobalKey key,
+    Duration? startAt,
+    @Default("") String selectedNonDashTrack,
+    @Default(Duration.zero) Duration? bufferPosition,
+    Video? video,
+    DownloadedVideo? offlineVideo,
+    bool? playNow,
+    bool? disableControls,
+  }) = _VideoPlayerState;
 
   const VideoPlayerState._();
 }

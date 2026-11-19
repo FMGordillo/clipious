@@ -22,7 +22,8 @@ class VideoFilterChannel extends StatelessWidget {
 
     AutoRouter.of(context)
         .push(
-            VideoFilterSetupRoute(channelId: filter.channelId, filter: filter))
+          VideoFilterSetupRoute(channelId: filter.channelId, filter: filter),
+        )
         .then((value) => cubit.refreshFilters());
   }
 
@@ -56,38 +57,44 @@ class VideoFilterChannel extends StatelessWidget {
                         ),
                       ),
                       Visibility(
-                          visible: state.loading,
-                          child: const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 1,
-                              ))),
+                        visible: state.loading,
+                        child: const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 1),
+                        ),
+                      ),
                       Visibility(
-                          visible: cubit.hasChannel() && !state.loading,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Thumbnail(
-                              thumbnails:
-                                  ImageObject.getThumbnailUrlsByPreferredOrder(
-                                      state.channel?.authorThumbnails),
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20)),
+                        visible: cubit.hasChannel() && !state.loading,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Thumbnail(
+                            thumbnails:
+                                ImageObject.getThumbnailUrlsByPreferredOrder(
+                                  state.channel?.authorThumbnails,
+                                ),
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                       Expanded(
-                          child: Visibility(
-                              visible: cubit.hasChannel(),
-                              child: Text(
-                                state.channel?.author ?? '',
-                                style: titleStyle,
-                              ))),
+                        child: Visibility(
+                          visible: cubit.hasChannel(),
+                          child: Text(
+                            state.channel?.author ?? '',
+                            style: titleStyle,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                ...state.filters.map((e) => SwipeActionCell(
+                ...state.filters.map(
+                  (e) => SwipeActionCell(
                     key: ValueKey('filter-swipe-${e.uuid}'),
                     trailingActions: [
                       SwipeAction(
@@ -107,11 +114,14 @@ class VideoFilterChannel extends StatelessWidget {
                           // await handler(true);
                           editFilter(context, filter: e);
                         },
-                      )
+                      ),
                     ],
                     child: InkWell(
-                        onTap: () => editFilter(context, filter: e),
-                        child: VideoFilterItem(filter: e))))
+                      onTap: () => editFilter(context, filter: e),
+                      child: VideoFilterItem(filter: e),
+                    ),
+                  ),
+                ),
               ],
             ),
           );

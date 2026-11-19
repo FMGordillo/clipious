@@ -88,14 +88,16 @@ class FileDB extends IDbClient {
   }
 
   Future<void> setLastSubscriptionNotification(
-      SubscriptionNotification sub) async {
+    SubscriptionNotification sub,
+  ) async {
     File f = await _openAppFile(_subNotifsFile);
     await _writeMapToFile(f, sub.toJson());
   }
 
   Future<ChannelNotification?> getChannelNotification(String channelId) async {
-    return (await getAllChannelNotifications())
-        .firstWhereOrNull((element) => element.channelId == channelId);
+    return (await getAllChannelNotifications()).firstWhereOrNull(
+      (element) => element.channelId == channelId,
+    );
   }
 
   Future<List<ChannelNotification>> getAllChannelNotifications() async {
@@ -118,7 +120,9 @@ class FileDB extends IDbClient {
   }
 
   Future<void> setChannelNotificationLastViewedVideo(
-      String channelId, String videoId) async {
+    String channelId,
+    String videoId,
+  ) async {
     var notif = await getChannelNotification(channelId);
     if (notif != null) {
       notif.lastSeenVideoId = videoId;
@@ -128,9 +132,11 @@ class FileDB extends IDbClient {
   }
 
   Future<PlaylistNotification?> getPlaylistNotification(
-      String playlistId) async {
-    return (await getAllPlaylistNotifications())
-        .firstWhereOrNull((element) => element.playlistId == playlistId);
+    String playlistId,
+  ) async {
+    return (await getAllPlaylistNotifications()).firstWhereOrNull(
+      (element) => element.playlistId == playlistId,
+    );
   }
 
   Future<List<PlaylistNotification>> getAllPlaylistNotifications() async {
@@ -155,7 +161,9 @@ class FileDB extends IDbClient {
   }
 
   Future<void> setPlaylistNotificationLastViewedVideo(
-      String playlistId, int videoCount) async {
+    String playlistId,
+    int videoCount,
+  ) async {
     var notif = await getPlaylistNotification(playlistId);
     if (notif != null) {
       notif.lastVideoCount = videoCount;
@@ -165,7 +173,8 @@ class FileDB extends IDbClient {
   }
 
   Future<void> _updateChannelNotifications(
-      List<ChannelNotification> notifications) async {
+    List<ChannelNotification> notifications,
+  ) async {
     Map<String, ChannelNotification> map = {};
     for (var element in notifications) {
       map[element.channelId] = element;
@@ -176,7 +185,8 @@ class FileDB extends IDbClient {
   }
 
   Future<void> _updatePlayListNotifications(
-      List<PlaylistNotification> notifications) async {
+    List<PlaylistNotification> notifications,
+  ) async {
     Map<String, PlaylistNotification> map = {};
     for (var element in notifications) {
       map[element.playlistId] = element;
@@ -402,7 +412,7 @@ class FileDB extends IDbClient {
     _log.fine("trying to get setting $name");
     return switch (name) {
       (useProxySettingName) => SettingsValue(useProxySettingName, "false"),
-      (_) => throw UnimplementedError()
+      (_) => throw UnimplementedError(),
     };
   }
 
@@ -498,7 +508,7 @@ class FileDB extends IDbClient {
 @JsonSerializable()
 class FileDbGenericSettings {
   Server?
-      server; // we only store the currently used server because that's what we're interested in
+  server; // we only store the currently used server because that's what we're interested in
   bool subscriptionNotifications = false;
   String? locale;
 

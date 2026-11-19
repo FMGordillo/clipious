@@ -55,7 +55,8 @@ class VideoFilterCubit extends Cubit<VideoFilterState> {
 
 @freezed
 sealed class VideoFilterState with _$VideoFilterState {
-  const factory VideoFilterState(
-      {@Default([]) List<VideoFilter> filters,
-      @Default(false) bool hideFilteredVideos}) = _VideoFilterState;
+  const factory VideoFilterState({
+    @Default([]) List<VideoFilter> filters,
+    @Default(false) bool hideFilteredVideos,
+  }) = _VideoFilterState;
 }

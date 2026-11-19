@@ -30,65 +30,77 @@ class ExpandedSideBar extends StatelessWidget {
     bool isFullScreen =
         controller.fullScreenState == FullScreenState.fullScreen;
     var distractionFreeMode = settings.distractionFreeMode;
-    return Builder(builder: (context) {
-      var selectedIndex = context
-          .select((PlayerCubit value) => value.state.selectedFullScreenIndex);
-      return !isFullScreen &&
-              !controller.isMini &&
-              (video != null || offlineVid != null)
-          ? video != null
-              ? DefaultTabController(
-                  initialIndex: selectedIndex,
-                  length: distractionFreeMode ? 2 : 4,
-                  child: Column(children: [
-                    TabBar(tabs: [
-                      Tab(
-                        icon: const Icon(Icons.info),
-                        text: locals.info,
-                      ),
-                      if (!distractionFreeMode)
-                        Tab(
-                          icon: const Icon(Icons.chat_bubble),
-                          text: locals.comments,
-                        ),
-                      if (!distractionFreeMode)
-                        Tab(
-                          icon: const Icon(Icons.schema),
-                          text: locals.recommended,
-                        ),
-                      Tab(
-                        icon: const Icon(Icons.playlist_play),
-                        text: locals.videoQueue,
-                      )
-                    ]),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: innerHorizontalPadding),
-                        child: TabBarView(children: <Widget>[
-                          SingleChildScrollView(
-                            child: VideoInfo(
-                              video: video,
-                              titleAndChannelInfo: false,
-                            ),
+    return Builder(
+      builder: (context) {
+        var selectedIndex = context.select(
+          (PlayerCubit value) => value.state.selectedFullScreenIndex,
+        );
+        return !isFullScreen &&
+                !controller.isMini &&
+                (video != null || offlineVid != null)
+            ? video != null
+                  ? DefaultTabController(
+                      initialIndex: selectedIndex,
+                      length: distractionFreeMode ? 2 : 4,
+                      child: Column(
+                        children: [
+                          TabBar(
+                            tabs: [
+                              Tab(
+                                icon: const Icon(Icons.info),
+                                text: locals.info,
+                              ),
+                              if (!distractionFreeMode)
+                                Tab(
+                                  icon: const Icon(Icons.chat_bubble),
+                                  text: locals.comments,
+                                ),
+                              if (!distractionFreeMode)
+                                Tab(
+                                  icon: const Icon(Icons.schema),
+                                  text: locals.recommended,
+                                ),
+                              Tab(
+                                icon: const Icon(Icons.playlist_play),
+                                text: locals.videoQueue,
+                              ),
+                            ],
                           ),
-                          if (!distractionFreeMode)
-                            SingleChildScrollView(
-                              child: CommentsContainer(
-                                video: video,
-                                key: ValueKey('comms-${video.videoId}'),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: innerHorizontalPadding,
+                              ),
+                              child: TabBarView(
+                                children: <Widget>[
+                                  SingleChildScrollView(
+                                    child: VideoInfo(
+                                      video: video,
+                                      titleAndChannelInfo: false,
+                                    ),
+                                  ),
+                                  if (!distractionFreeMode)
+                                    SingleChildScrollView(
+                                      child: CommentsContainer(
+                                        video: video,
+                                        key: ValueKey('comms-${video.videoId}'),
+                                      ),
+                                    ),
+                                  if (!distractionFreeMode)
+                                    SingleChildScrollView(
+                                      child: RecommendedVideos(video: video),
+                                    ),
+                                  const VideoQueue(),
+                                ],
                               ),
                             ),
-                          if (!distractionFreeMode)
-                            SingleChildScrollView(
-                                child: RecommendedVideos(video: video)),
-                          const VideoQueue(),
-                        ]),
+                          ),
+                        ],
                       ),
                     )
-                  ]))
-              : const SizedBox.shrink()
-          : const SizedBox.shrink();
-    });
+                  : const SizedBox.shrink()
+            : const SizedBox.shrink();
+      },
+    );
   }
 }

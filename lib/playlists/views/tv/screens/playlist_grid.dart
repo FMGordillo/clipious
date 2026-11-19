@@ -14,8 +14,11 @@ class TvPlaylistGridScreen extends StatelessWidget {
   final PaginatedList<Playlist> playlistList;
   final String? tags;
 
-  const TvPlaylistGridScreen(
-      {super.key, required this.playlistList, this.tags});
+  const TvPlaylistGridScreen({
+    super.key,
+    required this.playlistList,
+    this.tags,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,48 +30,54 @@ class TvPlaylistGridScreen extends StatelessWidget {
       child: Scaffold(
         body: TvOverscan(
           child: BlocBuilder<PlaylistListCubit, PlaylistListState>(
-              builder: (context, state) {
-            var cubit = context.read<PlaylistListCubit>();
+            builder: (context, state) {
+              var cubit = context.read<PlaylistListCubit>();
 
-            return Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      locals.playlists,
-                      style: textTheme.titleLarge,
-                    ),
-                    state.loading
-                        ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: SizedBox(
+              return Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(locals.playlists, style: textTheme.titleLarge),
+                      state.loading
+                          ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: SizedBox(
                                 width: 15,
                                 height: 15,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2)),
-                          )
-                        : const SizedBox.shrink()
-                  ],
-                ),
-                Expanded(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                  Expanded(
                     child: GridView.count(
-                  controller: cubit.scrollController,
-                  childAspectRatio: 16 / 13,
-                  crossAxisCount: 3,
-                  children: [
-                    ...state.playlists.map((e) => PlaylistInList(
-                        key: ValueKey(e.playlistId),
-                        playlist: e,
-                        canDeleteVideos: false,
-                        isTv: true)),
-                    if (state.loading)
-                      ...repeatWidget(() => const TvPlaylistPlaceHolder(),
-                          count: 10)
-                  ],
-                ))
-              ],
-            );
-          }),
+                      controller: cubit.scrollController,
+                      childAspectRatio: 16 / 13,
+                      crossAxisCount: 3,
+                      children: [
+                        ...state.playlists.map(
+                          (e) => PlaylistInList(
+                            key: ValueKey(e.playlistId),
+                            playlist: e,
+                            canDeleteVideos: false,
+                            isTv: true,
+                          ),
+                        ),
+                        if (state.loading)
+                          ...repeatWidget(
+                            () => const TvPlaylistPlaceHolder(),
+                            count: 10,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

@@ -17,11 +17,16 @@ class ChannelCubit extends Cubit<ChannelController> {
     bool isSubscribed = await service.isSubscribedToChannel(state.channelId);
     Channel channel = await service.getChannel(state.channelId);
 
-    emit(state.copyWith(
-        channel: channel, loading: false, isSubscribed: isSubscribed));
+    emit(
+      state.copyWith(
+        channel: channel,
+        loading: false,
+        isSubscribed: isSubscribed,
+      ),
+    );
   }
 
-/*
+  /*
   @override
   close() async {
     state.controller?.dispose();
@@ -37,8 +42,9 @@ class ChannelCubit extends Cubit<ChannelController> {
       } else {
         await service.subscribe(state.channel!.authorId);
       }
-      bool isSubscribed =
-          await service.isSubscribedToChannel(state.channel!.authorId);
+      bool isSubscribed = await service.isSubscribedToChannel(
+        state.channel!.authorId,
+      );
 
       emit(state.copyWith(isSubscribed: isSubscribed));
     }
@@ -51,14 +57,14 @@ class ChannelCubit extends Cubit<ChannelController> {
 
 @freezed
 sealed class ChannelController with _$ChannelController {
-  const factory ChannelController(
-          {required String channelId,
-          @Default(false) bool isSubscribed,
-          Channel? channel,
-          @Default(true) bool loading,
-          @Default(false) bool smallHeader,
-          @Default(200) double barHeight,
-          @Default(1) double barOpacity,
-          @Default(ChannelSortBy.newest) ChannelSortBy sortBy}) =
-      _ChannelController;
+  const factory ChannelController({
+    required String channelId,
+    @Default(false) bool isSubscribed,
+    Channel? channel,
+    @Default(true) bool loading,
+    @Default(false) bool smallHeader,
+    @Default(200) double barHeight,
+    @Default(1) double barOpacity,
+    @Default(ChannelSortBy.newest) ChannelSortBy sortBy,
+  }) = _ChannelController;
 }
