@@ -95,6 +95,9 @@ dev_dependencies:
 dependency_overrides:
   matcher: 0.12.19
   test_api: 0.7.10
+  # jni 1.2.0 breaks path_provider_android 2.3.1 (ClassNotFoundException "Landroid/content/Context;"), app hangs on splash
+  jni: 1.1.2
+  jni_flutter: 1.0.4+1
 flutter:
   assets:
     - assets/icon.svg
