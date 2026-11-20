@@ -1,15 +1,15 @@
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/downloads/models/downloaded_video.dart';
-import 'package:clipious/extensions.dart';
 import 'package:clipious/globals.dart';
+import 'package:clipious/player/models/dash_audio_track.dart';
 import 'package:clipious/player/states/interfaces/media_player.dart';
+import 'package:clipious/settings/models/db/server.dart';
 import 'package:clipious/videos/models/video.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 
 import '../../settings/states/settings.dart';
-import '../../videos/models/adaptive_format.dart';
 import '../models/media_event.dart';
 
 part 'audio_player.freezed.dart';
@@ -19,6 +19,8 @@ Logger log = Logger('AudioPlayerController');
 class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   AudioPlayer? audioPlayer;
   final SettingsCubit settings;
+  List<DashAudioTrack> _audioTracks = [];
+  int _selectedAudioTrack = 0;
 
   AudioPlayerCubit(super.initialState, super.player, this.settings) {
     onInit();
@@ -131,6 +133,8 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
           assert(state.video!.formatStreams != null);
           if (service.useProxy()) {
             // audio only streams don't seem to work when using proxy mode, using formatted streams when proxy is enabled
+            _audioTracks = [];
+            _selectedAudioTrack = 0;
             var formatStream = state
                 .video!
                 .formatStreams![state.video!.formatStreams!.length - 1];
@@ -139,11 +143,8 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
               headers: server.headersForUrl(formatStream.url),
             );
           } else {
-            AdaptiveFormat? audio = state.video?.adaptiveFormats!
-                .where((element) => element.type.contains("audio"))
-                .sortByReversed((e) => int.parse(e.bitrate ?? "0"))
-                .first;
-            if (audio != null) {
+            final audioUrl = await _resolveAudioUrl(state.video!, server);
+            if (audioUrl != null) {
               if (startAt == null) {
                 double progress = db.getVideoProgress(state.video!.videoId);
                 if (progress > 0 && progress < 0.90) {
@@ -156,12 +157,14 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
               emit(state);
 
               source = AudioSource.uri(
-                Uri.parse(audio.url),
-                headers: server.headersForUrl(audio.url),
+                Uri.parse(audioUrl),
+                headers: server.headersForUrl(audioUrl),
               );
             }
           }
         } else {
+          _audioTracks = [];
+          _selectedAudioTrack = 0;
           String path = await state.offlineVideo!.effectivePath;
           source = AudioSource.file(path);
         }
@@ -290,7 +293,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
 
   @override
   List<String> getAudioTracks() {
-    return [];
+    return _audioTracks.map((t) => t.label).toList();
   }
 
   @override
@@ -300,7 +303,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
 
   @override
   int selectedAudioTrack() {
-    return 0;
+    return _selectedAudioTrack;
   }
 
   @override
@@ -314,8 +317,71 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
   }
 
   @override
-  selectAudioTrack(int index) {
-    return 0;
+  selectAudioTrack(int index) async {
+    if (index < 0 ||
+        index >= _audioTracks.length ||
+        index == _selectedAudioTrack) {
+      return;
+    }
+    final track = _audioTracks[index];
+    final server = await db.getCurrentlySelectedServer();
+    final pos = position();
+    _selectedAudioTrack = index;
+    try {
+      await audioPlayer?.setAudioSource(
+        AudioSource.uri(
+          Uri.parse(track.url),
+          headers: server.headersForUrl(track.url),
+        ),
+        initialPosition: pos,
+      );
+      play();
+    } catch (e) {
+      log.severe("Couldn't switch audio track", e);
+    }
+  }
+
+  /// Prefer DASH default language; fall back to first adaptive audio (Invidious order).
+  Future<String?> _resolveAudioUrl(Video video, Server server) async {
+    _audioTracks = await _loadDashAudioTracks(video, server);
+    if (_audioTracks.isNotEmpty) {
+      _selectedAudioTrack = _audioTracks.indexWhere((t) => t.isDefault);
+      if (_selectedAudioTrack < 0) _selectedAudioTrack = 0;
+      return _audioTracks[_selectedAudioTrack].url;
+    }
+
+    _selectedAudioTrack = 0;
+    return video.adaptiveFormats
+        ?.where((e) => e.type.contains('audio'))
+        .firstOrNull
+        ?.url;
+  }
+
+  Future<List<DashAudioTrack>> _loadDashAudioTracks(
+    Video video,
+    Server server,
+  ) async {
+    var dashUrl = video.dashUrl;
+    if (dashUrl == null || dashUrl.isEmpty) return [];
+
+    if (service.useProxy()) {
+      dashUrl += dashUrl.contains('?') ? '&local=true' : '?local=true';
+    }
+    if (!dashUrl.startsWith('http')) {
+      dashUrl = '${server.url}$dashUrl';
+    }
+
+    try {
+      final response = await service.httpClient.get(
+        Uri.parse(dashUrl),
+        headers: server.headersForUrl(dashUrl),
+      );
+      if (response.statusCode != 200) return [];
+      return parseDashAudioTracks(response.body);
+    } catch (e, st) {
+      log.warning('Failed to load DASH audio tracks', e, st);
+      return [];
+    }
   }
 
   @override
