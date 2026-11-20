@@ -18,7 +18,7 @@ FileDbGenericSettings _$FileDbGenericSettingsFromJson(
 Map<String, dynamic> _$FileDbGenericSettingsToJson(
   FileDbGenericSettings instance,
 ) => <String, dynamic>{
-  'server': instance.server,
+  'server': instance.server?.toJson(),
   'subscriptionNotifications': instance.subscriptionNotifications,
   'locale': instance.locale,
 };

@@ -18,6 +18,7 @@ import 'package:clipious/notifications/notifications.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/router.dart';
 import 'package:clipious/settings/models/db/settings.dart';
+import 'package:clipious/settings/models/errors/no_server_selected.dart';
 import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
@@ -72,7 +73,12 @@ Future<void> main() async {
   try {
     await db.getCurrentlySelectedServer();
     hasServer = true;
-  } catch (err) {
+  } on NoServerSelected {
+    hasServer = false;
+  } catch (err, stacktrace) {
+    // Do not treat unrelated DB errors as "first launch" without a trace —
+    // that makes a failed read look like the wizard was never completed.
+    log.severe('Failed to read selected server on startup', err, stacktrace);
     hasServer = false;
   }
   appRouter = AppRouter(hasServer: hasServer);

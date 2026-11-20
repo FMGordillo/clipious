@@ -16,7 +16,7 @@ import 'package:clipious/videos/models/db/progress.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sembast/sembast.dart';
+import 'package:sembast/sembast_io.dart';
 import 'package:sembast/sembast_memory.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -59,22 +59,34 @@ class SembastSqfDb extends IDbClient {
   SembastSqfDb(this.db);
 
   static Future<SembastSqfDb> create() async {
+    final log = Logger('SembastSqfLDB');
     late final Directory docsDir;
     try {
       docsDir = await getApplicationDocumentsDirectory();
     } catch (e) {
+      // Directory.current is not stable across launches; only a last resort.
+      log.severe(
+        'Could not resolve application documents directory, falling back to cwd',
+        e,
+      );
       docsDir = Directory.current;
     }
 
     var dbPath = p.join(docsDir.path, "clipious.db");
+    log.info('Opening database at $dbPath');
 
-    final databaseFactorySqflite = getDatabaseFactorySqflite(
-      sqflite.databaseFactory,
-    );
-    var db = await databaseFactorySqflite.openDatabase(
-      dbPath.toString(),
-      version: 1,
-    );
+    final Database db;
+    if (Platform.isLinux || Platform.isWindows) {
+      // sqflite has no Linux/Windows plugin. Without a real file backend the
+      // app either crashes on startup or cannot persist the selected server
+      // across launches (welcome wizard every time).
+      db = await databaseFactoryIo.openDatabase(dbPath);
+    } else {
+      final databaseFactorySqflite = getDatabaseFactorySqflite(
+        sqflite.databaseFactory,
+      );
+      db = await databaseFactorySqflite.openDatabase(dbPath, version: 1);
+    }
 
     return SembastSqfDb(db);
   }

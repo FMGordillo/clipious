@@ -505,7 +505,7 @@ class FileDB extends IDbClient {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class FileDbGenericSettings {
   Server?
   server; // we only store the currently used server because that's what we're interested in

@@ -23,7 +23,7 @@ class TvManageServersInner extends StatelessWidget {
     var cubit = context.read<ServerListSettingsCubit>();
     final server = await AutoRouter.of(context).push(const TvAddServerRoute());
     if (server != null && server is Server && context.mounted) {
-      cubit.saveServer(server);
+      await cubit.saveServer(server);
     }
   }
 

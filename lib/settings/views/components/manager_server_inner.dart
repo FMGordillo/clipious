@@ -115,7 +115,7 @@ class ManagerServersView extends StatelessWidget {
     var cubit = context.read<ServerListSettingsCubit>();
     final server = await AutoRouter.of(context).push(const AddServerRoute());
     if (server != null && server is Server && context.mounted) {
-      cubit.saveServer(server);
+      await cubit.saveServer(server);
     }
   }
 

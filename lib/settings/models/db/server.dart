@@ -7,6 +7,13 @@ part 'server.g.dart';
 
 final _log = Logger('Server');
 
+Map<String, String> serverHeadersFromJson(dynamic value) {
+  if (value is Map) {
+    return value.map((key, v) => MapEntry(key.toString(), v.toString()));
+  }
+  return const {};
+}
+
 @freezed
 sealed class Server with _$Server {
   const factory Server({
@@ -16,7 +23,9 @@ sealed class Server with _$Server {
     @JsonKey(includeFromJson: false, includeToJson: false) Duration? ping,
     @JsonKey(includeFromJson: false, includeToJson: false) String? flag,
     @JsonKey(includeFromJson: false, includeToJson: false) String? region,
-    @Default({}) Map<String, String> customHeaders,
+    @JsonKey(fromJson: serverHeadersFromJson)
+    @Default({})
+    Map<String, String> customHeaders,
     @Default(false) bool inUse,
   }) = _Server;
 

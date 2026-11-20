@@ -104,7 +104,7 @@ class ServerListSettingsCubit extends Cubit<ServerListSettingsState> {
   saveServer(Server server) async {
     await db.upsertServer(server);
     if (state.dbServers.isEmpty) {
-      switchServer(server);
+      await switchServer(server);
     }
     await refreshServers();
   }

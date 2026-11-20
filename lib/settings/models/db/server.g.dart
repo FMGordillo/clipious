@@ -10,11 +10,9 @@ _Server _$ServerFromJson(Map<String, dynamic> json) => _Server(
   url: json['url'] as String,
   authToken: json['authToken'] as String?,
   sidCookie: json['sidCookie'] as String?,
-  customHeaders:
-      (json['customHeaders'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ) ??
-      const {},
+  customHeaders: json['customHeaders'] == null
+      ? const {}
+      : serverHeadersFromJson(json['customHeaders']),
   inUse: json['inUse'] as bool? ?? false,
 );
 

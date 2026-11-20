@@ -18,6 +18,7 @@ import 'package:clipious/search/views/screens/video_tab.dart';
 import 'package:clipious/search/views/tv/screens/search.dart';
 import 'package:clipious/settings/models/db/server.dart';
 import 'package:clipious/settings/models/db/video_filter.dart';
+import 'package:clipious/settings/models/errors/no_server_selected.dart';
 import 'package:clipious/settings/views/screens/add_server.dart';
 import 'package:clipious/settings/views/screens/app_logs.dart';
 import 'package:clipious/settings/views/screens/appearance.dart';
@@ -267,7 +268,18 @@ class AppRouter extends RootStackRouter {
       }
       await db.getCurrentlySelectedServer();
       resolver.next(true);
-    } catch (e) {
+    } on NoServerSelected {
+      if (isTv) {
+        resolver.redirectUntil(const TvWelcomeWizardRoute(), replace: true);
+      } else {
+        resolver.redirectUntil(const WelcomeWizardRoute(), replace: true);
+      }
+    } catch (e, stacktrace) {
+      log.severe(
+        'Navigation guard failed while checking server',
+        e,
+        stacktrace,
+      );
       if (isTv) {
         resolver.redirectUntil(const TvWelcomeWizardRoute(), replace: true);
       } else {
