@@ -32,6 +32,26 @@ const _manifest = '''
 </MPD>
 ''';
 
+const _unknownOnly = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<MPD>
+ <Period>
+  <AdaptationSet id="0" mimeType="audio/mp4" label="Unknown [50197k]" lang="und">
+   <Role schemeIdUri="urn:mpeg:dash:role:2011" value="main"/>
+   <Representation id="139" bandwidth="50197">
+    <BaseURL>https://example.com/low</BaseURL>
+   </Representation>
+  </AdaptationSet>
+  <AdaptationSet id="1" mimeType="audio/mp4" label="Unknown [129533k]" lang="und">
+   <Role schemeIdUri="urn:mpeg:dash:role:2011" value="alternate"/>
+   <Representation id="140" bandwidth="129533">
+    <BaseURL>https://example.com/high</BaseURL>
+   </Representation>
+  </AdaptationSet>
+ </Period>
+</MPD>
+''';
+
 void main() {
   test('parseDashAudioTracks keeps best bitrate per lang, default first', () {
     final tracks = parseDashAudioTracks(_manifest);
@@ -40,11 +60,25 @@ void main() {
     expect(tracks[0].lang, 'en');
     expect(tracks[0].isDefault, true);
     expect(tracks[0].label, 'English original');
+    expect(tracks[0].itag, '141');
     expect(tracks[0].url, 'https://example.com/en');
 
     expect(tracks[1].lang, 'hi');
     expect(tracks[1].isDefault, false);
     expect(tracks[1].label, 'Hindi');
+    expect(tracks[1].itag, '140');
     expect(tracks[1].url, 'https://example.com/hi-high');
+    expect(hasSelectableAudioLanguages(tracks), true);
+  });
+
+  test('Unknown bitrate stubs collapse and are not selectable', () {
+    final tracks = parseDashAudioTracks(_unknownOnly);
+
+    expect(tracks.length, 1);
+    expect(tracks[0].label, 'Unknown');
+    expect(tracks[0].isDefault, true);
+    expect(tracks[0].itag, '140');
+    expect(tracks[0].url, 'https://example.com/high');
+    expect(hasSelectableAudioLanguages(tracks), false);
   });
 }

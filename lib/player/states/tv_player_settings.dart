@@ -43,12 +43,8 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
                 .toList() ??
             [];
 
-  List<String> get audioTrackNames => settings.state.useDash
-      ? player.videoController?.betterPlayerAsmsAudioTracks
-                ?.map((e) => '${e.label}')
-                .toList() ??
-            []
-      : [];
+  List<String> get audioTrackNames =>
+      settings.state.useDash ? player.getAudioTracks() : [];
 
   List<String> get availableCaptions =>
       player.videoController?.betterPlayerSubtitlesSourceList
@@ -109,14 +105,10 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
   }
 
   changeChangeAudioTrack(String selected) {
-    log.fine('Audio quality selected $selected');
-    BetterPlayerAsmsAudioTrack? track = videoController
-        ?.betterPlayerAsmsAudioTracks
-        ?.firstWhere((e) => '${e.label}' == selected);
-
-    if (track != null) {
-      log.fine('Changing audio track to $selected');
-      videoController?.setAudioTrack(track);
+    log.fine('Audio track selected $selected');
+    final index = player.getAudioTracks().indexOf(selected);
+    if (index >= 0) {
+      player.selectAudioTrack(index);
     }
   }
 

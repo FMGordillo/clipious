@@ -10,6 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
 
 import '../../settings/states/settings.dart';
+import '../../videos/models/adaptive_format.dart';
 import '../models/media_event.dart';
 
 part 'audio_player.freezed.dart';
@@ -293,6 +294,7 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
 
   @override
   List<String> getAudioTracks() {
+    if (!hasSelectableAudioLanguages(_audioTracks)) return [];
     return _audioTracks.map((t) => t.label).toList();
   }
 
@@ -341,9 +343,14 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
     }
   }
 
-  /// Prefer DASH default language; fall back to first adaptive audio (Invidious order).
+  /// Prefer DASH default language; play via adaptiveFormats URLs (just_audio-safe).
   Future<String?> _resolveAudioUrl(Video video, Server server) async {
-    _audioTracks = await _loadDashAudioTracks(video, server);
+    final dashTracks = await _loadDashAudioTracks(video, server);
+    _audioTracks = _bindTracksToAdaptiveFormats(
+      dashTracks,
+      video.adaptiveFormats,
+    );
+
     if (_audioTracks.isNotEmpty) {
       _selectedAudioTrack = _audioTracks.indexWhere((t) => t.isDefault);
       if (_selectedAudioTrack < 0) _selectedAudioTrack = 0;
@@ -351,10 +358,36 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
     }
 
     _selectedAudioTrack = 0;
+    // Invidious puts the default-language audio first; do not sort by bitrate.
     return video.adaptiveFormats
         ?.where((e) => e.type.contains('audio'))
         .firstOrNull
         ?.url;
+  }
+
+  /// DASH BaseURLs are SegmentBase streams; just_audio needs adaptiveFormats URLs.
+  List<DashAudioTrack> _bindTracksToAdaptiveFormats(
+    List<DashAudioTrack> tracks,
+    List<AdaptiveFormat>? formats,
+  ) {
+    if (tracks.isEmpty) return [];
+    final audio =
+        formats?.where((e) => e.type.contains('audio')).toList() ?? [];
+    if (audio.isEmpty) return [];
+
+    final bound = <DashAudioTrack>[];
+    for (final track in tracks) {
+      AdaptiveFormat? match;
+      if (track.itag != null) {
+        match = audio.where((a) => a.itag == track.itag).firstOrNull;
+      }
+      match ??= audio
+          .where((a) => int.tryParse(a.bitrate ?? '') == track.bandwidth)
+          .firstOrNull;
+      if (match == null) continue;
+      bound.add(track.copyWith(url: match.url));
+    }
+    return bound;
   }
 
   Future<List<DashAudioTrack>> _loadDashAudioTracks(

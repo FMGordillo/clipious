@@ -477,7 +477,42 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   }
 
   String _audioTrackToString(BetterPlayerAsmsAudioTrack? track) {
-    return '${track?.label} ${track?.language != null ? '- ${track?.language}' : ''}';
+    final label = track?.label;
+    final language = track?.language;
+    if (label != null &&
+        label.isNotEmpty &&
+        !label.toLowerCase().startsWith('unknown')) {
+      return language != null && language != 'und'
+          ? '$label - $language'
+          : label;
+    }
+    return language ?? label ?? 'Audio';
+  }
+
+  /// Invidious emits one AdaptationSet per bitrate (fake quality menu). Collapse
+  /// to one entry per language so the Audio picker is usable.
+  List<BetterPlayerAsmsAudioTrack> _uniqueAudioTracks() {
+    final raw = videoController?.betterPlayerAsmsAudioTracks ?? [];
+    final byKey = <String, BetterPlayerAsmsAudioTrack>{};
+    for (final track in raw) {
+      final key = (track.language != null && track.language != 'und')
+          ? track.language!
+          : (track.label ?? '${track.id}');
+      byKey.putIfAbsent(key, () => track);
+    }
+    final unique = byKey.values.toList();
+    if (unique.length <= 1) return [];
+    final realLangs = unique
+        .map((t) => t.language)
+        .whereType<String>()
+        .where((l) => l != 'und')
+        .toSet();
+    final realLabels = unique
+        .map((t) => t.label?.toLowerCase() ?? '')
+        .where((l) => l.isNotEmpty && !l.startsWith('unknown'))
+        .toSet();
+    if (realLangs.length <= 1 && realLabels.length <= 1) return [];
+    return unique;
   }
 
   String _subtitleToString(BetterPlayerSubtitlesSource? source) {
@@ -522,31 +557,20 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   List<String> getAudioTracks() {
-    if (state.video != null) {
-      if (videoController?.betterPlayerAsmsAudioTracks?.isNotEmpty ?? false) {
-        return videoController?.betterPlayerAsmsAudioTracks
-                ?.map(_audioTrackToString)
-                .toList() ??
-            [];
-      }
-    }
-    // for offline video we don't offer video track selection
-    return [];
+    if (state.video == null) return [];
+    return _uniqueAudioTracks().map(_audioTrackToString).toList();
   }
 
   @override
   int selectedAudioTrack() {
-    if (state.video != null) {
-      if (settings.state.useDash) {
-        var tracks = getAudioTracks();
-        var track = _audioTrackToString(
-          videoController?.betterPlayerAsmsAudioTrack,
-        );
-        log.fine("Current audio track: $track");
-        return tracks.indexOf(track);
-      }
+    if (state.video != null && settings.state.useDash) {
+      final tracks = getAudioTracks();
+      final track = _audioTrackToString(
+        videoController?.betterPlayerAsmsAudioTrack,
+      );
+      log.fine("Current audio track: $track");
+      return tracks.indexOf(track);
     }
-    // for offline video we don't offer video track selection
     return -1;
   }
 
@@ -570,12 +594,21 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   selectAudioTrack(int index) {
-    var betterPlayerAsmsTrack =
-        videoController?.betterPlayerAsmsAudioTracks?[index];
-    log.fine("Selected audio track, ${betterPlayerAsmsTrack?.label}");
-    if (betterPlayerAsmsTrack != null) {
-      videoController?.setAudioTrack(betterPlayerAsmsTrack);
-    }
+    final unique = _uniqueAudioTracks();
+    if (index < 0 || index >= unique.length) return;
+    final track = unique[index];
+    log.fine("Selected audio track, ${track.label}");
+    // Remap id to unique-language index — ExoPlayer groups by language, not bitrate.
+    videoController?.setAudioTrack(
+      BetterPlayerAsmsAudioTrack(
+        id: index,
+        segmentAlignment: track.segmentAlignment,
+        label: track.label,
+        language: track.language,
+        url: track.url,
+        mimeType: track.mimeType,
+      ),
+    );
   }
 
   @override
