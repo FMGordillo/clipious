@@ -42,7 +42,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 - Return YouTube dislikes
 
 ## Installation
-The best way to install is to get it directly from the release page. Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
+The best way to install is to get it directly from the [GitHub releases page](https://github.com/FMGordillo/clipious/releases/latest). Using [Obtainium](https://github.com/ImranR98/Obtainium) can help keeping the app up to date.
+
+Each release ships one APK per CPU. Pick the one for your device:
+
+| Device | APK |
+|---|---|
+| Most phones and tablets | `app-arm64-v8a-release.apk` |
+| Chromecast with Google TV (and other 32-bit Android TV devices) | `app-armeabi-v7a-release.apk` |
+| x86_64 emulators | `app-x86_64-release.apk` |
+
+Not sure which one you need? Run `adb shell getprop ro.product.cpu.abilist` on the device: `arm64-v8a` in the output means the arm64 build, otherwise use armeabi-v7a. Obtainium's APK filter can select one file automatically.
 
 It is also available on F-Droid, IzzyOnDroid, and Accrescent:
 
@@ -53,11 +63,11 @@ It is also available on F-Droid, IzzyOnDroid, and Accrescent:
       alt='Get it on Accrescent'
       height="80">](https://accrescent.app/app/com.github.lamarios.clipious)
 
-Or download the latest APK from the [Releases Section](https://github.com/lamarios/clipious/releases/latest).
+Or download the latest APK from the [Releases Section](https://github.com/FMGordillo/clipious/releases/latest).
 
 ### TV
 
-For TV users it is recommended to use [Accrescent](https://accrescent.app) as it works well enough on TV and allows updates.
+For TV users it is recommended to use [Accrescent](https://accrescent.app) as it works well enough on TV and allows updates. If you sideload from GitHub instead, use the `armeabi-v7a` APK from the table above; the arm64 APK will not install on those devices.
 
 ## Screenshots
 ### Phone

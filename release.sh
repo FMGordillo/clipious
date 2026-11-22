@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 #
-#  release.sh – build, tag and publish Clipious to Codeberg Releases
+#  release.sh – build and tag Clipious for a GitHub release (FMGordillo/clipious)
 #
 #  Prerequisites
 #  • Flutter
 #  • devenv shell
-#  • codeberg CLI (berg)
 #  • Android keystore – a file *android/key.properties* (see below)
 #
 #  Usage
@@ -25,7 +24,7 @@
 #    0. decides the bump, asks for confirmation and bumps pubspec.yaml
 #    4. (removed – version is handled in step 0)
 #    5. commits the bump, creates and pushes a git tag with the same version
-#    6. creates a draft Codeberg release and uploads all APKs and checksums
+#    6. manual: upload all APKs and .sha1 files to the GitHub release for the tag (the script does not upload)
 #    7. (optional) automatically closes the release when uploading is finished
 #
 #  Example:   ./release.sh
@@ -150,5 +149,5 @@ BUMPED=0
 git tag -a "$TAG" -m "Release ${NEW_VERSION}"
 git push origin HEAD "$TAG"
 
-# ---------- 6. Create/draft Codeberg release --------------------------------
-echo "All done. Remember to publish the release from the Codeberg UI."
+# ---------- 6. Manual: GitHub release ----------------------------------------
+echo "All done. Upload the APKs and .sha1 files to the GitHub release for $TAG, then publish it."
