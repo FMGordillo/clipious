@@ -27,8 +27,7 @@ clipious watch
 
 # Build APKs (run `clipious` for all commands)
 clipious apk            # universal debug APK
-clipious apk-split      # per-ABI release APKs
-clipious apk-tv         # Android TV APK
+clipious apk-split      # per-ABI release APKs (mobile + Android TV)
 ```
 
 ## Architecture

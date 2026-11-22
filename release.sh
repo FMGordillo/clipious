@@ -20,7 +20,7 @@
 #
 #  The script
 #    1. runs the code‑generator
-#    2. builds signed release APKs for mobile and TV
+#    2. builds signed per-ABI release APKs (covers mobile and Android TV)
 #    3. collects all APK files and generates SHA1 checksums
 #    0. decides the bump, asks for confirmation and bumps pubspec.yaml
 #    4. (removed – version is handled in step 0)
@@ -116,11 +116,6 @@ flutter clean && flutter pub get && dart run build_runner build
 echo "Building signed Android (mobile) release..."
 ANDROID_KEY_FILE=/home/fmgordillo/code/clipious/android/key.properties \
   flutter build apk --release --split-per-abi
-
-# Build signed Android (TV) release
-echo "Building signed Android (TV) release..."
-ANDROID_KEY_FILE=/home/fmgordillo/code/clipious/android/key.properties \
-  flutter build apk --release --target-platform android-arm
 
 # ---------- 3. Collect all APK files and generate SHA1 checksums -----------------------
 echo "Collecting APK files and generating SHA1 checksums..."

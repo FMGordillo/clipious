@@ -136,9 +136,6 @@
           [ $# -gt 0 ] && shift
           flutter build apk "--$mode" --split-per-abi "$@"
           echo "-> build/app/outputs/flutter-apk/" ;;
-        apk-tv)
-          flutter build apk --release --target-platform android-arm "$@"
-          echo "-> build/app/outputs/flutter-apk/" ;;
         release)   ./release.sh "$@" ;;
         *)
           echo "Usage: clipious <command> [args]"
@@ -151,8 +148,7 @@
           echo "  lint         dart analyze ./lib"
           echo "  test [path]  flutter test"
           echo "  apk [mode]   universal APK (debug|profile|release; default debug)"
-          echo "  apk-split    per-ABI APKs (default release; optional mode arg)"
-          echo "  apk-tv       release APK for Android TV (armv7)"
+          echo "  apk-split    per-ABI release APKs for mobile and Android TV (default release; optional mode arg)"
           echo "  release      run release.sh (build, tag, publish)"
           echo "  (also: setup, check-services)" ;;
       esac
@@ -225,7 +221,7 @@
     export GRADLE_OPTS="''${GRADLE_OPTS//build-tools\/33.0.2\//build-tools/35.0.0/}"
     mkdir -p "$ANDROID_SDK_ROOT" "$GRADLE_USER_HOME"
 
-    echo "Run 'clipious' for dev/build commands (gen, apk, apk-split, apk-tv, test, ...). Also: setup, check-services"
+    echo "Run 'clipious' for dev/build commands (gen, apk, apk-split, test, ...). Also: setup, check-services"
     echo "Pre-commit hooks will automatically start services as needed."
     echo "Run 'devenv up' manually to start PostgreSQL and Invidious for development."
   '';
