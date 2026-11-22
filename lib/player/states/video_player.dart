@@ -356,6 +356,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
                 (s) => BetterPlayerSubtitlesSource(
                   type: BetterPlayerSubtitlesSourceType.network,
                   urls: ['$baseUrl${s.url}'],
+                  headers: server.headersForUrl('$baseUrl${s.url}'),
                   name: s.label,
                   selectedByDefault: s.label == lastSubtitle,
                 ),
@@ -598,17 +599,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     if (index < 0 || index >= unique.length) return;
     final track = unique[index];
     log.fine("Selected audio track, ${track.label}");
-    // Remap id to unique-language index — ExoPlayer groups by language, not bitrate.
-    videoController?.setAudioTrack(
-      BetterPlayerAsmsAudioTrack(
-        id: index,
-        segmentAlignment: track.segmentAlignment,
-        label: track.label,
-        language: track.language,
-        url: track.url,
-        mimeType: track.mimeType,
-      ),
-    );
+    // Keep the manifest id: native setAudioTrack matches it to ExoPlayer's audio group index.
+    videoController?.setAudioTrack(track);
   }
 
   @override
