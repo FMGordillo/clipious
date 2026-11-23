@@ -1,12 +1,15 @@
+import 'package:clipious/downloads/models/downloaded_video.dart';
+import 'package:clipious/globals.dart';
+import 'package:clipious/player/states/linux_video_player.dart';
+import 'package:clipious/player/states/player.dart';
+import 'package:clipious/player/states/video_player.dart';
+import 'package:clipious/player/views/components/player_controls.dart';
+import 'package:clipious/settings/states/settings.dart';
+import 'package:clipious/videos/models/video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:clipious/downloads/models/downloaded_video.dart';
-import 'package:clipious/player/states/video_player.dart';
-import 'package:clipious/settings/states/settings.dart';
+import 'package:media_kit_video/media_kit_video.dart' as mkv;
 import 'package:river_player/river_player.dart';
-
-import '../../../videos/models/video.dart';
-import '../../states/player.dart';
 
 class VideoPlayer extends StatefulWidget {
   final Video? video;
@@ -45,20 +48,47 @@ class _VideoPlayerState extends State<VideoPlayer> {
     var player = context.read<PlayerCubit>();
     var settings = context.read<SettingsCubit>();
 
-    return BlocProvider(
-      create: (context) => VideoPlayerCubit(
-        VideoPlayerState(
-          startAt: widget.startAt,
-          overFlowTextColor: overFlowTextColor,
-          colors: colorScheme,
-          key: _betterPlayerKey,
-          video: widget.video,
-          offlineVideo: widget.offlineVideo,
-          disableControls: widget.disableControls,
+    final initial = VideoPlayerState(
+      startAt: widget.startAt,
+      overFlowTextColor: overFlowTextColor,
+      colors: colorScheme,
+      key: _betterPlayerKey,
+      video: widget.video,
+      offlineVideo: widget.offlineVideo,
+      disableControls: widget.disableControls,
+    );
+
+    if (isLinuxDesktop) {
+      return BlocProvider(
+        create: (context) => LinuxVideoPlayerCubit(initial, player, settings),
+        child: BlocBuilder<LinuxVideoPlayerCubit, VideoPlayerState>(
+          builder: (context, playerState) {
+            final cubit = context.read<LinuxVideoPlayerCubit>();
+            return BlocListener<PlayerCubit, PlayerState>(
+              listenWhen: (previous, current) =>
+                  previous.mediaCommand != current.mediaCommand &&
+                  current.mediaCommand != null,
+              listener: (context, state) =>
+                  cubit.handleCommand(state.mediaCommand!),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  mkv.Video(
+                    controller: cubit.videoController,
+                    controls: mkv.NoVideoControls,
+                  ),
+                  if (!(widget.disableControls ?? false))
+                    PlayerControls(mediaPlayerCubit: cubit),
+                ],
+              ),
+            );
+          },
         ),
-        player,
-        settings,
-      ),
+      );
+    }
+
+    return BlocProvider(
+      create: (context) => VideoPlayerCubit(initial, player, settings),
       child: BlocBuilder<VideoPlayerCubit, VideoPlayerState>(
         builder: (context, playerState) {
           var cubit = context.read<VideoPlayerCubit>();

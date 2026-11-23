@@ -9,7 +9,10 @@ list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
   ffmpeg_kit_flutter_new_full
   flutter_volume_controller
+  media_kit_libs_linux
+  media_kit_video
   url_launcher_linux
+  volume_controller
   window_to_front
 )
 

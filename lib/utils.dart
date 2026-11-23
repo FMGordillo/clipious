@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:clipious/settings/models/db/settings.dart';
@@ -226,10 +227,16 @@ DeviceType getDeviceType() {
 
 Future<bool> isDeviceTv() async {
   final forceTv = db.getSettings(forceTvUiSettingName);
+  if (forceTv?.value == 'true') {
+    return true;
+  }
+  // androidInfo is unavailable on Linux/desktop; never call it there.
+  if (isLinuxDesktop || !Platform.isAndroid) {
+    return false;
+  }
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-  return forceTv?.value == 'true' ||
-      androidInfo.systemFeatures.contains('android.software.leanback');
+  return androidInfo.systemFeatures.contains('android.software.leanback');
 }
 
 int getGridCount(BuildContext context) {

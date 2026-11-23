@@ -16,7 +16,7 @@ part 'app.freezed.dart';
 final log = Logger('HomeState');
 
 class AppCubit extends Cubit<AppState> {
-  late final StreamSubscription intentDataStreamSubscription;
+  StreamSubscription? intentDataStreamSubscription;
 
   AppCubit(super.initialState) {
     onReady();
@@ -49,41 +49,43 @@ class AppCubit extends Cubit<AppState> {
   }
 
   onReady() async {
-    intentDataStreamSubscription = ReceiveSharingIntent.instance
-        .getMediaStream()
-        .listen(
-          (shared) {
-            final String? value = shared
-                .where((element) => element.type == SharedMediaType.url)
-                .map((e) => e.path)
-                .firstOrNull;
-            if (value != null) {
-              openAppLink(value, false);
-            }
-          },
-          onError: (err) {
-            log.warning("getLinkStream error: $err");
-          },
-        );
+    if (!isLinuxDesktop) {
+      intentDataStreamSubscription = ReceiveSharingIntent.instance
+          .getMediaStream()
+          .listen(
+            (shared) {
+              final String? value = shared
+                  .where((element) => element.type == SharedMediaType.url)
+                  .map((e) => e.path)
+                  .firstOrNull;
+              if (value != null) {
+                openAppLink(value, false);
+              }
+            },
+            onError: (err) {
+              log.warning("getLinkStream error: $err");
+            },
+          );
 
-    // For sharing or opening urls/text coming from outside the app while the app is closed
-    ReceiveSharingIntent.instance.getInitialMedia().then((shared) {
-      final String? value = shared
-          .where((element) => element.type == SharedMediaType.url)
-          .map((e) => e.path)
-          .firstOrNull;
-      if (value != null) {
-        openAppLink(value, true);
-      }
-      ReceiveSharingIntent.instance.reset();
-    });
+      // For sharing or opening urls/text coming from outside the app while the app is closed
+      ReceiveSharingIntent.instance.getInitialMedia().then((shared) {
+        final String? value = shared
+            .where((element) => element.type == SharedMediaType.url)
+            .map((e) => e.path)
+            .firstOrNull;
+        if (value != null) {
+          openAppLink(value, true);
+        }
+        ReceiveSharingIntent.instance.reset();
+      });
+    }
 
     service.syncHistory();
   }
 
   @override
   close() async {
-    intentDataStreamSubscription.cancel();
+    await intentDataStreamSubscription?.cancel();
     super.close();
   }
 

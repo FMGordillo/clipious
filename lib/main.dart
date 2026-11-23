@@ -24,6 +24,7 @@ import 'package:clipious/utils/models/pending_crash.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
 import 'package:clipious/workmanager.dart';
 import 'package:logging/logging.dart';
+import 'package:media_kit/media_kit.dart' hide PlayerState;
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'settings/models/db/app_logs.dart';
@@ -55,11 +56,29 @@ Future<void> main() async {
   Logger.root.level = kDebugMode
       ? Level.FINEST
       : Level.INFO; // defaults to Level.INFO
-  Logger.root.onRecord.listen((record) async {
+  // Print immediately; persist to DB only after `db` is ready (Linux DB open
+  // logs INFO during SembastSqfDb.create and would hit LateInitializationError).
+  Logger.root.onRecord.listen((record) {
     debugPrint(
       '[${record.level.name}] [${record.loggerName}] ${record.message}',
     );
-    // we don't want debug
+  });
+
+  HttpOverrides.global = MyHttpOverrides();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isLinux) {
+    MediaKit.ensureInitialized();
+  }
+
+  packageInfo = await PackageInfo.fromPlatform();
+
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  db = await SembastSqfDb.create();
+  await fileDb.syncWithDb();
+
+  Logger.root.onRecord.listen((record) async {
     if (record.level == Level.INFO || record.level == Level.SEVERE) {
       await db.insertLogs(
         AppLog(
@@ -72,16 +91,6 @@ Future<void> main() async {
       );
     }
   });
-
-  HttpOverrides.global = MyHttpOverrides();
-
-  WidgetsFlutterBinding.ensureInitialized();
-
-  packageInfo = await PackageInfo.fromPlatform();
-
-  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  db = await SembastSqfDb.create();
-  await fileDb.syncWithDb();
 
   late final bool hasServer;
   try {

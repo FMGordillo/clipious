@@ -64,3 +64,5 @@ devenv.local.yaml
 local.properties
 .claude/
 
+result
+pubspec.lock.json

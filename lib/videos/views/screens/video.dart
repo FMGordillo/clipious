@@ -154,83 +154,88 @@ class VideoScreen extends StatelessWidget {
                             videoState.loadingVideo || videoState.video == null
                             ? []
                             : [
-                                AnimatedSwitcher(
-                                  duration: animationDuration,
-                                  child: videoState.downloading
-                                      ? GestureDetector(
-                                          onTap: () =>
-                                              openDownloadManager(context),
-                                          child: Stack(
-                                            alignment: Alignment.center,
+                                if (!isLinuxDesktop)
+                                  AnimatedSwitcher(
+                                    duration: animationDuration,
+                                    child: videoState.downloading
+                                        ? GestureDetector(
+                                            onTap: () =>
+                                                openDownloadManager(context),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                IconButton(
+                                                  icon: Icon(
+                                                    Icons.add,
+                                                    color: colorScheme.surface,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                                SizedBox(
+                                                  height: 15,
+                                                  width: 15,
+                                                  child: TweenAnimationBuilder(
+                                                    duration: animationDuration,
+                                                    tween: Tween<double>(
+                                                      begin: 0,
+                                                      end: videoState
+                                                          .downloadProgress,
+                                                    ),
+                                                    builder: (context, value, child) {
+                                                      return CircularProgressIndicator(
+                                                        value:
+                                                            videoState
+                                                                    .downloadProgress ==
+                                                                0
+                                                            ? null
+                                                            : value,
+                                                        strokeWidth: 2,
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Stack(
                                             children: [
                                               IconButton(
-                                                icon: Icon(
-                                                  Icons.add,
-                                                  color: colorScheme.surface,
-                                                ),
-                                                onPressed: () {},
+                                                onPressed:
+                                                    videoState.isDownloaded ||
+                                                        videoState
+                                                            .downloadFailed
+                                                    ? () => openDownloadManager(
+                                                        context,
+                                                      )
+                                                    : () => downloadVideo(
+                                                        context,
+                                                        videoState,
+                                                      ),
+                                                icon:
+                                                    videoState.isDownloaded &&
+                                                        !videoState
+                                                            .downloadFailed
+                                                    ? const Icon(
+                                                        Icons.download_done,
+                                                      )
+                                                    : const Icon(
+                                                        Icons.download,
+                                                      ),
                                               ),
-                                              SizedBox(
-                                                height: 15,
-                                                width: 15,
-                                                child: TweenAnimationBuilder(
-                                                  duration: animationDuration,
-                                                  tween: Tween<double>(
-                                                    begin: 0,
-                                                    end: videoState
-                                                        .downloadProgress,
-                                                  ),
-                                                  builder: (context, value, child) {
-                                                    return CircularProgressIndicator(
-                                                      value:
-                                                          videoState
-                                                                  .downloadProgress ==
-                                                              0
-                                                          ? null
-                                                          : value,
-                                                      strokeWidth: 2,
-                                                    );
-                                                  },
-                                                ),
+                                              Positioned(
+                                                right: 5,
+                                                top: 5,
+                                                child: videoState.downloadFailed
+                                                    ? const Icon(
+                                                        Icons.error,
+                                                        size: 15,
+                                                        color: Colors.red,
+                                                      )
+                                                    : const SizedBox.shrink(),
                                               ),
                                             ],
                                           ),
-                                        )
-                                      : Stack(
-                                          children: [
-                                            IconButton(
-                                              onPressed:
-                                                  videoState.isDownloaded ||
-                                                      videoState.downloadFailed
-                                                  ? () => openDownloadManager(
-                                                      context,
-                                                    )
-                                                  : () => downloadVideo(
-                                                      context,
-                                                      videoState,
-                                                    ),
-                                              icon:
-                                                  videoState.isDownloaded &&
-                                                      !videoState.downloadFailed
-                                                  ? const Icon(
-                                                      Icons.download_done,
-                                                    )
-                                                  : const Icon(Icons.download),
-                                            ),
-                                            Positioned(
-                                              right: 5,
-                                              top: 5,
-                                              child: videoState.downloadFailed
-                                                  ? const Icon(
-                                                      Icons.error,
-                                                      size: 15,
-                                                      color: Colors.red,
-                                                    )
-                                                  : const SizedBox.shrink(),
-                                            ),
-                                          ],
-                                        ),
-                                ),
+                                  ),
                                 Visibility(
                                   visible: videoState.video != null,
                                   child: VideoShareButton(

@@ -23,6 +23,18 @@
     pkgs.jdk21
     pkgs.flutter
     pkgs.webkitgtk_4_1 # required for Flutter Linux desktop build (webkit2gtk-4.1)
+  ] ++ lib.optionals pkgs.stdenv.isLinux [
+    # Flutter Linux desktop + media_kit/mpv
+    pkgs.cmake
+    pkgs.ninja
+    pkgs.pkg-config
+    pkgs.gtk3
+    pkgs.mpv
+    pkgs.mpv-unwrapped
+    pkgs.alsa-lib
+    pkgs.libpulseaudio
+    pkgs.libass
+    pkgs.clang
   ];
 
   # PostgreSQL service — replaces the manual postgres setup in nix/clipious.nix
@@ -136,6 +148,12 @@
           [ $# -gt 0 ] && shift
           flutter build apk "--$mode" --split-per-abi "$@"
           echo "-> build/app/outputs/flutter-apk/" ;;
+        linux)
+          mode="''${1:-debug}"
+          [ $# -gt 0 ] && shift
+          flutter config --enable-linux-desktop >/dev/null
+          flutter build linux "--$mode" "$@"
+          echo "-> build/linux/" ;;
         release)   ./release.sh "$@" ;;
         *)
           echo "Usage: clipious <command> [args]"
@@ -149,6 +167,7 @@
           echo "  test [path]  flutter test"
           echo "  apk [mode]   universal APK (debug|profile|release; default debug)"
           echo "  apk-split    per-ABI release APKs for mobile and Android TV (default release; optional mode arg)"
+          echo "  linux [mode] Linux desktop build (debug|profile|release; default debug)"
           echo "  release      run release.sh (build, tag, publish)"
           echo "  (also: setup, check-services)" ;;
       esac
@@ -221,7 +240,7 @@
     export GRADLE_OPTS="''${GRADLE_OPTS//build-tools\/33.0.2\//build-tools/35.0.0/}"
     mkdir -p "$ANDROID_SDK_ROOT" "$GRADLE_USER_HOME"
 
-    echo "Run 'clipious' for dev/build commands (gen, apk, apk-split, test, ...). Also: setup, check-services"
+    echo "Run 'clipious' for dev/build commands (gen, apk, linux, test, ...). Also: setup, check-services"
     echo "Pre-commit hooks will automatically start services as needed."
     echo "Run 'devenv up' manually to start PostgreSQL and Invidious for development."
   '';

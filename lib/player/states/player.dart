@@ -75,7 +75,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void mapMediaEventToMediaHandler(MediaEvent event) {
-    if (!isTv && event.type != MediaEventType.progress) {
+    if (!isTv && !isLinuxDesktop && event.type != MediaEventType.progress) {
       log.fine("Event state: ${event.state}, ${event.type}");
       var playbackState = PlaybackState(
         controls: [
@@ -149,15 +149,17 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         pause();
       });
 
-      mediaHandler = await AudioService.init(
-        builder: () => MediaHandler(this),
-        config: const AudioServiceConfig(
-          androidNotificationChannelId:
-              'com.github.lamarios.clipious.channel.audio',
-          androidNotificationChannelName: 'Video playback',
-          androidNotificationOngoing: true,
-        ),
-      );
+      if (!isLinuxDesktop) {
+        mediaHandler = await AudioService.init(
+          builder: () => MediaHandler(this),
+          config: const AudioServiceConfig(
+            androidNotificationChannelId:
+                'com.github.lamarios.clipious.channel.audio',
+            androidNotificationChannelName: 'Video playback',
+            androidNotificationOngoing: true,
+          ),
+        );
+      }
       BackButtonInterceptor.add(
         handleBackButton,
         name: 'miniPlayer',
@@ -685,7 +687,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
       await setSponsorBlock();
 
-      if (!isTv) {
+      if (!isTv && !isLinuxDesktop) {
         mediaHandler.skipToQueueItem(currentIndex);
       }
     } catch (err) {
@@ -1037,6 +1039,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void enterPip() {
+    if (isLinuxDesktop) {
+      return;
+    }
     setFullScreen(FullScreenState.fullScreen);
     setEvent(
       const MediaEvent(

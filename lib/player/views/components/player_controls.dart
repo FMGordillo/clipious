@@ -532,12 +532,13 @@ class PlayerControls extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
-                                          IconButton(
-                                            onPressed: () => player.enterPip(),
-                                            icon: const Icon(
-                                              Icons.picture_in_picture,
+                                          if (!isLinuxDesktop)
+                                            IconButton(
+                                              onPressed: () => player.enterPip(),
+                                              icon: const Icon(
+                                                Icons.picture_in_picture,
+                                              ),
                                             ),
-                                          ),
                                           IconButton(
                                             onPressed: () => showOptionMenu(
                                               context,

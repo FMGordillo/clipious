@@ -18,6 +18,9 @@ var log = Logger('background-task');
 const taskName = "Clipious background refresh task";
 
 Future<void> configureBackgroundService(SettingsCubit settings) async {
+  if (isLinuxDesktop) {
+    return;
+  }
   if (settings.state.backgroundNotifications) {
     await Workmanager().initialize(
       callbackDispatcher,
@@ -27,6 +30,9 @@ Future<void> configureBackgroundService(SettingsCubit settings) async {
 }
 
 Future<void> setupTasks(SettingsCubit settings) async {
+  if (isLinuxDesktop) {
+    return;
+  }
   try {
     await Workmanager().cancelByUniqueName(taskName);
   } catch (e) {
@@ -47,6 +53,9 @@ Future<void> setupTasks(SettingsCubit settings) async {
 }
 
 Future<void> stopTasks() async {
+  if (isLinuxDesktop) {
+    return;
+  }
   await Workmanager().cancelAll();
 }
 

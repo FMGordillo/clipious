@@ -89,6 +89,7 @@ enum HomeDataSource {
 
   bool isPermitted(BuildContext context, bool isLoggedIn) {
     return switch (this) {
+      (HomeDataSource.downloads) => !isLinuxDesktop,
       (HomeDataSource.playlist || HomeDataSource.history) => isLoggedIn,
       (HomeDataSource.searchHistory) =>
         context.read<SettingsCubit>().state.useSearchHistory,

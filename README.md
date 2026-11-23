@@ -163,9 +163,30 @@ Use `--profile` rather than `--debug` when testing media playback — the native
 | `clipious watch` | Watch mode for code generation |
 | `clipious apk [debug\|profile\|release]` | Universal APK (default debug) |
 | `clipious apk-split [mode]` | Per-ABI release APKs for mobile and Android TV (default release) |
+| `clipious linux [mode]` | Linux desktop build (default debug) |
 | `clipious test` / `fmt` / `lint` | Test, format, analyze |
 
 Run `clipious` with no args for the full list.
+
+### Linux desktop (local fork)
+
+Dev run (inside `devenv shell`):
+
+```bash
+flutter run -d linux
+# or
+clipious linux          # debug build → build/linux/
+clipious linux release
+```
+
+Nix package (x86_64-linux):
+
+```bash
+nix build .#clipious
+nix run .#clipious
+```
+
+Playback uses `media_kit` on Linux. Downloads, PiP, share-intent, and background sync are disabled. After changing Dart dependencies, refresh `nix/package_graph.json` from `.dart_tool/package_graph.json` (`flutter pub get`).
 
 ### Translations
 

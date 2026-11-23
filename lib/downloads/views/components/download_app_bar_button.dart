@@ -11,6 +11,9 @@ class AppBarDownloadButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isLinuxDesktop) {
+      return const SizedBox.shrink();
+    }
     var colors = Theme.of(context).colorScheme;
     var textTheme = Theme.of(context).textTheme;
     return BlocBuilder<DownloadManagerCubit, DownloadManagerState>(
