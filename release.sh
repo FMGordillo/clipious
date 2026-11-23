@@ -24,8 +24,7 @@
 #    0. decides the bump, asks for confirmation and bumps pubspec.yaml
 #    4. (removed – version is handled in step 0)
 #    5. commits the bump, creates and pushes a git tag with the same version
-#    6. manual: upload all APKs and .sha1 files to the GitHub release for the tag (the script does not upload)
-#    7. (optional) automatically closes the release when uploading is finished
+#    6. creates a GitHub release for the tag (notes = commit subjects), uploads all APKs and .sha1 files, then publishes it
 #
 #  Example:   ./release.sh
 
@@ -37,6 +36,9 @@ case "$REQUESTED" in
     ""|major|minor|patch) ;;
     *) echo "Usage: $0 [major|minor|patch]" >&2; exit 1 ;;
 esac
+
+# Fail before any side effect if gh is missing or not logged in
+command -v gh >/dev/null && gh auth status >/dev/null 2>&1 || { echo "gh missing or not logged in (run: gh auth login)" >&2; exit 1; }
 
 if ! git diff --quiet -- pubspec.yaml || ! git diff --cached --quiet; then
     echo "pubspec.yaml or the git index has uncommitted changes; commit or stash them first." >&2
@@ -149,5 +151,10 @@ BUMPED=0
 git tag -a "$TAG" -m "Release ${NEW_VERSION}"
 git push origin HEAD "$TAG"
 
-# ---------- 6. Manual: GitHub release ----------------------------------------
-echo "All done. Upload the APKs and .sha1 files to the GitHub release for $TAG, then publish it."
+# ---------- 6. GitHub release: create as draft, upload, then publish ---------
+# Draft first so a failed upload never leaves a public release with partial assets
+gh release create "$TAG" --draft --title "Clipious $NEW_VERSION" \
+  --notes "$(sed 's/^/- /' <<<"$SUBJECTS")" \
+  "$BUILD_DIR"/*.apk "$BUILD_DIR"/*.sha1
+gh release edit "$TAG" --draft=false
+echo "Published GitHub release $TAG."
