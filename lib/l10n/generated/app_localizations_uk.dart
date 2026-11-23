@@ -1254,6 +1254,13 @@ class AppLocalizationsUk extends AppLocalizations {
       'Під час перегляду відео в повноекранному режимі вертикальне перетягування зліва або справа регулює яскравість або гучність відповідно';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Повторіть спробу';
 
   @override

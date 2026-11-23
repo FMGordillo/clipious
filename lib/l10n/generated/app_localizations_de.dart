@@ -1266,6 +1266,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Beim Anschauen eines Videos im Vollbildmodus passt das vertikale Ziehen von links oder rechts wird die Helligkeit bzw. Lautstärke an';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Versuchen Sie es erneut';
 
   @override

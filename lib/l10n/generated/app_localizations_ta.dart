@@ -1265,6 +1265,13 @@ class AppLocalizationsTa extends AppLocalizations {
       'முழுத் திரையில் ஒரு வீடியோவைப் பார்க்கும்போது, இடது அல்லது வலதுபுறத்திலிருந்து செங்குத்தாக இழுப்பது முறையே ஒளி அல்லது அளவை சரிசெய்யும்';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'மீண்டும் முயற்சிக்கவும்';
 
   @override

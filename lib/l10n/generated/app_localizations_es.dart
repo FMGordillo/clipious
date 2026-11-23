@@ -1266,6 +1266,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Cuando vea un vídeo a pantalla completa, arrastre verticalmente desde la izquierda o la derecha para ajustar el brillo o el volumen, respectivamente';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Reintentar';
 
   @override

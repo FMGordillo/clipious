@@ -1199,6 +1199,13 @@ class AppLocalizationsJa extends AppLocalizations {
       '全画面で動画を視聴時に、左や右で縦方向にドラッグすると、明るさや音量を調整します';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => '再試行';
 
   @override

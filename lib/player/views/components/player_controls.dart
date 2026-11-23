@@ -286,6 +286,11 @@ class PlayerControls extends StatelessWidget {
               (SettingsCubit settings) => settings.state.screenControls,
             );
 
+            bool disableBrightnessAdjustment = context.select(
+              (SettingsCubit settings) =>
+                  settings.state.disableBrightnessAdjustment,
+            );
+
             String videoTitle = context.select(
               (PlayerCubit cubit) =>
                   cubit.state.currentlyPlaying?.title ??
@@ -400,7 +405,8 @@ class PlayerControls extends StatelessWidget {
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onVerticalDragStart:
-                                      canDragToAdjustDeviceSettings
+                                      canDragToAdjustDeviceSettings &&
+                                          !disableBrightnessAdjustment
                                       ? (details) {
                                           cubit.startBrightnessAdjustments(
                                             details,
@@ -408,7 +414,8 @@ class PlayerControls extends StatelessWidget {
                                         }
                                       : null,
                                   onVerticalDragUpdate:
-                                      canDragToAdjustDeviceSettings
+                                      canDragToAdjustDeviceSettings &&
+                                          !disableBrightnessAdjustment
                                       ? (details) {
                                           cubit.updateBrightness(
                                             details,

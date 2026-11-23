@@ -107,6 +107,14 @@ class VideoPlayerSettingsScreen extends StatelessWidget {
                         title: Text(locals.screenControls),
                         description: Text(locals.screenControlsExplanation),
                       ),
+                      SettingsTile.switchTile(
+                        initialValue: state.disableBrightnessAdjustment,
+                        onToggle: cubit.setDisableBrightnessAdjustment,
+                        title: Text(locals.disableBrightnessAdjustment),
+                        description: Text(
+                          locals.disableBrightnessAdjustmentExplanation,
+                        ),
+                      ),
                     ],
                   ),
                   SettingsSection(

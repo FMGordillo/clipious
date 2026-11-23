@@ -1256,6 +1256,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Tam ekranda bir video izlerken, soldan ya da sağdan dikey olarak taşımak, sırasıyla parlaklığı ya da sesi ayarlayacaktır';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Yeniden dene';
 
   @override

@@ -1262,6 +1262,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'När du tittar på en video i helskärm, dra vertikalt från vänster eller höger för att justera ljusstyrkan respektive volymen';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Försök igen';
 
   @override

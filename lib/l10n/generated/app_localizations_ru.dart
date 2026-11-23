@@ -1257,6 +1257,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Когда вы смотрите видео на полном экране, вертикальные проведения слева или справа будут менять яркость или громкость';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Попробовать снова';
 
   @override

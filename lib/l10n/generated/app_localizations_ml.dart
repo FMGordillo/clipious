@@ -1245,6 +1245,13 @@ class AppLocalizationsMl extends AppLocalizations {
       'When watching a video in full screen, Vertically dragging from the left or the right will adjust the brightness or volume respectively';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Retry';
 
   @override

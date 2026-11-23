@@ -2230,6 +2230,18 @@ abstract class AppLocalizations {
   /// **'When watching a video in full screen, Vertically dragging from the left or the right will adjust the brightness or volume respectively'**
   String get screenControlsExplanation;
 
+  /// No description provided for @disableBrightnessAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable brightness adjustment'**
+  String get disableBrightnessAdjustment;
+
+  /// No description provided for @disableBrightnessAdjustmentExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness'**
+  String get disableBrightnessAdjustmentExplanation;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:

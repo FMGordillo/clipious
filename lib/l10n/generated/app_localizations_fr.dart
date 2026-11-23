@@ -1270,6 +1270,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'En regardant une vidéo en plein écran, glisser verticalement de la gauche ou de la droite ajustera la luminosité ou le volume respectivement';
 
   @override
+  String get disableBrightnessAdjustment => 'Disable brightness adjustment';
+
+  @override
+  String get disableBrightnessAdjustmentExplanation =>
+      'Disable dragging on the left of the player to adjust the screen brightness, in case the app gets stuck overriding the system brightness';
+
+  @override
   String get retry => 'Réessayer';
 
   @override

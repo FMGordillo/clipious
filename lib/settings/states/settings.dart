@@ -421,6 +421,9 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   setScreenControls(bool b) async => await _set(screenControlsSettingName, b);
 
+  setDisableBrightnessAdjustment(bool b) async =>
+      await _set(disableBrightnessAdjustmentSettingName, b);
+
   setReturnYoutubeDislikeUrl(String url) async =>
       await _set(returnYoutubeDislikeUrlSettingName, url);
 
@@ -548,6 +551,10 @@ sealed class SettingsState with _$SettingsState {
 
   bool get screenControls =>
       (_get(screenControlsSettingName)?.value ?? 'true') == 'true';
+
+  bool get disableBrightnessAdjustment =>
+      (_get(disableBrightnessAdjustmentSettingName)?.value ?? 'false') ==
+      'true';
 
   bool get forceTvUi =>
       (_get(forceTvUiSettingName)?.value ?? 'false') == 'true';
