@@ -10,6 +10,7 @@ import 'package:clipious/settings/models/db/server.dart';
 import 'package:clipious/settings/models/db/settings.dart';
 import 'package:clipious/settings/models/db/video_filter.dart';
 import 'package:clipious/utils/interfaces/db.dart';
+import 'package:clipious/utils/models/pending_crash.dart';
 import 'package:clipious/videos/models/db/dearrow_cache.dart';
 import 'package:clipious/videos/models/db/history_video_cache.dart';
 import 'package:clipious/videos/models/db/progress.dart';
@@ -52,6 +53,7 @@ class SembastSqfDb extends IDbClient {
     'historyVideoCache',
   ); // use historyVideoCache
   final progressStore = stringMapStoreFactory.store('progress');
+  final pendingCrashStore = stringMapStoreFactory.store('pendingCrash');
   final offlineSubscriptions = stringMapStoreFactory.store(
     'offline_subscriptions',
   );
@@ -348,6 +350,21 @@ class SembastSqfDb extends IDbClient {
   @override
   Future<void> addOfflineSubscription(OfflineSubscription sub) async {
     await offlineSubscriptions.record(sub.channelId).put(db, sub.toJson());
+  }
+
+  @override
+  Future<void> setPendingCrash(PendingCrash? crash) async {
+    if (crash == null) {
+      await pendingCrashStore.record('crash').delete(db);
+    } else {
+      await pendingCrashStore.record('crash').put(db, crash.toJson());
+    }
+  }
+
+  @override
+  Future<PendingCrash?> getPendingCrash() async {
+    final json = await pendingCrashStore.record('crash').get(db);
+    return json == null ? null : PendingCrash.fromJson(json);
   }
 
   @override

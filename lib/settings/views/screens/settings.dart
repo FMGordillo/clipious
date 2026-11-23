@@ -1,12 +1,10 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
 import 'package:clipious/app/states/app.dart';
 import 'package:clipious/router.dart';
-import 'package:clipious/utils.dart';
-import 'package:clipious/utils/models/imgur_error.dart';
+import 'package:clipious/utils/views/components/bug_report_dialog.dart';
 import 'package:clipious/utils/views/components/app_icon.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -217,23 +215,10 @@ class SettingsScreen extends StatelessWidget {
                       leading: const Icon(Icons.feedback_outlined),
                       title: Text(locals.submitFeedback),
                       description: Text(locals.submitFeedbackDescription),
-                      onPressed: (context) {
-                        okCancelDialog(
-                          context,
-                          locals.submitFeedback,
-                          locals.feedbackDisclaimer,
-                          () => BetterFeedback.of(context).show((feedback) {
-                            try {
-                              cubit.sendFeedBack(feedback);
-                            } catch (err) {
-                              showAlertDialog(context, locals.error, [
-                                Text(locals.feedbackScreenshotError),
-                                if (err is ImgurError) Text(err.error),
-                              ]);
-                            }
-                          }),
-                        );
-                      },
+                      onPressed: (context) => showBugReportDialog(
+                        context,
+                        title: locals.submitFeedback,
+                      ),
                     ),
                   ],
                 ),

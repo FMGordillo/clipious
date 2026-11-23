@@ -23,6 +23,7 @@ import '../notifications/models/db/playlist_notifications.dart';
 import '../notifications/models/db/subscription_notifications.dart';
 import '../settings/models/db/server.dart';
 import 'interfaces/db.dart';
+import 'models/pending_crash.dart';
 
 part 'file_db.g.dart';
 
@@ -38,6 +39,8 @@ const _subNotifsFile = 'subscription_notifications.json',
     _fileDbFolder = 'fileDb';
 
 final _log = Logger('FileDb');
+
+const _pendingCrashFile = 'pending_crash.json';
 
 class FileDB extends IDbClient {
   FileDB();
@@ -327,6 +330,19 @@ class FileDB extends IDbClient {
   Future<void> deleteDownload(DownloadedVideo vid) {
     // TODO: implement deleteDownload
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> setPendingCrash(PendingCrash? crash) async {
+    File f = await _openAppFile(_pendingCrashFile);
+    await _writeMapToFile(f, crash?.toJson() ?? {});
+  }
+
+  @override
+  Future<PendingCrash?> getPendingCrash() async {
+    File f = await _openAppFile(_pendingCrashFile);
+    var content = await _readFileAsMap(f);
+    return content.isEmpty ? null : PendingCrash.fromJson(content);
   }
 
   @override

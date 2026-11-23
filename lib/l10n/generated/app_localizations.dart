@@ -1993,20 +1993,50 @@ abstract class AppLocalizations {
   /// Setting tile descriptions for feedback submission
   ///
   /// In en, this message translates to:
-  /// **'Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback'**
+  /// **'Found a bug or have a suggestion? Send a report with your app version and device details. It opens a public GitHub issue.'**
   String get submitFeedbackDescription;
 
-  /// Content of dialog shown before submitting feedback to make sure the user is ok whith where the data is going
+  /// Note in the bug report preview that the GitHub issue will be public
   ///
   /// In en, this message translates to:
-  /// **'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.'**
-  String get feedbackDisclaimer;
+  /// **'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.'**
+  String get bugReportPublicNote;
 
-  /// Title for dialog if something goes wrong while uploading feedback screenshot
+  /// Label of the text field where the user describes the bug
   ///
   /// In en, this message translates to:
-  /// **'Error while uploading screenshot to Imgur'**
-  String get feedbackScreenshotError;
+  /// **'What happened?'**
+  String get bugReportDescriptionLabel;
+
+  /// Title of the dialog offering to report an error from the previous run
+  ///
+  /// In en, this message translates to:
+  /// **'Clipious crashed last time'**
+  String get bugReportCrashTitle;
+
+  /// Button that opens the prefilled GitHub issue
+  ///
+  /// In en, this message translates to:
+  /// **'Open in GitHub'**
+  String get bugReportOpenInGitHub;
+
+  /// Snackbar shown after the bug report text is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Report copied to clipboard'**
+  String get bugReportCopied;
+
+  /// Shown in the bug report preview when the text is cut to fit the GitHub link
+  ///
+  /// In en, this message translates to:
+  /// **'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.'**
+  String get bugReportTruncatedNote;
+
+  /// Shown when the browser could not open the GitHub issue
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.'**
+  String get bugReportOpenFailed;
 
   /// Sort channel videos from newest to oldest
   ///

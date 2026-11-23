@@ -1127,12 +1127,28 @@ class AppLocalizationsTr extends AppLocalizations {
       'Hata mı buldunuz ya da bir öneriniz mi var? Uygulamanın ekran görüntüsünü almak, açıklama eklemek ve geri bildirim göndermek için bu aracı kullanın';
 
   @override
-  String get feedbackDisclaimer =>
-      'Geri bildirim göndermek için bir GitHub hesabına ihtiyacınız olacak ve ekran görüntünüz anonim olarak Imgur\'a gönderilecektir.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'Imgur\'a ekran görüntüsü yüklenirken hata oluştu';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'En Yeni';

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +20,7 @@ import 'package:clipious/settings/models/db/settings.dart';
 import 'package:clipious/settings/models/errors/no_server_selected.dart';
 import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils.dart';
+import 'package:clipious/utils/models/pending_crash.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
 import 'package:clipious/workmanager.dart';
 import 'package:logging/logging.dart';
@@ -36,6 +36,20 @@ bool isTv = false;
 late MediaHandler mediaHandler;
 
 final Logger log = Logger('main');
+
+// Plain debugPrint on failure: Logger writes through the DB, which could loop back here.
+void _savePendingCrash(Object error, StackTrace? stack) {
+  db
+      .setPendingCrash(
+        PendingCrash(
+          error: error.toString(),
+          stackTrace: stack?.toString() ?? '',
+        ),
+      )
+      .catchError(
+        (Object err) => debugPrint('Could not save crash report: $err'),
+      );
+}
 
 Future<void> main() async {
   Logger.root.level = kDebugMode
@@ -93,40 +107,49 @@ Future<void> main() async {
   }
 
   isTv = await isDeviceTv();
+
+  // Uncaught errors are kept for the next launch, which offers to report them.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    _savePendingCrash(details.exceptionAsString(), details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    _savePendingCrash(error, stack);
+    return false; // not handled here: keep the default engine behaviour
+  };
+
   runApp(
-    BetterFeedback(
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) {
-              return AppCubit(AppState(0, null, HomeLayout()));
-            },
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) {
+            return AppCubit(AppState(0, null, HomeLayout()));
+          },
+        ),
+        BlocProvider(
+          create: (context) {
+            var settingsCubit = SettingsCubit(
+              SettingsState.init(),
+              context.read<AppCubit>(),
+            );
+            configureBackgroundService(settingsCubit);
+            return settingsCubit;
+          },
+        ),
+        BlocProvider(
+          create: (context) => PlayerCubit(
+            PlayerState.init(null),
+            context.read<SettingsCubit>(),
           ),
-          BlocProvider(
-            create: (context) {
-              var settingsCubit = SettingsCubit(
-                SettingsState.init(),
-                context.read<AppCubit>(),
-              );
-              configureBackgroundService(settingsCubit);
-              return settingsCubit;
-            },
+        ),
+        BlocProvider(
+          create: (context) => DownloadManagerCubit(
+            const DownloadManagerState(),
+            context.read<PlayerCubit>(),
           ),
-          BlocProvider(
-            create: (context) => PlayerCubit(
-              PlayerState.init(null),
-              context.read<SettingsCubit>(),
-            ),
-          ),
-          BlocProvider(
-            create: (context) => DownloadManagerCubit(
-              const DownloadManagerState(),
-              context.read<PlayerCubit>(),
-            ),
-          ),
-        ],
-        child: const MyApp(),
-      ),
+        ),
+      ],
+      child: const MyApp(),
     ),
   );
 }

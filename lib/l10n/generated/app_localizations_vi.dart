@@ -1118,12 +1118,28 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tìm thấy một lỗi hoặc có một gợi ý? Sử dụng công cụ này để chụp ảnh màn hình ứng dụng, chú thích và gửi phản hồi';
 
   @override
-  String get feedbackDisclaimer =>
-      'Để gửi phản hồi, bạn sẽ cần có tài khoản GitHub và ảnh chụp màn hình của bạn sẽ được gửi ẩn danh tới Imgur.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'Lỗi khi tải ảnh chụp màn hình lên Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'Mới nhất';

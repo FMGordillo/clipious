@@ -1127,11 +1127,28 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нашли ошибку или у вас есть предложение? Используйте этот инструмент, чтобы сделать скриншот приложения, добавить аннотации и отправить отзыв';
 
   @override
-  String get feedbackDisclaimer =>
-      'Чтобы отправить отзыв, вам понадобится учётная запись GitHub, и ваш скриншот будет отправлен в Imgur анонимно.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError => 'Ошибка при загрузке скриншота в Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'Новейшие';

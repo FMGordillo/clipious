@@ -1120,11 +1120,28 @@ class AppLocalizationsFa extends AppLocalizations {
       'مشکلی پیدا کرده‌اید یا پیشنهادی دارید؟ از این ابزار برای گرفتن screenshot از برنامه، یادداشت نوشتن روی آن و ارسال بازخورد استفاده کنید';
 
   @override
-  String get feedbackDisclaimer =>
-      'برای ارسال بازخورد شما به حساب GitHub نیاز دارید و تصویر شما به صورت ناشناس به Imgur ارسال می شود.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError => 'خطا در هنگام بارگذاری تصویر به Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'تازه‌ترین';

@@ -1,6 +1,7 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/offline_subscriptions/models/offline_subscription.dart';
+import 'package:clipious/utils/models/pending_crash.dart';
 
 import '../../downloads/models/downloaded_video.dart';
 import '../../home/models/db/home_layout.dart';
@@ -138,4 +139,8 @@ abstract class IDbClient {
   Future<bool> isOfflineSubscribed(String channelId);
 
   Future<List<OfflineSubscription>> getOfflineSubscriptions();
+
+  /// Null clears the pending crash.
+  Future<void> setPendingCrash(PendingCrash? crash);
+  Future<PendingCrash?> getPendingCrash();
 }

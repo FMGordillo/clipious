@@ -1325,17 +1325,37 @@
   "@submitFeedback": {
     "description": "Title for settings to submit feed back through the app"
   },
-  "submitFeedbackDescription": "Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback",
+  "submitFeedbackDescription": "Found a bug or have a suggestion? Send a report with your app version and device details. It opens a public GitHub issue.",
   "@submitFeedbackDescription": {
     "description": "Setting tile descriptions for feedback submission"
   },
-  "feedbackDisclaimer": "To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.",
-  "@feedbackDisclaimer": {
-    "description": "Content of dialog shown before submitting feedback to make sure the user is ok whith where the data is going"
+  "bugReportPublicNote": "Sending opens a public GitHub issue. Anyone can read it, so check the text below first.",
+  "@bugReportPublicNote": {
+    "description": "Note in the bug report preview that the GitHub issue will be public"
   },
-  "feedbackScreenshotError": "Error while uploading screenshot to Imgur",
-  "@feedbackScreenshotError": {
-    "description": "Title for dialog if something goes wrong while uploading feedback screenshot"
+  "bugReportDescriptionLabel": "What happened?",
+  "@bugReportDescriptionLabel": {
+    "description": "Label of the text field where the user describes the bug"
+  },
+  "bugReportCrashTitle": "Clipious crashed last time",
+  "@bugReportCrashTitle": {
+    "description": "Title of the dialog offering to report an error from the previous run"
+  },
+  "bugReportOpenInGitHub": "Open in GitHub",
+  "@bugReportOpenInGitHub": {
+    "description": "Button that opens the prefilled GitHub issue"
+  },
+  "bugReportCopied": "Report copied to clipboard",
+  "@bugReportCopied": {
+    "description": "Snackbar shown after the bug report text is copied"
+  },
+  "bugReportTruncatedNote": "The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.",
+  "@bugReportTruncatedNote": {
+    "description": "Shown in the bug report preview when the text is cut to fit the GitHub link"
+  },
+  "bugReportOpenFailed": "Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.",
+  "@bugReportOpenFailed": {
+    "description": "Shown when the browser could not open the GitHub issue"
   },
   "channelSortByNewest": "Newest",
   "@channelSortByNewest": {

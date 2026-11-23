@@ -12,6 +12,7 @@ import 'package:clipious/router.dart';
 import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils.dart';
 import 'package:clipious/utils/views/components/app_icon.dart';
+import 'package:clipious/utils/views/components/bug_report_dialog.dart';
 import 'package:logging/logging.dart';
 
 import '../../../notifications/notifications.dart';
@@ -45,6 +46,9 @@ class _MainScreenState extends State<MainContentScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => offerPendingCrashReport(context),
+    );
 
     // Only after at least the action method is set, the notification events are delivered
     AwesomeNotifications()

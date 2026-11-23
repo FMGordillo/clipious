@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:bloc/bloc.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
@@ -12,9 +10,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/app/states/app.dart';
 import 'package:clipious/workmanager.dart';
 import 'package:locale_names/locale_names.dart';
-import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../globals.dart';
 import '../../home/models/db/home_layout.dart';
@@ -35,8 +31,6 @@ enum EnableBackGroundNotificationResponse {
   notificationsNotAllowed,
   needBatteryOptimization,
 }
-
-var _log = Logger('SettingsController');
 
 class SettingsCubit extends Cubit<SettingsState> {
   final AppCubit appCubit;
@@ -455,39 +449,6 @@ class SettingsCubit extends Cubit<SettingsState> {
         subscriptionNotifications: await fileDb.getSubscriptionNotifications(),
       ),
     );
-  }
-
-  sendFeedBack(UserFeedback feedback) async {
-    try {
-      appCubit.setGlobalLoading(true);
-      final deviceInfo = await DeviceInfoPlugin().androidInfo;
-      final androidInfo = deviceInfo.version;
-
-      final firstLine = feedback.text.split('\n')[0];
-
-      String body =
-          '**Runtime info:**\n[Device] Manufacturer: ${deviceInfo.manufacturer} / Brand: ${deviceInfo.brand} / Model: ${deviceInfo.model} / Hardware: ${deviceInfo.hardware}';
-      body +=
-          '\n[Android] Version: ${androidInfo.release}.${androidInfo.incremental} (${androidInfo.codename})';
-      body +=
-          '\n[Clipious] Version: ${state.packageInfo.version} Build: ${state.packageInfo.buildNumber}';
-
-      body += '\n\n\n**Feedback:**\n${feedback.text}\n\n\n';
-
-      String screenshotUrl = await service.uploadImageToImgur(
-        base64Encode(feedback.screenshot),
-      );
-      body += '\n**Screenshot:**\n![app screenshot]($screenshotUrl)';
-
-      final url =
-          'https://github.com/lamarios/clipious/issues/new?title=${Uri.encodeComponent('[App Feedback] $firstLine')}&body=${Uri.encodeComponent(body)}';
-      await launchUrl(Uri.parse(url));
-    } catch (err) {
-      _log.severe("Issue while submitting feedback", err);
-      rethrow;
-    } finally {
-      appCubit.setGlobalLoading(false);
-    }
   }
 }
 

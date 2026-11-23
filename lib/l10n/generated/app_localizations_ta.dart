@@ -1135,12 +1135,28 @@ class AppLocalizationsTa extends AppLocalizations {
       'ஒரு பிழை கிடைத்ததா அல்லது பரிந்துரை உள்ளதா? பயன்பாட்டின் திரை சாட்டை எடுக்க இந்த கருவியைப் பயன்படுத்தவும், சிறுகுறிப்பு செய்து கருத்துக்களை சமர்ப்பிக்கவும்';
 
   @override
-  String get feedbackDisclaimer =>
-      'பின்னூட்டங்களைச் சமர்ப்பிக்க உங்களுக்கு ஒரு அறிவிலிமையம் கணக்கு தேவைப்படும், மேலும் உங்கள் திரை காட்சி அநாமதேயமாக இம்கூருக்கு சமர்ப்பிக்கப்படும்.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'திரை சாட்டை இம்கூரில் பதிவேற்றும்போது பிழை';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'புதியது';

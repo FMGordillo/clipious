@@ -1133,12 +1133,28 @@ class AppLocalizationsPt extends AppLocalizations {
       'Encontrou um bug ou tem uma sugestão? Use esta ferramenta para tirar capturas de tela do aplicativo, fazer anotações e enviar feedbacks';
 
   @override
-  String get feedbackDisclaimer =>
-      'Para enviar feedback, você precisará de uma conta no GitHub, e sua captura de tela será enviada anonimamente para o Imgur.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'Erro ao enviar captura de tela para o Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'Mais novo';

@@ -1126,12 +1126,28 @@ class AppLocalizationsNl extends AppLocalizations {
       'Heb je een fout gevonden of heb je een suggestie? Gebruik deze tool om een screenshot van de app te maken, de feedback uit te leggen en te versturen';
 
   @override
-  String get feedbackDisclaimer =>
-      'Om feedback in te dienen heb je een GitHub-account nodig en wordt je screenshot anoniem naar Imgur verzonden.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'Fout tijdens het uploaden van de screenshot naar Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'Nieuwste';

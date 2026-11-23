@@ -1129,15 +1129,31 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get submitFeedbackDescription =>
-      'Found a bug or have a suggestion? Use this tool to take screenshot of the app, annotate and submit feedback';
+      'Found a bug or have a suggestion? Send a report with your app version and device details. It opens a public GitHub issue.';
 
   @override
-  String get feedbackDisclaimer =>
-      'To submit feedback you will need a GitHub account and your screenshot will be submitted to Imgur anonymously.';
+  String get bugReportPublicNote =>
+      'Sending opens a public GitHub issue. Anyone can read it, so check the text below first.';
 
   @override
-  String get feedbackScreenshotError =>
-      'Error while uploading screenshot to Imgur';
+  String get bugReportDescriptionLabel => 'What happened?';
+
+  @override
+  String get bugReportCrashTitle => 'Clipious crashed last time';
+
+  @override
+  String get bugReportOpenInGitHub => 'Open in GitHub';
+
+  @override
+  String get bugReportCopied => 'Report copied to clipboard';
+
+  @override
+  String get bugReportTruncatedNote =>
+      'The GitHub link is too long for the whole report, so its end is cut. Copy has the full report.';
+
+  @override
+  String get bugReportOpenFailed =>
+      'Could not open GitHub. Use Copy to clipboard and paste the report into a new issue.';
 
   @override
   String get channelSortByNewest => 'Newest';
