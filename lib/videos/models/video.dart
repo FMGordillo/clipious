@@ -1,6 +1,7 @@
 import 'package:clipious/settings/models/db/server.dart';
 import 'package:clipious/settings/models/db/video_filter.dart';
 import 'package:clipious/utils/models/sharelink.dart';
+import 'package:clipious/videos/models/chapter.dart';
 import 'package:clipious/videos/models/ided_video.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -131,6 +132,9 @@ sealed class Video with _$Video implements ShareLinks, IdedVideo {
         ? [deArrowThumbnailUrl!]
         : ImageObject.getThumbnailUrlsByPreferredOrder(videoThumbnails);
   }
+
+  List<Chapter> get chapters =>
+      parseChapters(descriptionHtml ?? '', lengthSeconds ?? 0);
 }
 
 /*

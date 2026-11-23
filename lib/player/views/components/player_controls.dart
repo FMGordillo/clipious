@@ -13,7 +13,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
 
 import '../../../utils.dart';
+import '../../../videos/models/chapter.dart';
 import '../../../videos/models/video.dart';
+import 'chapter_track_shape.dart';
 import '../../states/audio_player.dart';
 import '../../states/player_controls.dart';
 import '../../states/video_player.dart';
@@ -265,6 +267,8 @@ class PlayerControls extends StatelessWidget {
             Video? currentlyPlaying = context.select(
               (PlayerCubit cubit) => cubit.state.currentlyPlaying,
             );
+            final chapters = currentlyPlaying?.chapters ?? const <Chapter>[];
+            final chapter = chapterAt(chapters, playerState.position);
             bool hasQueue = context.select(
               (PlayerCubit cubit) => cubit.state.hasQueue,
             );
@@ -627,39 +631,73 @@ class PlayerControls extends StatelessWidget {
                                       Expanded(
                                         child: SizedBox(
                                           height: 25,
-                                          child: Slider(
-                                            min: 0,
-                                            value: min(
-                                              playerState
-                                                  .position
-                                                  .inMilliseconds
-                                                  .toDouble(),
-                                              playerState
+                                          child: SliderTheme(
+                                            data: SliderTheme.of(context)
+                                                .copyWith(
+                                                  trackShape: ChapterTrackShape(
+                                                    chapters: chapters,
+                                                    total: playerState.duration,
+                                                  ),
+                                                ),
+                                            child: Slider(
+                                              min: 0,
+                                              value: min(
+                                                playerState
+                                                    .position
+                                                    .inMilliseconds
+                                                    .toDouble(),
+                                                playerState
+                                                    .duration
+                                                    .inMilliseconds
+                                                    .toDouble(),
+                                              ),
+                                              max: playerState
                                                   .duration
                                                   .inMilliseconds
                                                   .toDouble(),
+                                              secondaryTrackValue: min(
+                                                playerState
+                                                    .buffer
+                                                    .inMilliseconds
+                                                    .toDouble(),
+                                                playerState
+                                                    .duration
+                                                    .inMilliseconds
+                                                    .toDouble(),
+                                              ),
+                                              onChangeEnd: cubit.onScrubbed,
+                                              onChanged: cubit.onScrubDrag,
                                             ),
-                                            max: playerState
-                                                .duration
-                                                .inMilliseconds
-                                                .toDouble(),
-                                            secondaryTrackValue: min(
-                                              playerState.buffer.inMilliseconds
-                                                  .toDouble(),
-                                              playerState
-                                                  .duration
-                                                  .inMilliseconds
-                                                  .toDouble(),
-                                            ),
-                                            onChangeEnd: cubit.onScrubbed,
-                                            onChanged: cubit.onScrubDrag,
                                           ),
                                         ),
                                       ),
-                                      Text(
-                                        '${prettyDurationCustom(playerState.position)} / ${prettyDurationCustom(playerState.duration)}',
-                                        style: textTheme.bodySmall?.copyWith(
-                                          color: Colors.white,
+                                      ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                          maxWidth: 200,
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            if (chapter != null)
+                                              Text(
+                                                chapter.title,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: textTheme.bodySmall
+                                                    ?.copyWith(
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                            Text(
+                                              '${prettyDurationCustom(playerState.position)} / ${prettyDurationCustom(playerState.duration)}',
+                                              style: textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],

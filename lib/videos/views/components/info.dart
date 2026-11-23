@@ -4,6 +4,7 @@ import 'package:clipious/router.dart';
 import 'package:clipious/utils/views/components/text_linkified.dart';
 import 'package:clipious/utils/views/components/thumbnail.dart';
 import 'package:clipious/videos/models/video.dart';
+import 'package:clipious/videos/views/components/chapter_list.dart';
 import 'package:clipious/videos/views/components/video_metrics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -110,6 +111,8 @@ class VideoInfo extends StatelessWidget {
                 ),
               ],
             ),
+          if (descriptionAndTags && video.chapters.isNotEmpty)
+            ChapterList(chapters: video.chapters, onSelect: player.seek),
           if (descriptionAndTags)
             TextLinkified(
               text: video.description ?? '',
