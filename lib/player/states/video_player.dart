@@ -183,7 +183,12 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
           },
         );
         break;
+      case BetterPlayerEventType.pause:
+      case BetterPlayerEventType.finished:
+        WakelockPlus.disable();
+        break;
       case BetterPlayerEventType.play:
+        WakelockPlus.enable();
         double speed = 1.0;
         if (settings.state.rememberPlayBackSpeed) {
           log.fine("Setting playback speed to $speed");
@@ -365,8 +370,6 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
           resolutions: resolutions.isNotEmpty ? resolutions : null,
         );
       }
-
-      WakelockPlus.enable();
 
       bool fillVideo = settings.state.fillFullscreen;
 
