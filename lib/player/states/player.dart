@@ -36,6 +36,10 @@ part 'player.freezed.dart';
 const double targetHeight = 66;
 const double miniPlayerThreshold = 300;
 const skipToVideoThrottleName = 'skip-to-video';
+
+// delay before the next queued video starts after the current one finishes
+const autoplayNextDelay = Duration(seconds: 5);
+const autoplayNextDebounceName = 'autoplay-next';
 const double bigPlayerThreshold = 700;
 const stepMultiplier = 1.15;
 
@@ -172,8 +176,14 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         if (state.currentlyPlaying != null) {
           saveProgress(state.currentlyPlaying!.lengthSeconds ?? 0);
         }
-        playNext();
-        _setPlaying(false);
+        if (state.mediaEvent.state != MediaState.completed) {
+          _setPlaying(false);
+          EasyDebounce.debounce(
+            autoplayNextDebounceName,
+            autoplayNextDelay,
+            playNext,
+          );
+        }
         break;
       default:
         break;
@@ -216,6 +226,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   @override
   close() async {
+    EasyDebounce.cancel(autoplayNextDebounceName);
     BackButtonInterceptor.removeByName('miniPlayer');
     WidgetsBinding.instance.removeObserver(this);
     super.close();
@@ -470,6 +481,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void playNext() {
+    EasyDebounce.cancel(autoplayNextDebounceName);
     EasyThrottle.throttle(
       skipToVideoThrottleName,
       const Duration(seconds: 1),
@@ -598,6 +610,8 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   /// Switches to a video without changing the queue
   Future<void> _switchToVideo(IdedVideo video, {Duration? startAt}) async {
+    // a manual switch supersedes the pending autoplay of the finished video
+    EasyDebounce.cancel(autoplayNextDebounceName);
     try {
       // we move the existing video to the stack of played video
       await audioSession.setActive(true);
@@ -725,6 +739,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void play() {
+    EasyDebounce.cancel(autoplayNextDebounceName);
     emit(
       state.copyWith(mediaCommand: const MediaCommand(MediaCommandType.play)),
     );
@@ -887,6 +902,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void seek(Duration duration) {
+    EasyDebounce.cancel(autoplayNextDebounceName);
     if (duration.inSeconds < 0) {
       duration = Duration.zero;
     }
