@@ -354,6 +354,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get videoQueue => 'Fronta videí';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Přidat do fronty';
 
   @override

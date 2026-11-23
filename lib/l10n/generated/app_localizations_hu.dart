@@ -354,6 +354,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get videoQueue => 'Műsorlista';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Hozzáadás a műsorlistához';
 
   @override

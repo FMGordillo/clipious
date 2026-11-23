@@ -354,6 +354,9 @@ class AppLocalizationsOr extends AppLocalizations {
   String get videoQueue => 'ଭିଡିଓ ଧାଡି';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'ଧାଡିରେ ଯୋଡନ୍ତୁ';
 
   @override

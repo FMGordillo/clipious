@@ -356,6 +356,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get videoQueue => 'Черга відео';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Додати до черги';
 
   @override

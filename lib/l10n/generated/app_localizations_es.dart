@@ -357,6 +357,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get videoQueue => 'La cola del video';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Añadir a la cola';
 
   @override

@@ -354,6 +354,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get videoQueue => 'Cua de vídeos';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Afegeix a la cua';
 
   @override

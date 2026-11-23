@@ -785,6 +785,12 @@ abstract class AppLocalizations {
   /// **'Video queue'**
   String get videoQueue;
 
+  /// No description provided for @markAsWatched.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as watched'**
+  String get markAsWatched;
+
   /// Label on button to add a video to the queue list
   ///
   /// In en, this message translates to:

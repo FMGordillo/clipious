@@ -353,6 +353,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get videoQueue => 'قائمة انتظار الفيديو';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'إضافة إلى قائمة الانتظار';
 
   @override

@@ -356,6 +356,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get videoQueue => 'Coadă video';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Adaugă la coadă';
 
   @override

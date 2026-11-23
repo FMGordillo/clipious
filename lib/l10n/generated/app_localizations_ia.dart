@@ -356,6 +356,9 @@ class AppLocalizationsIa extends AppLocalizations {
   String get videoQueue => 'Cauda de video';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Adder al cauda';
 
   @override

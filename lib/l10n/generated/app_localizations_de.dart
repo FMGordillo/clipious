@@ -358,6 +358,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get videoQueue => 'Videowarteschlange';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Zur Warteschlange hinzufügen';
 
   @override

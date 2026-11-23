@@ -357,6 +357,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get videoQueue => 'Fila de vídeo';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Adicionar à fila';
 
   @override

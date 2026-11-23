@@ -354,6 +354,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get videoQueue => 'Video növbəsi';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Növbəyə əlavə et';
 
   @override

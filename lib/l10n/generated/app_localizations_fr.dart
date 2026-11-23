@@ -358,6 +358,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get videoQueue => 'File d\'attente';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Ajouter à la file d\'attente';
 
   @override

@@ -355,6 +355,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get videoQueue => 'Video kuyruğu';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Sıraya ekle';
 
   @override

@@ -347,6 +347,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get videoQueue => '動画再生待ち';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => '再生待ちに追加';
 
   @override

@@ -827,6 +827,14 @@ class Service {
     handleResponse(response);
   }
 
+  // Watched = server history entry (shown as watched by Invidious) + local progress 1 (check icon).
+  Future<void> markVideoWatched(String videoId) async {
+    if (await isLoggedIn()) {
+      await addToUserHistory(videoId);
+    }
+    await db.saveProgress(Progress.named(progress: 1, videoId: videoId));
+  }
+
   Future<void> addToUserHistory(String videoId) async {
     var req = await buildRequest(
       urlAddDeleteHistory,

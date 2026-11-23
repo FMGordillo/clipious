@@ -4,15 +4,17 @@ import 'package:clipious/utils.dart';
 import 'package:clipious/videos/models/video.dart';
 import 'package:clipious/videos/states/video_in_list.dart';
 import 'package:duration/duration.dart';
+import 'package:flutter/gestures.dart' show kLongPressTimeout;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
 
 import '../../../../globals.dart';
+import '../../../../utils/views/tv/components/tv_button.dart';
 import '../../components/video_thumbnail.dart';
 
-class TvVideoItem extends StatelessWidget {
+class TvVideoItem extends StatefulWidget {
   final Video video;
   final bool autoFocus;
   final void Function(bool focus)? onFocusChange;
@@ -26,28 +28,84 @@ class TvVideoItem extends StatelessWidget {
     this.onFocusChange,
   });
 
-  openVideo(BuildContext context, Video e, FocusNode node, KeyEvent event) {
-    if (event is KeyUpEvent &&
-        isOk(event.logicalKey, physicalKeyboardKey: event.physicalKey)) {
-      if (e.filtered) {
-        var cubit = context.read<VideoInListCubit>();
-        cubit.showVideoDetails();
-        return KeyEventResult.handled;
-      }
-      if (onSelect != null) {
-        onSelect!(context, e);
-      } else {
-        if (!(video.isUpcoming ?? false)) {
-          AutoRouter.of(context).push(TvVideoRoute(videoId: e.videoId));
-        }
-      }
+  @override
+  State<TvVideoItem> createState() => _TvVideoItemState();
+}
+
+class _TvVideoItemState extends State<TvVideoItem> {
+  DateTime? _selectPressedAt;
+
+  KeyEventResult openVideo(
+    BuildContext context,
+    Video e,
+    FocusNode node,
+    KeyEvent event,
+  ) {
+    if (!isOk(event.logicalKey, physicalKeyboardKey: event.physicalKey)) {
+      return KeyEventResult.ignored;
+    }
+    if (event is KeyDownEvent) {
+      _selectPressedAt = DateTime.now();
+      return KeyEventResult.ignored;
+    }
+    if (event is! KeyUpEvent) {
+      return KeyEventResult.ignored;
+    }
+    // Menu opens on release: dialog buttons would otherwise get the key repeats of a held select.
+    final pressedAt = _selectPressedAt;
+    _selectPressedAt = null;
+    if (pressedAt != null &&
+        DateTime.now().difference(pressedAt) >= kLongPressTimeout &&
+        !e.filtered &&
+        !(e.isUpcoming ?? false)) {
+      showMarkWatchedDialog(context, e);
       return KeyEventResult.handled;
     }
-    return KeyEventResult.ignored;
+    if (e.filtered) {
+      var cubit = context.read<VideoInListCubit>();
+      cubit.showVideoDetails();
+      return KeyEventResult.handled;
+    }
+    if (widget.onSelect != null) {
+      widget.onSelect!(context, e);
+    } else {
+      if (!(e.isUpcoming ?? false)) {
+        AutoRouter.of(context).push(TvVideoRoute(videoId: e.videoId));
+      }
+    }
+    return KeyEventResult.handled;
+  }
+
+  void showMarkWatchedDialog(BuildContext context, Video e) {
+    var locals = AppLocalizations.of(context)!;
+    var cubit = context.read<VideoInListCubit>();
+
+    showTvDialog(
+      context: context,
+      title: e.title,
+      builder: (BuildContext context) => [],
+      actions: [
+        TvButton(
+          autofocus: true,
+          onPressed: (context) async {
+            await service.markVideoWatched(e.videoId);
+            cubit.updateProgress();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+            child: Text(locals.markAsWatched),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final video = widget.video;
     ColorScheme colors = Theme.of(context).colorScheme;
     TextTheme textTheme = Theme.of(context).textTheme;
     var locals = AppLocalizations.of(context)!;
@@ -64,10 +122,10 @@ class TvVideoItem extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Focus(
-              onFocusChange: onFocusChange,
+              onFocusChange: widget.onFocusChange,
               onKeyEvent: (node, event) =>
                   openVideo(context, state.video!, node, event),
-              autofocus: autoFocus,
+              autofocus: widget.autoFocus,
               child: Builder(
                 builder: (ctx) {
                   final FocusNode focusNode = Focus.of(ctx);

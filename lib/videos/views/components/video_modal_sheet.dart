@@ -1,6 +1,7 @@
 import 'package:clipious/videos/models/video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:clipious/globals.dart';
 import 'package:clipious/l10n/generated/app_localizations.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/utils.dart';
@@ -53,6 +54,11 @@ class VideoModalSheet extends StatelessWidget {
         duration: const Duration(seconds: 1),
       ),
     );
+  }
+
+  void markWatched(BuildContext context) {
+    Navigator.of(context).pop();
+    service.markVideoWatched(video.videoId);
   }
 
   void downloadVideo(BuildContext context) {
@@ -112,6 +118,16 @@ class VideoModalSheet extends StatelessWidget {
                   icon: const Icon(Icons.download),
                 ),
                 Text(locals.download),
+              ],
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton.filledTonal(
+                  onPressed: () => markWatched(context),
+                  icon: const Icon(Icons.visibility),
+                ),
+                Text(locals.markAsWatched),
               ],
             ),
             Column(

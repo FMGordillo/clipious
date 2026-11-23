@@ -358,6 +358,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get videoQueue => 'வீடியோ வரிசை';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'வரிசையில் சேர்க்கவும்';
 
   @override

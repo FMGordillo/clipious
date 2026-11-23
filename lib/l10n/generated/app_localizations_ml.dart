@@ -353,6 +353,9 @@ class AppLocalizationsMl extends AppLocalizations {
   String get videoQueue => 'Video queue';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'വരിയിലേക്ക് ചേർക്കുക';
 
   @override

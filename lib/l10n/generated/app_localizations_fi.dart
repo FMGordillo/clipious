@@ -354,6 +354,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get videoQueue => 'Jono';
 
   @override
+  String get markAsWatched => 'Mark as watched';
+
+  @override
   String get addToQueueList => 'Lisää jonoon';
 
   @override
