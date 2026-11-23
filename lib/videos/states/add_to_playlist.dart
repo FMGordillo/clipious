@@ -18,6 +18,12 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
     onReady();
   }
 
+  // onReady awaits network calls that can outlive the sheet; emitting after close throws.
+  @override
+  void emit(AddToPlaylistController state) {
+    if (!isClosed) super.emit(state);
+  }
+
   bool videoInPlaylist(String playlistId) {
     Playlist? pl = state.playlists.firstWhere(
       (pl) => pl.playlistId == playlistId,
@@ -68,10 +74,8 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
 
     bool isVideoLiked = video != null;
 
-    if (!isClosed) {
-      emit(state.copyWith(isVideoLiked: isVideoLiked));
-      log.fine('video is currently liked ? $state.isVideoLiked');
-    }
+    emit(state.copyWith(isVideoLiked: isVideoLiked));
+    log.fine('video is currently liked ? $state.isVideoLiked');
   }
 
   Future<Playlist?> createPlayList() async {
@@ -91,9 +95,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistController> {
         )
         .length;
     log.fine('playlist count ${state.playListCount}');
-    if (!isClosed) {
-      emit(state.copyWith(playListCount: playListCount));
-    }
+    emit(state.copyWith(playListCount: playListCount));
   }
 
   Future<void> toggleLike() async {

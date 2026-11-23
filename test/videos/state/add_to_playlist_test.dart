@@ -54,4 +54,12 @@ void main() {
 
 
   });
+
+  test('does not emit after close', () async {
+    var cubit = AddToPlaylistCubit(const AddToPlaylistController('dQw4w9WgXcQ'));
+    await cubit.close();
+    // constructor's onReady is still awaiting; let it finish after close
+    await Future.delayed(const Duration(milliseconds: 500));
+    expect(cubit.isClosed, true);
+  });
 }
