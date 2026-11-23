@@ -9,6 +9,7 @@ part 'comment.g.dart';
 @JsonSerializable()
 class Comment {
   String author;
+  @JsonKey(defaultValue: <ImageObject>[])
   List<ImageObject> authorThumbnails = [];
   String authorId;
   String authorUrl;
