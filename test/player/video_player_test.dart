@@ -47,6 +47,14 @@ class TestVideoPlayerCubit extends VideoPlayerCubit {
   void onInit() {}
 }
 
+class SubtitleTestController extends BetterPlayerController {
+  @override
+  final BetterPlayerDataSource betterPlayerDataSource;
+
+  SubtitleTestController(this.betterPlayerDataSource)
+    : super(const BetterPlayerConfiguration());
+}
+
 void main() {
   late TestVideoPlayerCubit cubit;
 
@@ -89,5 +97,45 @@ void main() {
     cubit.onVideoListener(BetterPlayerEvent(BetterPlayerEventType.finished));
 
     expect(await WakelockPlus.enabled, isFalse);
+  });
+
+  test('removes only inline timestamps from Invidious cues', () async {
+    const firstLine = 'HalfLife<00:00:05.359> 2<00:06.480> <i>barrel</i>';
+    const secondLine = 'Preserve &lt;00:06.480&gt; and <b>formatting</b>';
+    BetterPlayerSubtitlesSource track(
+      String name,
+    ) => BetterPlayerSubtitlesSource(
+      type: BetterPlayerSubtitlesSourceType.memory,
+      name: name,
+      content:
+          'WEBVTT\n\n00:00:05.000 --> 00:00:09.000\n$firstLine\n$secondLine',
+    );
+
+    final invidious = track('English');
+    final controller = SubtitleTestController(
+      BetterPlayerDataSource.network(
+        'https://example.com/video',
+        subtitles: [invidious],
+      ),
+    )..addEventsListener(cubit.onVideoListener);
+    addTearDown(controller.dispose);
+    cubit.videoController = controller;
+
+    Future<void> select(BetterPlayerSubtitlesSource source) async {
+      final saved = cubit.settings.stream.firstWhere(
+        (state) => state.lastSubtitles == source.name,
+      );
+      await controller.setupSubtitleSource(source, sourceInitialize: true);
+      await saved;
+    }
+
+    await select(invidious);
+    final cue = controller.subtitlesLines.single;
+    expect(cue.start, const Duration(seconds: 5));
+    expect(cue.end, const Duration(seconds: 9));
+    expect(cue.texts, ['HalfLife 2 <i>barrel</i>', secondLine]);
+
+    await select(track('Manifest track'));
+    expect(controller.subtitlesLines.single.texts, [firstLine, secondLine]);
   });
 }
