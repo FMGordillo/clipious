@@ -186,11 +186,12 @@ nix build .#clipious
 nix run .#clipious
 ```
 
-For flake-based Home Manager on `x86_64-linux`, add `inputs.clipious.url = "github:FMGordillo/clipious";` to your flake and pass `inputs` to your Home Manager modules via `extraSpecialArgs` (`home-manager.extraSpecialArgs` on NixOS). In your Home Manager module:
+For flake-based Home Manager on `x86_64-linux`, add `inputs.clipious.url = "github:FMGordillo/clipious";` to your flake. With `clipious` in scope from your flake inputs, add this to your Home Manager modules (not your NixOS system modules):
 
 ```nix
-{ inputs, pkgs, ... }: {
-  home.packages = [ inputs.clipious.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+{
+  imports = [ clipious.homeManagerModules.default ];
+  programs.clipious.enable = true;
 }
 ```
 

@@ -24,5 +24,16 @@
       };
       default = clipious;
     });
+
+    homeManagerModules = rec {
+      clipious = { config, lib, pkgs, ... }: {
+        options.programs.clipious.enable = lib.mkEnableOption "Clipious";
+
+        config = lib.mkIf config.programs.clipious.enable {
+          home.packages = [self.packages.${pkgs.stdenv.hostPlatform.system}.default];
+        };
+      };
+      default = clipious;
+    };
   };
 }
