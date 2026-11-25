@@ -11,6 +11,13 @@ import '../test_app_cubit.dart';
 import '../test_player_cubit.dart';
 import '../test_settings_cubit.dart';
 
+class MediaHandlerTestPlayer extends TestPlayerCubit {
+  MediaHandlerTestPlayer(super.initialState, super.settings);
+
+  @override
+  bool get supportsMediaHandler => true;
+}
+
 void main() {
   testWidgets('processes playback events without a media handler', (
     tester,
@@ -18,7 +25,7 @@ void main() {
     db = await SembastSqfDb.createInMemory();
     final app = TestAppCubit(AppState(0, null, HomeLayout()));
     final settings = TestSettingsCubit(SettingsState.init(), app);
-    final player = TestPlayerCubit(PlayerState.init(null), settings);
+    final player = MediaHandlerTestPlayer(PlayerState.init(null), settings);
     addTearDown(player.close);
     addTearDown(settings.close);
     addTearDown(app.close);

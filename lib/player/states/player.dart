@@ -9,6 +9,7 @@ import 'package:clipious/player/models/sleep_timer.dart';
 import 'package:clipious/videos/models/ided_video.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -127,6 +128,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         .indexWhere((element) => element.videoId == currentVideoId);
   }
 
+  @visibleForTesting
+  bool get supportsMediaHandler => !isLinuxDesktop;
+
   Future<void> onReady() async {
     emit(
       state.copyWith(
@@ -151,7 +155,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         pause();
       });
 
-      if (!isLinuxDesktop) {
+      if (supportsMediaHandler) {
         _mediaHandler = await AudioService.init(
           builder: () => MediaHandler(this),
           config: const AudioServiceConfig(
