@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:clipious/downloads/models/downloaded_video.dart';
 import 'package:clipious/globals.dart';
@@ -7,6 +8,7 @@ import 'package:clipious/player/states/interfaces/media_player.dart';
 import 'package:clipious/player/states/linux_stream_url.dart';
 import 'package:clipious/player/states/video_player.dart';
 import 'package:clipious/settings/states/settings.dart';
+import 'package:clipious/videos/models/caption.dart';
 import 'package:clipious/videos/models/video.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +20,7 @@ final _log = Logger('LinuxVideoPlayer');
 
 class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   final SettingsCubit settings;
-  final Player mkPlayer = Player();
+  final Player mkPlayer;
   late final VideoController videoController = VideoController(mkPlayer);
 
   StreamSubscription? _playingSub;
@@ -37,8 +39,16 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   bool _playing = false;
   double _rate = 1;
   double _aspectRatio = 16 / 9;
+  List<Caption> _captions = [];
+  int _selectedSubtitle = -1;
+  int _subtitleRequest = 0;
 
-  LinuxVideoPlayerCubit(super.initialState, super.player, this.settings) {
+  LinuxVideoPlayerCubit(
+    super.initialState,
+    super.player,
+    this.settings, {
+    Player? mkPlayer,
+  }) : mkPlayer = mkPlayer ?? Player() {
     _bindStreams();
     playVideo(state.offlineVideo != null, startAt: state.startAt);
   }
@@ -114,6 +124,7 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     final w = mkPlayer.state.width;
     final h = mkPlayer.state.height;
     if (w != null && h != null && w > 0 && h > 0) {
+      _restoreSubtitle();
       _aspectRatio = w / h;
       player.setEvent(
         MediaEvent(
@@ -133,6 +144,7 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   void disposeControllers() {
+    _subtitleRequest++;
     WakelockPlus.disable();
     _playingSub?.cancel();
     _completedSub?.cancel();
@@ -148,6 +160,9 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   Future<void> playVideo(bool offline, {Duration? startAt}) async {
+    final subtitleRequest = ++_subtitleRequest;
+    _captions = [];
+    _selectedSubtitle = -1;
     if (player.state.isAudio) {
       return;
     }
@@ -191,6 +206,23 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
       _rate = settings.state.lastSpeed;
     }
     super.playVideo(offline);
+    if (isClosed || subtitleRequest != _subtitleRequest) return;
+    _captions = video.captions;
+    _restoreSubtitle();
+  }
+
+  void _restoreSubtitle() {
+    if (_captions.isEmpty ||
+        _selectedSubtitle != -1 ||
+        (mkPlayer.state.width ?? 0) <= 0 ||
+        (mkPlayer.state.height ?? 0) <= 0) {
+      return;
+    }
+    _selectedSubtitle = 0;
+    final last = settings.state.rememberSubtitles
+        ? _captions.indexWhere((c) => c.label == settings.state.lastSubtitles)
+        : -1;
+    unawaited(_setSubtitle(last + 1, remember: false));
   }
 
   @override
@@ -250,7 +282,8 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   List<String> getAudioTracks() => [];
 
   @override
-  List<String> getSubtitles() => [];
+  List<String> getSubtitles() =>
+      _selectedSubtitle == -1 ? [] : ['Off', ..._captions.map((c) => c.label)];
 
   @override
   int selectedVideoTrack() => -1;
@@ -259,7 +292,7 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   int selectedAudioTrack() => -1;
 
   @override
-  int selectedSubtitle() => -1;
+  int selectedSubtitle() => _selectedSubtitle;
 
   @override
   void selectVideoTrack(int index) {}
@@ -268,7 +301,47 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   void selectAudioTrack(int index) {}
 
   @override
-  void selectSubtitle(int index) {}
+  Future<void> selectSubtitle(int index) => _setSubtitle(index, remember: true);
+
+  Future<void> _setSubtitle(int index, {required bool remember}) async {
+    if (_captions.isEmpty || index < 0 || index > _captions.length) return;
+    final request = ++_subtitleRequest;
+    final caption = index == 0 ? null : _captions[index - 1];
+    try {
+      var track = SubtitleTrack.no();
+      if (caption != null) {
+        final server = await db.getCurrentlySelectedServer();
+        final path = Uri.parse(caption.url);
+        if (path.hasAuthority || path.hasScheme || !path.path.startsWith('/')) {
+          _log.warning('Invalid caption URL');
+          return;
+        }
+        final url = '${server.url}${caption.url}';
+        final response = await service.httpClient.get(
+          Uri.parse(url),
+          headers: server.headersForUrl(url),
+        );
+        if (response.statusCode != 200) {
+          _log.warning('Caption request failed: HTTP ${response.statusCode}');
+          return;
+        }
+        track = SubtitleTrack.data(
+          utf8.decode(response.bodyBytes),
+          title: caption.label,
+          language: caption.languageCode,
+        );
+      }
+      if (request != _subtitleRequest) return;
+      await mkPlayer.setSubtitleTrack(track);
+      if (request != _subtitleRequest) return;
+      _selectedSubtitle = index;
+      if (remember) {
+        await settings.setLastSubtitle(caption?.label ?? '');
+      }
+    } on Exception {
+      _log.warning('Could not load subtitle track');
+    }
+  }
 
   @override
   bool isMuted() => mkPlayer.state.volume == 0;
