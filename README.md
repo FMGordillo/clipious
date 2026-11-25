@@ -114,27 +114,35 @@ This gives you the correct Flutter, Android SDK, `adb`, and all required tools.
 
 #### 2. One-time setup
 
-Run once after cloning (configures the Flutter JDK, installs the pre-commit formatting hook):
+Run once after cloning to configure the Flutter JDK and fetch dependencies:
 
 ```bash
 setup
 ```
 
+Entering `devenv shell` installs the pre-commit hooks. Commit from that shell so
+the hooks can check formatting on staged Dart files (excluding generated code)
+and analyze app code without starting backend services. Use `dart format <file>`
+if a staged file fails the format check, then stage it again.
+
 #### 3. Start the local Invidious backend
 
-Tests rely on a locally running Invidious server with a seeded test user. Start it with:
+Integration tests rely on a local Invidious server with a seeded test user. Start it with:
 
 ```bash
 devenv up
 ```
 
-This spins up PostgreSQL on port 5433, runs the Invidious migrations, and seeds a test account (username `test`, password `test`). This is how tests are run in CI.
+This spins up PostgreSQL on port 5433, runs the Invidious migrations, and seeds a test account (username `test`, password `test`).
 
 #### 4. Run the tests
 
 ```bash
 flutter test
 ```
+
+GitHub Actions analyzes app code, runs offline tests, and builds a Linux debug
+app on pushes and pull requests to `master`. It does not need local Invidious.
 
 #### 5. Run on a device
 

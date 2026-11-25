@@ -178,42 +178,32 @@
     description = "Ensure devenv services (PostgreSQL, Invidious) are running";
   };
 
-  # Git Hooks — format, analyze, and test Dart code
-  # Hooks are wrapped with check-services to automatically start PostgreSQL and Invidious
-  # on-demand if they're not already running.
+  # Git Hooks — check Dart without starting backend services.
   git-hooks = {
     enable = true;
     hooks = {
       dart-format = {
         enable = true;
         name = "Dart Format";
-        entry = "bash -c 'check-services dart format --set-exit-if-changed \"$@\"' --";
+        entry = "dart format --output=none --set-exit-if-changed";
         language = "system";
         files = "\\.dart$";
-        stages = ["commit"];
+        excludes = ["\\.(freezed|g|gr)\\.dart$" "^lib/l10n/generated/"];
+        stages = ["pre-commit"];
       };
       dart-analyze = {
         enable = true;
         name = "Dart Analyze";
-        entry = "bash -c 'check-services dart analyze'";
+        entry = "dart analyze --no-fatal-warnings lib";
         language = "system";
-        files = "\\.dart$";
+        files = "^(lib/.*\\.dart|pubspec\\.(yaml|lock)|analysis_options\\.yaml)$";
         pass_filenames = false;
-        stages = ["commit"];
-      };
-      flutter-test = {
-        enable = true;
-        name = "Flutter Test";
-        entry = "bash -c 'check-services flutter test'";
-        language = "system";
-        files = "\\.dart$";
-        pass_filenames = false;
-        stages = ["commit"];
+        stages = ["pre-commit"];
       };
     };
   };
 
-  # One-time setup: configure flutter JDK, install git hooks.
+  # One-time setup: configure Flutter JDK and fetch dependencies.
   # Separated from enterShell so blocking network/IO operations don't interfere
   # with the interactive terminal.
   scripts.setup = {
@@ -226,7 +216,7 @@
 
       echo "Done — run 'devenv up' to start PostgreSQL and Invidious."
     '';
-    description = "One-time project setup (flutter JDK, git hooks)";
+    description = "One-time project setup (Flutter JDK, dependencies)";
   };
 
   # Shell hook — only fast, non-blocking, non-interactive operations
@@ -241,7 +231,6 @@
     mkdir -p "$ANDROID_SDK_ROOT" "$GRADLE_USER_HOME"
 
     echo "Run 'clipious' for dev/build commands (gen, apk, linux, test, ...). Also: setup, check-services"
-    echo "Pre-commit hooks will automatically start services as needed."
     echo "Run 'devenv up' manually to start PostgreSQL and Invidious for development."
   '';
 }
