@@ -457,6 +457,8 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
   @override
   void seek(Duration position) {
+    if (videoController?.videoPlayerController?.value.duration == null) return;
+
     videoController?.seekTo(position);
   }
 
