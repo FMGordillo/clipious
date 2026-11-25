@@ -22,6 +22,8 @@ compileSdk 36, targetSdk 35, build-tools 35.0.0, NDK 28.2.13676358, iOS 14.
 - `auto_route` < 11.2.0, `dynamic_color` 1.x, `cached_network_image` 4.0.3: newer
   versions use the standalone `material_ui` package, whose widget types differ from
   Flutter 3.44's `material.dart` (e.g. `TabController`, `ColorScheme`).
+- `settings_ui` 3.x: 4.x reads colors from `material_ui`/`cupertino_ui` themes only, so
+  under `material.dart` it falls back to light defaults (unreadable tiles in dark theme).
 - `freezed` 4.0.0-dev.3: 4.0.3 requires Dart 3.13.
 - `dependency_overrides` `matcher`/`test_api`: pinned by `flutter_test`.
 - `intl`: pinned by `flutter_localizations`.
