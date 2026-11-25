@@ -24,6 +24,9 @@ part 'video_player.freezed.dart';
 final log = Logger('VideoPlayer');
 
 final _googleCdnRegex = RegExp(r'https://(.+)googlevideo.com/');
+final _webVttInlineTimestamp = RegExp(
+  r'<(?:[0-9]{2,}:)?[0-5][0-9]:[0-5][0-9]\.[0-9]{3}>',
+);
 
 class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   BetterPlayerController? videoController;
@@ -196,9 +199,21 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         }
         break;
       case BetterPlayerEventType.changedSubtitles:
-        settings.setLastSubtitle(
-          videoController?.betterPlayerSubtitlesSource?.name ?? '',
-        );
+        final controller = videoController;
+        final source = controller?.betterPlayerSubtitlesSource;
+        if (controller != null &&
+            controller.betterPlayerDataSource?.subtitles?.contains(source) ==
+                true) {
+          // River Player passes WebVTT cue text to an HTML renderer.
+          for (final cue in controller.subtitlesLines) {
+            final lines = cue.texts;
+            if (lines == null) continue;
+            for (var i = 0; i < lines.length; i++) {
+              lines[i] = lines[i].replaceAll(_webVttInlineTimestamp, '');
+            }
+          }
+        }
+        settings.setLastSubtitle(source?.name ?? '');
         break;
       case BetterPlayerEventType.setSpeed:
         if (event.parameters?.containsKey("speed") ?? false) {
