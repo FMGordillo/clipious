@@ -60,7 +60,7 @@ dependencies:
   screen_brightness: ^2.1.11
   sembast: ^3.8.9+1
   sembast_sqflite: ^2.2.2
-  settings_ui: ^4.0.2
+  settings_ui: ^3.0.1
   share_plus: ^13.2.1
   sqflite: ^2.4.3
   url_launcher: ^6.3.3
