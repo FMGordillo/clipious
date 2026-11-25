@@ -52,6 +52,7 @@ enum PlayerRepeat { noRepeat, repeatAll, repeatOne }
 class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   final SettingsCubit settings;
   late final AudioSession audioSession;
+  MediaHandler? _mediaHandler;
 
   PlayerCubit(super.initialState, this.settings) {
     onReady();
@@ -75,7 +76,8 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   }
 
   void mapMediaEventToMediaHandler(MediaEvent event) {
-    if (!isTv && !isLinuxDesktop && event.type != MediaEventType.progress) {
+    final handler = _mediaHandler;
+    if (handler != null && event.type != MediaEventType.progress) {
       log.fine("Event state: ${event.state}, ${event.type}");
       var playbackState = PlaybackState(
         controls: [
@@ -113,7 +115,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         queueIndex: currentIndex,
       );
 
-      mediaHandler.playbackState.add(playbackState);
+      handler.playbackState.add(playbackState);
     }
   }
 
@@ -150,7 +152,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       });
 
       if (!isLinuxDesktop) {
-        mediaHandler = await AudioService.init(
+        _mediaHandler = await AudioService.init(
           builder: () => MediaHandler(this),
           config: const AudioServiceConfig(
             androidNotificationChannelId:
@@ -687,9 +689,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
       await setSponsorBlock();
 
-      if (!isTv && !isLinuxDesktop) {
-        mediaHandler.skipToQueueItem(currentIndex);
-      }
+      _mediaHandler?.skipToQueueItem(currentIndex);
     } catch (err) {
       if (state.videos.length == 1) {
         // if we can't get video details, we need to stop everything

@@ -12,7 +12,6 @@ import 'package:clipious/downloads/states/download_manager.dart';
 import 'package:clipious/globals.dart';
 import 'package:clipious/home/models/db/home_layout.dart';
 import 'package:clipious/http_overrides.dart';
-import 'package:clipious/media_handler.dart';
 import 'package:clipious/notifications/notifications.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/router.dart';
@@ -33,8 +32,6 @@ const brandColor = Color(0xFF4f0096);
 
 final scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 bool isTv = false;
-
-late MediaHandler mediaHandler;
 
 final Logger log = Logger('main');
 
