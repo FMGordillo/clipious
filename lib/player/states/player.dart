@@ -9,7 +9,6 @@ import 'package:clipious/player/models/sleep_timer.dart';
 import 'package:clipious/videos/models/ided_video.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -61,7 +60,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   void setEvent(MediaEvent event) {
     handleMediaEvent(event);
-    mapMediaEventToMediaHandler(event);
+    if (event.type != MediaEventType.progress) {
+      _publishPlaybackState(event);
+    }
 
     emit(state.copyWith(mediaEvent: event));
   }
@@ -76,9 +77,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     }
   }
 
-  void mapMediaEventToMediaHandler(MediaEvent event) {
+  void _publishPlaybackState(MediaEvent event) {
     final handler = _mediaHandler;
-    if (handler != null && event.type != MediaEventType.progress) {
+    if (handler != null) {
       log.fine("Event state: ${event.state}, ${event.type}");
       var playbackState = PlaybackState(
         controls: [
@@ -131,6 +132,24 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   @visibleForTesting
   bool get supportsMediaHandler => !isLinuxDesktop;
 
+  @visibleForTesting
+  Future<MediaHandler> initMediaHandler() => AudioService.init(
+    builder: () => MediaHandler(this),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId:
+          'com.github.lamarios.clipious.channel.audio',
+      androidNotificationChannelName: 'Video playback',
+      androidNotificationOngoing: true,
+    ),
+  );
+
+  void _publishCurrentMediaItem() {
+    final index = currentIndex;
+    if (index >= 0) {
+      _mediaHandler?.skipToQueueItem(index);
+    }
+  }
+
   Future<void> onReady() async {
     emit(
       state.copyWith(
@@ -156,15 +175,11 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       });
 
       if (supportsMediaHandler) {
-        _mediaHandler = await AudioService.init(
-          builder: () => MediaHandler(this),
-          config: const AudioServiceConfig(
-            androidNotificationChannelId:
-                'com.github.lamarios.clipious.channel.audio',
-            androidNotificationChannelName: 'Video playback',
-            androidNotificationOngoing: true,
-          ),
-        );
+        _mediaHandler = await initMediaHandler();
+        if (state.hasVideo) {
+          _publishPlaybackState(state.mediaEvent);
+          _publishCurrentMediaItem();
+        }
       }
       BackButtonInterceptor.add(
         handleBackButton,
@@ -693,7 +708,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
       await setSponsorBlock();
 
-      _mediaHandler?.skipToQueueItem(currentIndex);
+      _publishCurrentMediaItem();
     } catch (err) {
       if (state.videos.length == 1) {
         // if we can't get video details, we need to stop everything
