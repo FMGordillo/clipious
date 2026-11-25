@@ -9,7 +9,7 @@
     self,
     nixpkgs,
   }: let
-    systems = ["x86_64-linux" "aarch64-linux"];
+    systems = ["x86_64-linux"];
     forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
   in {
     packages = forAllSystems (pkgs: rec {
@@ -20,9 +20,20 @@
     apps = forAllSystems (pkgs: rec {
       clipious = {
         type = "app";
-        program = "${self.packages.${pkgs.system}.clipious}/bin/clipious";
+        program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.clipious}/bin/clipious";
       };
       default = clipious;
     });
+
+    homeManagerModules = rec {
+      clipious = { config, lib, pkgs, ... }: {
+        options.programs.clipious.enable = lib.mkEnableOption "Clipious";
+
+        config = lib.mkIf config.programs.clipious.enable {
+          home.packages = [self.packages.${pkgs.stdenv.hostPlatform.system}.default];
+        };
+      };
+      default = clipious;
+    };
   };
 }

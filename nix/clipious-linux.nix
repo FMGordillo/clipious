@@ -12,6 +12,8 @@
   alsa-lib,
   libpulseaudio,
 }: let
+  versionLine = lib.findFirst (lib.hasPrefix "version:") (throw "Missing version in pubspec.yaml") (lib.splitString "\n" (builtins.readFile ../pubspec.yaml));
+
   # Prefetched so cmake does not download during the sandbox build.
   ffmpegKitLinux = fetchzip {
     url = "https://github.com/sk3llo/ffmpeg_kit_flutter/releases/download/8.1.2-full/ffmpeg-kit-linux-x86_64-full-8.1.2.tar.gz";
@@ -20,7 +22,7 @@
 in
   flutter.buildFlutterApplication rec {
     pname = "clipious";
-    version = "2.4.0";
+    version = lib.head (lib.splitString "+" (lib.trim (lib.removePrefix "version:" versionLine)));
 
     src = lib.cleanSourceWith {
       src = ../.;
@@ -42,7 +44,7 @@ in
         ]);
     };
 
-    autoPubspecLock = ../pubspec.lock;
+    pubspecLock = lib.importJSON ./pubspec-lock.json;
 
     gitHashes = {
       river_player = "sha256-mmDK2C2Etdrpe/JBSzEaPz3Ng1pQKWiyrc7nYCVKcNk=";
