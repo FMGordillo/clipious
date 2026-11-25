@@ -9,6 +9,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:river_player/river_player.dart';
+import 'package:river_player/src/video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
 
@@ -76,6 +77,14 @@ void main() {
   });
 
   tearDown(() async => await db.close());
+
+  test('ignores seek before video initialization', () {
+    cubit.videoController = BetterPlayerController(
+      const BetterPlayerConfiguration(),
+    )..videoPlayerController = VideoPlayerController(autoCreate: false);
+
+    cubit.seek(const Duration(seconds: 1));
+  });
 
   test('keeps screen awake while video plays', () async {
     cubit.onVideoListener(BetterPlayerEvent(BetterPlayerEventType.play));
