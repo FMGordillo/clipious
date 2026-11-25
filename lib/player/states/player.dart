@@ -52,6 +52,7 @@ enum PlayerRepeat { noRepeat, repeatAll, repeatOne }
 class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
   final SettingsCubit settings;
   late final AudioSession audioSession;
+  MediaHandler? _mediaHandler;
 
   PlayerCubit(super.initialState, this.settings) {
     onReady();
@@ -59,7 +60,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
   void setEvent(MediaEvent event) {
     handleMediaEvent(event);
-    mapMediaEventToMediaHandler(event);
+    if (event.type != MediaEventType.progress) {
+      _publishPlaybackState(event);
+    }
 
     emit(state.copyWith(mediaEvent: event));
   }
@@ -74,8 +77,9 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
     }
   }
 
-  void mapMediaEventToMediaHandler(MediaEvent event) {
-    if (!isTv && !isLinuxDesktop && event.type != MediaEventType.progress) {
+  void _publishPlaybackState(MediaEvent event) {
+    final handler = _mediaHandler;
+    if (handler != null) {
       log.fine("Event state: ${event.state}, ${event.type}");
       var playbackState = PlaybackState(
         controls: [
@@ -113,7 +117,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         queueIndex: currentIndex,
       );
 
-      mediaHandler.playbackState.add(playbackState);
+      handler.playbackState.add(playbackState);
     }
   }
 
@@ -123,6 +127,27 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         state.offlineCurrentlyPlaying?.videoId;
     return (state.videos.isNotEmpty ? state.videos : state.offlineVideos)
         .indexWhere((element) => element.videoId == currentVideoId);
+  }
+
+  @visibleForTesting
+  bool get supportsMediaHandler => !isLinuxDesktop;
+
+  @visibleForTesting
+  Future<MediaHandler> initMediaHandler() => AudioService.init(
+    builder: () => MediaHandler(this),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId:
+          'com.github.lamarios.clipious.channel.audio',
+      androidNotificationChannelName: 'Video playback',
+      androidNotificationOngoing: true,
+    ),
+  );
+
+  void _publishCurrentMediaItem() {
+    final index = currentIndex;
+    if (index >= 0) {
+      _mediaHandler?.skipToQueueItem(index);
+    }
   }
 
   Future<void> onReady() async {
@@ -149,16 +174,12 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
         pause();
       });
 
-      if (!isLinuxDesktop) {
-        mediaHandler = await AudioService.init(
-          builder: () => MediaHandler(this),
-          config: const AudioServiceConfig(
-            androidNotificationChannelId:
-                'com.github.lamarios.clipious.channel.audio',
-            androidNotificationChannelName: 'Video playback',
-            androidNotificationOngoing: true,
-          ),
-        );
+      if (supportsMediaHandler) {
+        _mediaHandler = await initMediaHandler();
+        if (state.hasVideo) {
+          _publishPlaybackState(state.mediaEvent);
+          _publishCurrentMediaItem();
+        }
       }
       BackButtonInterceptor.add(
         handleBackButton,
@@ -687,9 +708,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
 
       await setSponsorBlock();
 
-      if (!isTv && !isLinuxDesktop) {
-        mediaHandler.skipToQueueItem(currentIndex);
-      }
+      _publishCurrentMediaItem();
     } catch (err) {
       if (state.videos.length == 1) {
         // if we can't get video details, we need to stop everything
