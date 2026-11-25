@@ -186,7 +186,17 @@ nix build .#clipious
 nix run .#clipious
 ```
 
+For flake-based Home Manager on `x86_64-linux`, add `inputs.clipious.url = "github:FMGordillo/clipious";` to your flake and pass `inputs` to your Home Manager modules via `extraSpecialArgs` (`home-manager.extraSpecialArgs` on NixOS). In your Home Manager module:
+
+```nix
+{ inputs, pkgs, ... }: {
+  home.packages = [ inputs.clipious.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+}
+```
+
 Playback uses `media_kit` on Linux. Downloads, PiP, share-intent, and background sync are disabled. After changing Dart dependencies, refresh `nix/package_graph.json` from `.dart_tool/package_graph.json` (`flutter pub get`).
+
+After updating `pubspec.lock`, regenerate the Nix lock data with `nix shell nixpkgs#yq --command yq . pubspec.lock > nix/pubspec-lock.json`.
 
 ### Translations
 

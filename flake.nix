@@ -9,7 +9,7 @@
     self,
     nixpkgs,
   }: let
-    systems = ["x86_64-linux" "aarch64-linux"];
+    systems = ["x86_64-linux"];
     forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
   in {
     packages = forAllSystems (pkgs: rec {
@@ -20,7 +20,7 @@
     apps = forAllSystems (pkgs: rec {
       clipious = {
         type = "app";
-        program = "${self.packages.${pkgs.system}.clipious}/bin/clipious";
+        program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.clipious}/bin/clipious";
       };
       default = clipious;
     });
