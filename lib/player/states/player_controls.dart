@@ -220,6 +220,8 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
   }
 
   Future<void> startBrightnessAdjustments(DragStartDetails details) async {
+    if (isLinuxDesktop) return;
+
     final currentBrightness = await ScreenBrightness().current;
     emit(
       state.copyWith(
@@ -234,6 +236,8 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
     DragUpdateDetails details,
     BoxConstraints constraints,
   ) async {
+    if (isLinuxDesktop) return;
+
     // percentage of the screen we moved since we started dragging
     double movedBy =
         (state.screenControlStart - details.localPosition.dy) /

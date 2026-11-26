@@ -6,6 +6,7 @@ import 'package:clipious/globals.dart';
 import 'package:clipious/home/models/db/home_layout.dart';
 import 'package:clipious/player/states/linux_video_player.dart';
 import 'package:clipious/player/states/player.dart';
+import 'package:clipious/player/states/player_controls.dart';
 import 'package:clipious/player/states/video_player.dart';
 import 'package:clipious/service.dart';
 import 'package:clipious/settings/models/db/server.dart';
@@ -13,6 +14,7 @@ import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
 import 'package:clipious/videos/models/caption.dart';
 import 'package:clipious/videos/models/video.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
@@ -50,6 +52,39 @@ class _PlatformPlayer extends PlatformPlayer {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  test(
+    'Linux ignores brightness drags without calling the plugin',
+    () async {
+      db = await SembastSqfDb.createInMemory();
+      addTearDown(() async => await db.close());
+      final app = TestAppCubit(AppState(0, null, HomeLayout()));
+      addTearDown(app.close);
+      await app.initState();
+      final settings = TestSettingsCubit(SettingsState.init(), app);
+      addTearDown(settings.close);
+      final player = SilentPlayerCubit(
+        PlayerState(playQueue: ListQueue()),
+        settings,
+      );
+      addTearDown(player.close);
+      final cubit = PlayerControlsCubit(const PlayerControlsState(), player);
+      addTearDown(cubit.close);
+      addTearDown(() => EasyDebounce.cancel('player-controls-hide'));
+      final initialState = cubit.state;
+
+      await cubit.startBrightnessAdjustments(
+        DragStartDetails(globalPosition: const Offset(0, 50)),
+      );
+      await cubit.updateBrightness(
+        DragUpdateDetails(globalPosition: const Offset(0, 25)),
+        const BoxConstraints(maxHeight: 100),
+      );
+
+      expect(cubit.state, initialState);
+    },
+    skip: !isLinuxDesktop,
+  );
 
   test('Linux restores and disables Invidious subtitles', () async {
     const route = '/api/v1/captions/video?label=Fran%C3%A7ais';
