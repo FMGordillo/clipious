@@ -88,6 +88,9 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
       case MediaEventType.bufferChanged:
         setBuffer(event.value);
         break;
+      case MediaEventType.bufferingEnd:
+        emit(state.copyWith(buffering: false));
+        break;
       case MediaEventType.pause:
       case MediaEventType.play:
         emit(state.copyWith());
@@ -107,7 +110,7 @@ class PlayerControlsCubit extends Cubit<PlayerControlsState> {
   }
 
   void setErrored() {
-    emit(state.copyWith(errored: true));
+    emit(state.copyWith(errored: true, buffering: false));
   }
 
   @override
