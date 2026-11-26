@@ -107,7 +107,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
         );
         return;
       case BetterPlayerEventType.bufferingEnd:
-        mediaState = MediaState.playing;
+        type = MediaEventType.bufferingEnd;
         break;
       case BetterPlayerEventType.bufferingStart:
         mediaState = MediaState.buffering;

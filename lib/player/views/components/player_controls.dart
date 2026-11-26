@@ -264,6 +264,9 @@ class PlayerControls extends StatelessWidget {
             bool isPlaying = context.select(
               (PlayerCubit cubit) => cubit.state.isPlaying,
             );
+            bool isBuffering = context.select(
+              (PlayerCubit cubit) => cubit.state.isBuffering,
+            );
             Video? currentlyPlaying = context.select(
               (PlayerCubit cubit) => cubit.state.currentlyPlaying,
             );
@@ -777,7 +780,7 @@ class PlayerControls extends StatelessWidget {
                             ],
                           ),
                         ),
-                      if (playerState.buffering)
+                      if (isBuffering || playerState.buffering)
                         const Center(
                           child: FractionallySizedBox(
                             heightFactor: 0.3,

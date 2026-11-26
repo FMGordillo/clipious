@@ -14,6 +14,7 @@ enum MediaEventType {
   speedChanged,
   durationChanged,
   bufferChanged,
+  bufferingEnd,
   progress,
   volumeChanged,
   fullScreenChanged,

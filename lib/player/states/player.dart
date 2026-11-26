@@ -64,7 +64,16 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       _publishPlaybackState(event);
     }
 
-    emit(state.copyWith(mediaEvent: event));
+    final isBuffering = switch (event.state) {
+      MediaState.buffering => true,
+      MediaState.idle ||
+      MediaState.loading ||
+      MediaState.error ||
+      MediaState.completed => false,
+      _ when event.type == MediaEventType.bufferingEnd => false,
+      _ => state.isBuffering,
+    };
+    emit(state.copyWith(mediaEvent: event, isBuffering: isBuffering));
   }
 
   @override
@@ -583,6 +592,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
           videos: videos,
           startAt: startAt,
           mediaEvent: mediaEvent,
+          isBuffering: false,
           playedVideos: [],
           selectedFullScreenIndex: selectedFullScreenIndex,
           top: 500,
@@ -663,6 +673,7 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
       emit(
         state.copyWith(
           mediaEvent: mediaEvent,
+          isBuffering: false,
           videos: videos,
           currentlyPlaying: currentlyPlaying,
           offlineVideos: offlineVideos,
@@ -1203,6 +1214,7 @@ sealed class PlayerState with _$PlayerState {
     @Default(Duration.zero) Duration position,
     @Default(Duration.zero) Duration bufferedPosition,
     @Default(false) bool isPlaying,
+    @Default(false) bool isBuffering,
     @Default(1.0) double speed,
 
     // events

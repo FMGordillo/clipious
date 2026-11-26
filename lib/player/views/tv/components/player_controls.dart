@@ -46,6 +46,9 @@ class TvPlayerControls extends StatelessWidget {
           var isPlaying = context.select(
             (PlayerCubit value) => value.state.isPlaying,
           );
+          var isBuffering = context.select(
+            (PlayerCubit value) => value.state.isBuffering,
+          );
           var position = context.select(
             (PlayerCubit value) => value.state.position,
           );
@@ -85,6 +88,10 @@ class TvPlayerControls extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (isBuffering)
+                    const Positioned.fill(
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   Positioned(
                     child: TvOverscan(
                       child: playerState.showSettings

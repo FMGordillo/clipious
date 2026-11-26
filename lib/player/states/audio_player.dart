@@ -72,7 +72,12 @@ class AudioPlayerCubit extends MediaPlayerCubit<AudioPlayerState> {
         player.setEvent(const MediaEvent(state: MediaState.buffering));
         break;
       case ProcessingState.ready:
-        player.setEvent(const MediaEvent(state: MediaState.ready));
+        player.setEvent(
+          const MediaEvent(
+            state: MediaState.ready,
+            type: MediaEventType.bufferingEnd,
+          ),
+        );
         break;
       case ProcessingState.completed:
         player.setEvent(const MediaEvent(state: MediaState.completed));

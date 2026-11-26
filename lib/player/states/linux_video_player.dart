@@ -105,6 +105,7 @@ class LinuxVideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
       player.setEvent(
         MediaEvent(
           state: buffering ? MediaState.buffering : MediaState.playing,
+          type: buffering ? null : MediaEventType.bufferingEnd,
         ),
       );
     });
