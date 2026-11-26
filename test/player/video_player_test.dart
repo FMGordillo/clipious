@@ -3,10 +3,13 @@ import 'package:clipious/home/models/db/home_layout.dart';
 import 'package:clipious/player/models/media_event.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/player/states/video_player.dart';
+import 'package:clipious/settings/models/db/server.dart';
 import 'package:clipious/settings/states/settings.dart';
+import 'package:clipious/videos/models/video.dart';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:river_player/river_player.dart';
 import 'package:river_player/src/video_player/video_player.dart';
@@ -35,17 +38,68 @@ class FakeWakelock implements WakelockPlusPlatformInterface {
 
 // setEvent drives the audio-service media handler, which is not under test
 class SilentPlayerCubit extends TestPlayerCubit {
+  final List<MediaEvent> events = [];
+
   SilentPlayerCubit(super.initialState, super.settings);
 
   @override
-  void setEvent(MediaEvent event) {}
+  void setEvent(MediaEvent event) {
+    events.add(event);
+  }
 }
 
 class TestVideoPlayerCubit extends VideoPlayerCubit {
-  TestVideoPlayerCubit(super.initialState, super.player, super.settings);
+  final BetterPlayerController Function(BetterPlayerConfiguration)?
+  controllerFactory;
+
+  TestVideoPlayerCubit(
+    super.initialState,
+    super.player,
+    super.settings, {
+    this.controllerFactory,
+  });
 
   @override
   void onInit() {}
+
+  @override
+  BetterPlayerController createVideoController(
+    BetterPlayerConfiguration configuration,
+  ) =>
+      controllerFactory?.call(configuration) ??
+      super.createVideoController(configuration);
+}
+
+class FailingSetupController extends BetterPlayerController {
+  int setupCalls = 0;
+  BetterPlayerDataSource? _dataSource;
+
+  FailingSetupController(super.configuration, {BetterPlayerDataSource? source})
+    : _dataSource = source;
+
+  @override
+  BetterPlayerDataSource? get betterPlayerDataSource => _dataSource;
+
+  @override
+  Future setupDataSource(BetterPlayerDataSource betterPlayerDataSource) async {
+    setupCalls++;
+    _dataSource = betterPlayerDataSource;
+    throw PlatformException(
+      code: 'VideoError',
+      message:
+          'Video player had error androidx.media3.exoplayer.ExoPlaybackException: Source error',
+      details: '',
+    );
+  }
+
+  @override
+  Future<void> pause() async {}
+
+  @override
+  Future<void> play() async {}
+
+  @override
+  bool? isPlaying() => false;
 }
 
 class SubtitleTestController extends BetterPlayerController {
@@ -57,6 +111,7 @@ class SubtitleTestController extends BetterPlayerController {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late TestVideoPlayerCubit cubit;
 
   setUp(() async {
@@ -146,5 +201,66 @@ void main() {
 
     await select(track('Manifest track'));
     expect(controller.subtitlesLines.single.texts, [firstLine, secondLine]);
+  });
+
+  test('catches VideoError on initial and subsequent playVideo', () async {
+    await db.upsertServer(const Server(url: 'https://invidious.example'));
+    final app = TestAppCubit(AppState(0, null, HomeLayout()));
+    addTearDown(app.close);
+    await app.initState();
+    final settings = TestSettingsCubit(SettingsState.init(), app);
+    addTearDown(settings.close);
+    final player = SilentPlayerCubit(
+      PlayerState(playQueue: ListQueue.from([])),
+      settings,
+    );
+    addTearDown(player.close);
+    late FailingSetupController controller;
+    final video = Video(
+      videoId: 'abc123',
+      hlsUrl: 'https://cdn.example/video.m3u8',
+      formatStreams: [],
+      adaptiveFormats: [],
+    );
+    final failingCubit = TestVideoPlayerCubit(
+      VideoPlayerState(
+        colors: ColorScheme.fromSeed(seedColor: Colors.red),
+        overFlowTextColor: Colors.white,
+        key: GlobalKey(),
+        video: video,
+      ),
+      player,
+      settings,
+      controllerFactory: (config) {
+        controller = FailingSetupController(config);
+        return controller;
+      },
+    );
+    addTearDown(failingCubit.close);
+
+    // Initial controller creation path
+    await failingCubit.playVideo(false);
+    expect(controller.setupCalls, 1);
+    expect(player.events.last.state, MediaState.error);
+
+    // Subsequent reuse path
+    player.events.clear();
+    await failingCubit.playVideo(false);
+    expect(controller.setupCalls, 2);
+    expect(player.events.last.state, MediaState.error);
+  });
+
+  test('catches VideoError when switching non-DASH resolution', () async {
+    final player = cubit.player as SilentPlayerCubit;
+    final controller = FailingSetupController(
+      const BetterPlayerConfiguration(),
+      source: BetterPlayerDataSource.network('https://cdn.example/360p.mp4'),
+    );
+    addTearDown(controller.dispose);
+    cubit.videoController = controller;
+
+    await cubit.selectResolution('https://cdn.example/720p.mp4');
+    expect(controller.setupCalls, 1);
+    expect(player.events.last.state, MediaState.error);
   });
 }
