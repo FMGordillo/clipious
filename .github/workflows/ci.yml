@@ -24,10 +24,28 @@ jobs:
       - name: Analyze Dart
         run: dart analyze --no-fatal-warnings lib
       - name: Run offline tests
+        id: tests
         run: >-
-          flutter test --no-pub
+          flutter test --no-pub --file-reporter "json:$RUNNER_TEMP/test-results.json"
           test/bug_report_test.dart test/comments test/player test/utils
           test/videos/chapter_test.dart test/videos/views/chapter_list_test.dart
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        id: report-node
+        if: ${{ !cancelled() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}
+        continue-on-error: true
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Upload Flutter test attempts
+        if: ${{ !cancelled() && steps.report-node.outcome == 'success' }}
+        continue-on-error: true
+        timeout-minutes: 2
+        working-directory: scripts/flaky
+        run: npm ci --ignore-scripts --no-audit --no-fund && node --test && node upload.ts
+        env:
+          RESULTS_FILE: ${{ runner.temp }}/test-results.json
+          FLAKY_INGEST_URL: ${{ secrets.FLAKY_INGEST_URL }}
+          FLAKY_INGEST_TOKEN: ${{ secrets.FLAKY_INGEST_TOKEN }}
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
