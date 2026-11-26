@@ -262,8 +262,43 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
     videoController?.setControlsEnabled(visible);
   }
 
+  @visibleForTesting
+  BetterPlayerController createVideoController(
+    BetterPlayerConfiguration configuration,
+  ) => BetterPlayerController(configuration);
+
+  Future<bool> _setupDataSource(BetterPlayerDataSource source) async {
+    final controller = videoController;
+    if (controller == null) return false;
+    try {
+      await controller.setupDataSource(source);
+      return !isClosed && videoController == controller;
+    } catch (e, st) {
+      log.severe('Failed to set up video data source', e, st);
+      if (!isClosed && videoController == controller) {
+        player.setEvent(const MediaEvent(state: MediaState.error));
+      }
+      return false;
+    }
+  }
+
+  Future<void> selectResolution(String url) async {
+    final controller = videoController;
+    final dataSource = controller?.betterPlayerDataSource;
+    if (controller == null || dataSource == null) return;
+    final currentPosition = position();
+    final wasPlaying = isPlaying();
+    controller.pause();
+    final loaded = await _setupDataSource(dataSource.copyWith(url: url));
+    if (!loaded) return;
+    seek(currentPosition);
+    if (wasPlaying) {
+      controller.play();
+    }
+  }
+
   @override
-  playVideo(bool offline, {Duration? startAt}) async {
+  Future<void> playVideo(bool offline, {Duration? startAt}) async {
     if (player.state.isAudio) {
       return;
     }
@@ -388,8 +423,11 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
 
       bool fillVideo = settings.state.fillFullscreen;
 
-      if (videoController == null) {
-        videoController = BetterPlayerController(
+      if (isClosed) return;
+
+      final isInitialController = videoController == null;
+      if (isInitialController) {
+        videoController = createVideoController(
           BetterPlayerConfiguration(
             overlay: isTv
                 ? const TvPlayerControls()
@@ -431,17 +469,21 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
               // overflowMenuCustomItems: [BetterPlayerOverflowMenuItem(useDash ? Icons.check_box_outlined : Icons.check_box_outline_blank, locals.useDash, toggleDash)])
             ),
           ),
-          betterPlayerDataSource: betterPlayerDataSource,
         );
         videoController!.addEventsListener(onVideoListener);
         videoController!.setBetterPlayerGlobalKey(newState.key);
         // isPipSupported = await videoController?.isPictureInPictureSupported() ?? false;
-      } else {
-        await videoController?.setupDataSource(betterPlayerDataSource);
-        seek(startAt ?? Duration.zero);
       }
 
       emit(newState);
+
+      final loaded = await _setupDataSource(betterPlayerDataSource);
+      if (!loaded) {
+        return;
+      }
+      if (!isInitialController) {
+        seek(startAt ?? Duration.zero);
+      }
     }
 
     super.playVideo(offline);
@@ -643,7 +685,7 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
       var track = getVideoTracks()[index];
       var url = videoController?.betterPlayerDataSource?.resolutions?[track];
       if (url != null) {
-        videoController?.setResolution(url);
+        selectResolution(url);
         emit(state.copyWith(selectedNonDashTrack: track));
       }
     }

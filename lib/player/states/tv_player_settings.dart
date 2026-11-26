@@ -99,7 +99,7 @@ class TvPlayerSettingsCubit extends Cubit<TvPlayerSettingsState> {
       String? url =
           videoController?.betterPlayerDataSource?.resolutions?[selected];
       if (url != null) {
-        videoController?.setResolution(url);
+        player.selectResolution(url);
       }
     }
   }
