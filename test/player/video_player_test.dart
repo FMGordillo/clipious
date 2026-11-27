@@ -263,4 +263,33 @@ void main() {
     expect(controller.setupCalls, 1);
     expect(player.events.last.state, MediaState.error);
   });
+
+  test('updates subtitle size without replacing the controller', () async {
+    await db.upsertServer(const Server(url: 'https://invidious.example'));
+    final player = TestVideoPlayerCubit(
+      cubit.state.copyWith(
+        video: Video(
+          videoId: 'abc123',
+          hlsUrl: 'https://cdn.example/video.m3u8',
+          formatStreams: [],
+          adaptiveFormats: [],
+        ),
+      ),
+      cubit.player,
+      cubit.settings,
+      controllerFactory: FailingSetupController.new,
+    );
+    addTearDown(player.close);
+    await player.playVideo(false);
+    final controller = player.videoController! as FailingSetupController;
+    final subtitles =
+        controller.betterPlayerConfiguration.subtitlesConfiguration;
+    expect(subtitles.fontSize, 14);
+
+    await player.settings.changeSubtitleSize(increase: true);
+
+    expect(subtitles.fontSize, 15);
+    expect(player.videoController, same(controller));
+    expect(controller.setupCalls, 1);
+  });
 }

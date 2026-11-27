@@ -87,6 +87,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
       );
     }
 
+    final subtitleSize = context.select(
+      (SettingsCubit cubit) => cubit.state.subtitleSize,
+    );
     return BlocProvider(
       create: (context) => VideoPlayerCubit(initial, player, settings),
       child: BlocBuilder<VideoPlayerCubit, VideoPlayerState>(
@@ -101,9 +104,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 .handleCommand(state.mediaCommand!),
             child: cubit.videoController == null
                 ? const SizedBox.shrink()
-                : BetterPlayer(
-                    controller: cubit.videoController!,
+                : KeyedSubtree(
                     key: _betterPlayerKey,
+                    child: BetterPlayer(
+                      // River Player reads subtitle styles when its drawer mounts.
+                      key: ValueKey(subtitleSize),
+                      controller: cubit.videoController!,
+                    ),
                   ),
           );
         },
