@@ -24,10 +24,18 @@ jobs:
       - name: Analyze Dart
         run: dart analyze --no-fatal-warnings lib
       - name: Run offline tests
+        id: tests
         run: >-
-          flutter test --no-pub
+          flutter test --no-pub --file-reporter "json:$RUNNER_TEMP/test-results.json"
           test/bug_report_test.dart test/comments test/player test/utils
           test/videos/chapter_test.dart test/videos/views/chapter_list_test.dart
+      - name: Upload Flutter test attempts
+        if: ${{ !cancelled() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}
+        uses: fmgordillo-dyna/flaky-radar-action@196f72af5bebb5ccfd8ca21dea4687792063bfef # v0.1.0
+        with:
+          report: ${{ runner.temp }}/test-results.json
+          dt-url: ${{ secrets.DT_URL }}
+          dt-token: ${{ secrets.DT_TOKEN }}
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update
