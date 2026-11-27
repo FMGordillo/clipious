@@ -2,15 +2,15 @@
   description = "Clipious — Invidious client (Linux desktop package)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-build.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs = {
     self,
-    nixpkgs,
+    nixpkgs-build,
   }: let
     systems = ["x86_64-linux"];
-    forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
+    forAllSystems = f: nixpkgs-build.lib.genAttrs systems (system: f nixpkgs-build.legacyPackages.${system});
   in {
     packages = forAllSystems (pkgs: rec {
       clipious = pkgs.callPackage ./nix/clipious-linux.nix {};

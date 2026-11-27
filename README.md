@@ -224,6 +224,8 @@ For flake-based Home Manager on `x86_64-linux`, add `inputs.clipious.url = "gith
 }
 ```
 
+Keep Clipious's `nixpkgs-build` input on its own pin: its Flutter SDK must support the Dart version in `pubspec.lock`. If your flake sets `inputs.clipious.inputs.nixpkgs.follows = "nixpkgs";`, remove that line and run `nix flake update clipious` from your configuration directory.
+
 Playback uses `media_kit` on Linux. Downloads, PiP, share-intent, and background sync are disabled. After changing Dart dependencies, refresh `nix/package_graph.json` from `.dart_tool/package_graph.json` (`flutter pub get`).
 
 After updating `pubspec.lock`, regenerate the Nix lock data with `nix shell nixpkgs#yq --command yq . pubspec.lock > nix/pubspec-lock.json`.
