@@ -168,7 +168,7 @@
           echo "  apk [mode]   universal APK (debug|profile|release; default debug)"
           echo "  apk-split    per-ABI release APKs for mobile and Android TV (default release; optional mode arg)"
           echo "  linux [mode] Linux desktop build (debug|profile|release; default debug)"
-          echo "  release      run release.sh (build, tag, publish)"
+          echo "  release      bump the version and push a release tag for CI"
           echo "  (also: setup, check-services)" ;;
       esac
     '';
