@@ -144,6 +144,21 @@ flutter test
 GitHub Actions analyzes app code, runs offline tests, and builds a Linux debug
 app on pushes and pull requests to `master`. It does not need local Invidious.
 
+Pushes to `FMGordillo/clipious` also build signed release APKs per Android ABI.
+Download them from the workflow run's `android-release-apks` artifact.
+The workflow does not publish a GitHub Release; `release.sh` still handles that.
+
+To enable signing, add these repository secrets under **Settings → Secrets and
+variables → Actions**:
+
+- `ANDROID_KEYSTORE_BASE64`: run `base64 -w0 /path/to/your-release-keystore`.
+  Use the existing release keystore so the APKs can update existing installs.
+- `ANDROID_KEY_PROPERTIES_BASE64`: run `base64 -w0 android/key.properties`.
+  The file must contain `storePassword`, `keyPassword`, and `keyAlias` for that
+  keystore. CI overrides `storeFile` to point to the decoded keystore.
+
+Do not commit either file or its encoded contents.
+
 #### 5. Run on a device
 
 Enable *Developer Options → USB Debugging* on your Android device, connect it via USB, then:
