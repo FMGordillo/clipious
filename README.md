@@ -144,9 +144,10 @@ flutter test
 GitHub Actions analyzes app code, runs offline tests, and builds a Linux debug
 app on pushes and pull requests to `master`. It does not need local Invidious.
 
-Pushes to `FMGordillo/clipious` also build signed release APKs per Android ABI.
-Download them from the workflow run's `android-release-apks` artifact.
-The workflow does not publish a GitHub Release; `release.sh` still handles that.
+Only pushes to `master` in `FMGordillo/clipious` build signed release APKs per
+Android ABI and publish them under [GitHub Releases](https://github.com/FMGordillo/clipious/releases)
+as a prerelease tagged `ci-<run number>`. Pull requests do not build or publish
+these APKs. `release.sh` still publishes versioned `v*` releases.
 
 To enable signing, add these repository secrets under **Settings → Secrets and
 variables → Actions**:

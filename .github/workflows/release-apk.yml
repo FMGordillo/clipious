@@ -1,6 +1,8 @@
 name: Android release APKs
 
-on: push
+on:
+  push:
+    branches: [master]
 
 permissions:
   contents: read
@@ -8,6 +10,8 @@ permissions:
 jobs:
   release-apk:
     if: github.repository == 'FMGordillo/clipious' && !github.event.deleted
+    permissions:
+      contents: write
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     steps:
@@ -43,8 +47,12 @@ jobs:
           printf '\nstoreFile=%s/release.jks\n' "$signing_dir" >> "$signing_dir/key.properties"
           unset ANDROID_KEYSTORE_BASE64 ANDROID_KEY_PROPERTIES_BASE64
           ANDROID_KEY_FILE="$signing_dir/key.properties" flutter build apk --release --split-per-abi --no-pub
-      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: android-release-apks
-          path: build/app/outputs/flutter-apk/*-release.apk
-          if-no-files-found: error
+      - name: Publish GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(awk '/^version: / {print $2; exit}' pubspec.yaml)
+          gh release create "ci-$GITHUB_RUN_NUMBER" --target "$GITHUB_SHA" --prerelease \
+            --title "Clipious $version (${GITHUB_SHA::7})" \
+            build/app/outputs/flutter-apk/*-release.apk
