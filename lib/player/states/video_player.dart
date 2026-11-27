@@ -28,6 +28,19 @@ final _webVttInlineTimestamp = RegExp(
   r'<(?:[0-9]{2,}:)?[0-5][0-9]:[0-5][0-9]\.[0-9]{3}>',
 );
 
+class _SubtitleConfiguration extends BetterPlayerSubtitlesConfiguration {
+  final SettingsCubit settings;
+
+  const _SubtitleConfiguration(
+    this.settings, {
+    required super.backgroundColor,
+    required super.outlineSize,
+  });
+
+  @override
+  double get fontSize => settings.state.subtitleSize;
+}
+
 class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
   BetterPlayerController? videoController;
   final SettingsCubit settings;
@@ -449,13 +462,11 @@ class VideoPlayerCubit extends MediaPlayerCubit<VideoPlayerState> {
             autoPlay: true,
             allowedScreenSleep: false,
             fit: fillVideo ? BoxFit.cover : BoxFit.contain,
-            subtitlesConfiguration: BetterPlayerSubtitlesConfiguration(
+            subtitlesConfiguration: _SubtitleConfiguration(
+              settings,
               backgroundColor: settings.state.subtitlesBackground
                   ? Colors.black.withValues(alpha: 0.8)
                   : Colors.transparent,
-              fontSize: settings.state.subtitleSize,
-              outlineEnabled: true,
-              outlineColor: Colors.black,
               outlineSize: 1,
             ),
             controlsConfiguration: const BetterPlayerControlsConfiguration(
