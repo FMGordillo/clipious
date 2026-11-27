@@ -1,6 +1,6 @@
 # Android SDK / toolchain notes
 
-Current: Flutter 3.44.3 (Dart 3.12), AGP 8.12.3, Gradle 8.13, Kotlin 2.2.20,
+Current: Flutter 3.44.3 (Dart 3.12), AGP 8.12.3, Gradle 8.14.3, Kotlin 2.2.20,
 compileSdk 36, targetSdk 35, build-tools 35.0.0, NDK 28.2.13676358, iOS 14.
 
 ## Nix/devenv specifics
@@ -44,4 +44,3 @@ compileSdk 36, targetSdk 35, build-tools 35.0.0, NDK 28.2.13676358, iOS 14.
 - Do not use build-tools 36.0.0 from Nix: its `aapt` fails with an undefined libc++ symbol,
   and `flutter run`/`flutter install` always use the newest build-tools `aapt` to read the
   APK manifest. 35.0.0 works for both `aapt` and `aapt2` (including android-36 linking).
-- Flutter warns Gradle 8.13 support will be dropped; bump the wrapper to >= 8.14.
