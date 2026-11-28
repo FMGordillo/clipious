@@ -352,8 +352,12 @@ class PlayerCubit extends Cubit<PlayerState> with WidgetsBindingObserver {
           'invidious-progress-sync-${progress.videoId}',
           const Duration(minutes: 10),
           () async {
-            if (await service.isLoggedIn()) {
-              service.addToUserHistory(progress.videoId);
+            try {
+              if (await service.isLoggedIn()) {
+                await service.addToUserHistory(progress.videoId);
+              }
+            } catch (err, stackTrace) {
+              log.warning('Failed to sync watch history', err, stackTrace);
             }
           },
         );

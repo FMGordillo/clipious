@@ -9,6 +9,7 @@ import 'package:clipious/home/models/db/home_layout.dart';
 import 'package:clipious/player/states/player.dart';
 import 'package:clipious/service.dart';
 import 'package:clipious/settings/models/db/server.dart';
+import 'package:clipious/settings/models/errors/invidious_service_error.dart';
 import 'package:clipious/settings/states/settings.dart';
 import 'package:clipious/utils/sembast_sqflite_database.dart';
 import 'package:clipious/videos/models/dislike.dart';
@@ -132,6 +133,43 @@ void main() {
 
       // Reaching here without a StateError confirms the isClosed guard works.
       expect(videoCubit.isClosed, isTrue);
+    });
+
+    test('VideoCubit handles InvidiousServiceError without uncaught throw',
+        () async {
+      var settingsCubit = TestSettingsCubit(
+        SettingsState.init(),
+        TestAppCubit(AppState(0, null, HomeLayout())),
+      );
+      PlayerCubit player = TestPlayerCubit(
+        PlayerState(playQueue: ListQueue()),
+        settingsCubit,
+      );
+
+      Object? uncaught;
+      await runZonedGuarded(
+        () async {
+          final completer = Completer<Video>();
+          service = _HangingVideoService(completer);
+
+          var videoCubit = VideoCubit(
+            VideoState(videoId: 'dQw4w9WgXcQ', isLoggedIn: false),
+            DownloadManagerCubit(const DownloadManagerState(), player),
+            player,
+            settingsCubit,
+          );
+
+          completer.completeError(InvidiousServiceError('Video unavailable'));
+          await Future<void>.delayed(Duration.zero);
+
+          expect(videoCubit.state.loadingVideo, isFalse);
+          expect(videoCubit.state.error, 'Video unavailable');
+          await videoCubit.close();
+        },
+        (error, _) => uncaught = error,
+      );
+
+      expect(uncaught, isNull);
     });
   });
 }

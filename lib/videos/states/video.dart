@@ -56,8 +56,9 @@ class VideoCubit extends Cubit<VideoState> {
       );
 
       getDownloadStatus();
-    } catch (err) {
-      if (isClosed) rethrow;
+    } catch (err, stackTrace) {
+      log.severe('Failed to load video ${state.videoId}', err, stackTrace);
+      if (isClosed) return;
       late String error;
       if (err is InvidiousServiceError) {
         error = (err).message;
@@ -65,7 +66,6 @@ class VideoCubit extends Cubit<VideoState> {
         error = coulnotLoadVideos;
       }
       emit(state.copyWith(error: error, loadingVideo: false));
-      rethrow;
     }
   }
 

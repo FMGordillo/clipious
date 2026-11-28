@@ -60,14 +60,14 @@ class AddToPlaylistDialog extends StatelessWidget {
       if (context.mounted) {
         Navigator.pop(context);
       }
-    } catch (err) {
+    } catch (err, stackTrace) {
+      log.warning('Failed to add video to playlist', err, stackTrace);
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(locals.errorAddingVideoToPlaylist),
           duration: const Duration(seconds: 3),
         ),
       );
-      rethrow;
     }
   }
 

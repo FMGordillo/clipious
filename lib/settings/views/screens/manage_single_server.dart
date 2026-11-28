@@ -139,7 +139,6 @@ class ManageSingleServerScreen extends StatelessWidget {
               Text(locals.wrongUsernamePassword),
             ]);
           }
-          rethrow;
         }
       },
     );

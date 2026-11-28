@@ -3,12 +3,14 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:clipious/utils/models/paginated_list.dart';
+import 'package:logging/logging.dart';
 
 import '../models/playlist.dart';
 
 part 'playlist_list.freezed.dart';
 
 const couldNotGetPlaylits = 'could-not-get-playlists';
+final _log = Logger('PlaylistListCubit');
 
 class PlaylistListCubit extends Cubit<PlaylistListState> {
   ScrollController scrollController = ScrollController();
@@ -59,16 +61,20 @@ class PlaylistListCubit extends Cubit<PlaylistListState> {
     emit(state.copyWith(error: '', loading: true));
     try {
       var playlists = await refreshFunction();
-      emit(state.copyWith(playlists: playlists, loading: false));
-    } catch (err) {
-      emit(
-        state.copyWith(
-          error: couldNotGetPlaylits,
-          playlists: [],
-          loading: false,
-        ),
-      );
-      rethrow;
+      if (!isClosed) {
+        emit(state.copyWith(playlists: playlists, loading: false));
+      }
+    } catch (err, stackTrace) {
+      _log.severe('Could not fetch playlists', err, stackTrace);
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            error: couldNotGetPlaylits,
+            playlists: [],
+            loading: false,
+          ),
+        );
+      }
     }
   }
 

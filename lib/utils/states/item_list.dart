@@ -69,7 +69,8 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
       if (!isClosed) {
         emit(state.copyWith(loading: false, items: items));
       }
-    } catch (err) {
+    } catch (err, stackTrace) {
+      log.severe('Could not fetch items', err, stackTrace);
       late ItemListErrors error;
       if (err is InvidiousServiceError && err.message == "Invalid scope") {
         error = ItemListErrors.invalidScope;
@@ -79,7 +80,6 @@ class ItemListCubit<T> extends Cubit<ItemListState<T>> {
       if (!isClosed) {
         emit(state.copyWith(error: error, items: [], loading: false));
       }
-      rethrow;
     }
   }
 

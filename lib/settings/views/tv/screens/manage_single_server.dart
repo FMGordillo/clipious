@@ -218,7 +218,6 @@ class TvManageSingleServerScreen extends StatelessWidget {
                   ),
                 ]);
               }
-              rethrow;
             }
           },
           child: Padding(
